@@ -36,7 +36,7 @@ namespace FrameWork.Editor
 
         private static void TryCreateFolder()
         {
-            if(!AssetDatabase.IsValidFolder(DataPath))
+            if(!AssetDatabase.IsValidFolder("Assets/"+DataPath))
             {
                 AssetDatabase.CreateFolder("Assets", DataPath);
             }
