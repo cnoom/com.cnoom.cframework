@@ -54,7 +54,7 @@ namespace CnoomFrameWork.Log
         {
             string senderColorStr = ColorUtility.ToHtmlStringRGB(senderColor);
             string messageColorStr = ColorUtility.ToHtmlStringRGB(messageColor);
-            return $"<color={senderColorStr}>{sender}</color>: <color={messageColorStr}>{message}</color>";
+            return $"<color=#{senderColorStr}>{sender}</color>: <color=#{messageColorStr}>{message}</color>";
         }
     }
 }
