@@ -78,6 +78,8 @@ namespace CnoomFrameWork.Core
         /// <param name="type">Unity日志类型</param>
         private void OnHandleException(string condition, string stackTrace, LogType type)
         {
+            if(Application.isPlaying == false)
+                return;
             switch(type)
             {
                 case LogType.Log:
