@@ -87,7 +87,7 @@ namespace CnoomFrameWork.Core
                     return;
             }
             var message = $"{condition}\n{stackTrace}";
-            log.ColorLogErrorEx(nameof(App), message);
+            log.LogErrorEx($"{nameof(App)} : {message}");
         }
 
         #endregion
@@ -110,7 +110,7 @@ namespace CnoomFrameWork.Core
         }
 
         #endregion
-        
+
         public ILog Log => log;
     }
 }
