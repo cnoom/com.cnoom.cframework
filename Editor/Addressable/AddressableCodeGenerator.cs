@@ -45,7 +45,7 @@ namespace FrameWork.Editor.Addressable
 
             sb.AppendLine("}");
 
-            File.WriteAllText(Path.Combine(FrameWorkConfig.DataPathAbsolute, $"{ClassName}.cs"), sb.ToString());
+            File.WriteAllText(Path.Combine(FrameWorkConfig.ScriptPath, $"{ClassName}.cs"), sb.ToString());
             AssetDatabase.Refresh();
         }
 
@@ -145,7 +145,7 @@ namespace FrameWork.Editor.Addressable
             sb.AppendLine("}");
 
             // 写入文件
-            string filePath = Path.Combine(FrameWorkConfig.DataPathAbsolute, $"{LabelClassName}.cs");
+            string filePath = Path.Combine(FrameWorkConfig.ScriptPath, $"{LabelClassName}.cs");
             File.WriteAllText(filePath, sb.ToString());
             AssetDatabase.Refresh();
         }

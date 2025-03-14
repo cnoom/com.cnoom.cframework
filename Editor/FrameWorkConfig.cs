@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace FrameWork.Editor
@@ -31,6 +32,32 @@ namespace FrameWork.Editor
             {
                 TryCreateFolder();
                 return $"{Application.dataPath}/{DataPath}";
+            }
+        }
+        
+        /// <summary>
+        /// 绝对脚本路径
+        /// </summary>
+        public static string ScriptPath
+        {
+            get
+            {
+                TryCreateFolder();
+                return $"{DataPathAbsolute}/Scripts";
+            }
+        }
+
+        [MenuItem("Test/1")]
+        public static void TryCreateAsmdef()
+        {
+            // 检查DataPath文件夹内是否存在asmdef文件,没有就创建
+            string asmdefPath = $"{DataPathRelative}/test.asmdef";
+            
+            if (!AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(asmdefPath))
+            {
+                
+                ProjectWindowUtil.CreateScriptAssetFromTemplateFile($"{DataPathRelative}","test.asmdef");
+                AssetDatabase.Refresh();
             }
         }
 
