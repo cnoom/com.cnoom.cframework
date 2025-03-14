@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using CnoomFrameWork.Core;
 using CnoomFrameWork.Extensions;
+using CnoomFrameWork.Log;
 using CnoomFrameWork.Modules.UiModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEditor;
@@ -52,7 +54,7 @@ namespace FrameWork.Editor.Ui
                             BaseUi baseUi = prefab.GetComponent<BaseUi>();
                             if(!baseUi)
                             {
-                                Debug.Log(nameof(UiEditorWindow).SuffixErrorMessage($"Prefab [{prefab.name}] does not have a BasePanel component."));
+                                App.Instance.Log.ColorLogErrorEx(nameof(UiEditorWindow),$"{prefab.name}没有BaseUi组件");
                                 continue;
                             }
                             TryAddPrefabToAddressable(baseUi);
@@ -102,7 +104,7 @@ namespace FrameWork.Editor.Ui
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
             if(!settings)
             {
-                Debug.Log(nameof(UiEditorWindow).SuffixErrorMessage("Addressable settings not found."));
+                App.Instance.Log.ColorLogErrorEx(nameof(UiEditorWindow), "Addressable settings not found.");
                 return;
             }
 
@@ -110,7 +112,7 @@ namespace FrameWork.Editor.Ui
             AddressableAssetGroup defaultGroup = settings.DefaultGroup;
             if(!defaultGroup)
             {
-                Debug.Log(nameof(UiEditorWindow).SuffixErrorMessage("Default Addressable group not found."));
+                App.Instance.Log.ColorLogErrorEx(nameof(UiEditorWindow), "Default Addressable group not found.");
                 return;
             }
 
@@ -135,7 +137,7 @@ namespace FrameWork.Editor.Ui
                 AddressableAssetSettingsDefaultObject.Settings.AddLabel(UILabel);
             }
             newEntry.labels.Add(UILabel);
-            Debug.Log(nameof(UiEditorWindow).SuffixLogMessage($"Added {obj.name} to Addressable with key: {obj.name}"));
+            App.Instance.Log.ColorLogWarningEx(nameof(UiEditorWindow), $"Added {obj.name} to Addressable with key: {obj.name}");
         }
     }
 }

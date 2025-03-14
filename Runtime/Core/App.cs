@@ -108,5 +108,7 @@ namespace CnoomFrameWork.Core
         }
 
         #endregion
+        
+        public ILog Log => log;
     }
 }
