@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEditor.Search;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -7,9 +8,9 @@ namespace FrameWork.Editor
     public static class FrameWorkConfig
     {
         /// <summary>
-        ///     数据路径
+        ///     数据文件名
         /// </summary>
-        private const string DataPath = "FrameWorkData";
+        private const string DataFolderName = "FrameWorkData";
 
         /// <summary>
         ///     相对数据路径
@@ -18,8 +19,8 @@ namespace FrameWork.Editor
         {
             get
             {
-                TryCreateFolder();
-                return $"Assets/{DataPath}";
+                TryCreateFolder("Assets", DataFolderName);
+                return $"Assets/{DataFolderName}";
             }
         }
 
@@ -30,11 +31,11 @@ namespace FrameWork.Editor
         {
             get
             {
-                TryCreateFolder();
-                return $"{Application.dataPath}/{DataPath}";
+                TryCreateFolder("Assets", DataFolderName);
+                return $"{Application.dataPath}/{DataFolderName}";
             }
         }
-        
+
         /// <summary>
         /// 绝对脚本路径
         /// </summary>
@@ -42,30 +43,17 @@ namespace FrameWork.Editor
         {
             get
             {
-                TryCreateFolder();
-                return $"{DataPathAbsolute}/Scripts";
+                string path = DataPathAbsolute+"/Scripts";
+                TryCreateFolder("Assets/" + DataFolderName, "Scripts");
+                return path;
             }
         }
 
-        [MenuItem("Test/1")]
-        public static void TryCreateAsmdef()
+        private static void TryCreateFolder(string path, string folderName)
         {
-            // 检查DataPath文件夹内是否存在asmdef文件,没有就创建
-            string asmdefPath = $"{DataPathRelative}/test.asmdef";
-            
-            if (!AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(asmdefPath))
+            if(!AssetDatabase.IsValidFolder(path + "/" + folderName))
             {
-                
-                ProjectWindowUtil.CreateScriptAssetFromTemplateFile($"{DataPathRelative}","test.asmdef");
-                AssetDatabase.Refresh();
-            }
-        }
-
-        private static void TryCreateFolder()
-        {
-            if(!AssetDatabase.IsValidFolder("Assets/"+DataPath))
-            {
-                AssetDatabase.CreateFolder("Assets", DataPath);
+                AssetDatabase.CreateFolder(path, folderName);
             }
         }
     }
