@@ -6,11 +6,12 @@ using CnoomFrameWork.IoC;
 using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
+using UnityEngine.Scripting;
 using Object = UnityEngine.Object;
 
 namespace CnoomFrameWork.Modules.UiModule
 {
-    [AutoRegisterModule]
+    [AutoRegisterModule, Preserve]
     public partial class UIModule : Module
     {
         // 当前所有已打开的界面
@@ -24,8 +25,8 @@ namespace CnoomFrameWork.Modules.UiModule
         private UiSettings uiSettings;
 
         [Inject] private AssetsModule AssetsModule { get; set; }
-        // 初始化ui配置
-        private void InitUiSetting()
+
+        protected override void OnInitialize()
         {
             poolTransform = new GameObject("PanelPool").transform;
             poolTransform.SetParent(app.transform);

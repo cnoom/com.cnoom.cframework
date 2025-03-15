@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using CnoomFrameWork.Core;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Modules.ActionModule
 {
-    [AutoRegisterModule]
+    [AutoRegisterModule, Preserve]
     public class ActionManager : Module
     {
 
