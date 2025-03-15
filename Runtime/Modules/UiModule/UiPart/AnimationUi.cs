@@ -15,8 +15,9 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         /// </summary>
         protected List<CanvasGroup> Animations;
 
-        protected virtual void Awake()
+        public override void OnGenerate()
         {
+            base.OnGenerate();
             InitAnimationPart();
         }
 

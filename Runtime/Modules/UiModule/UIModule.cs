@@ -55,7 +55,7 @@ namespace CnoomFrameWork.Modules.UiModule
             GameObject prefab = uiSettings.GetPanel<T>().gameObject;
             GameObject instance = Object.Instantiate(prefab, canvasTransform);
             T baseUi = instance.GetComponent<T>();
-            app.Inject(baseUi);
+            baseUi.OnGenerate();
             return instance.GetComponent<T>();
         }
 
