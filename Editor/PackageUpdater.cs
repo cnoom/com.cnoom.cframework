@@ -15,7 +15,6 @@ namespace FrameWork.Editor
         [MenuItem("FrameWork/更新框架包")]
         public static void UpdatePackage()
         {
-            EditorLog.Instance.ColorLogEx(nameof(PackageUpdater),"开始更新包...");
             // 创建一个更新包的请求
             ListRequest listRequest = Client.List();
             while (!listRequest.IsCompleted)
