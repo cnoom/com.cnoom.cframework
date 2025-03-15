@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using CnoomFrameWork.IoC;
+using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Modules.UiModule.UiPart
 {
@@ -8,6 +11,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         private EUiLayer _layer = EUiLayer.Normal;
         public EUiLayer Layer => _layer;
 
+        [Inject, Preserve] protected UIModule UIModule { get; set; }
         // 生命周期方法
         public virtual void OnEnter(object param = null) { }
         public virtual void OnPause() { }

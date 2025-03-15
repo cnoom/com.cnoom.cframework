@@ -16,7 +16,7 @@ namespace CnoomFrameWork.Modules.UiModule
     {
         // 当前所有已打开的界面
         private readonly Dictionary<Type, BaseUi> activePanels = new Dictionary<Type, BaseUi>();
-        private readonly App app = App.Instance;
+        private App app;
         // 使用栈管理界面层级
         private readonly Dictionary<EUiLayer, Stack<BaseUi>> layerStack = new Dictionary<EUiLayer, Stack<BaseUi>>();
         // 界面缓存池
@@ -28,6 +28,7 @@ namespace CnoomFrameWork.Modules.UiModule
 
         protected override void OnInitialize()
         {
+            app = App.Instance;
             poolTransform = new GameObject("PanelPool").transform;
             poolTransform.SetParent(app.transform);
 
@@ -53,6 +54,8 @@ namespace CnoomFrameWork.Modules.UiModule
 
             GameObject prefab = uiSettings.GetPanel<T>().gameObject;
             GameObject instance = Object.Instantiate(prefab, canvasTransform);
+            T baseUi = instance.GetComponent<T>();
+            app.Inject(baseUi);
             return instance.GetComponent<T>();
         }
 
