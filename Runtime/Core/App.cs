@@ -111,6 +111,15 @@ namespace CnoomFrameWork.Core
 
         #endregion
 
+        #region IoC
+
+        public void Inject(object obj)
+        {
+            Container.Inject(obj);
+        }
+
+        #endregion
+
         public ILog Log => log;
     }
 }
