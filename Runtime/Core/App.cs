@@ -46,6 +46,11 @@ namespace CnoomFrameWork.Core
             moduleManager.AutoRegisterModule();
         }
 
+        private void OnDestroy()
+        {
+            Application.logMessageReceived -= OnHandleException;
+        }
+
         #endregion
 
         #region 模块管理
@@ -68,26 +73,6 @@ namespace CnoomFrameWork.Core
         public ModuleManager UnRegisterModule(Module module)
         {
             return moduleManager.UnRegisterModule(module);
-        }
-
-        /// <summary>
-        ///     全局异常处理回调
-        /// </summary>
-        /// <param name="condition">异常信息内容</param>
-        /// <param name="stackTrace">异常调用堆栈</param>
-        /// <param name="type">Unity日志类型</param>
-        private void OnHandleException(string condition, string stackTrace, LogType type)
-        {
-            if(Application.isPlaying == false)
-                return;
-            switch(type)
-            {
-                case LogType.Log:
-                case LogType.Assert:
-                    return;
-            }
-            var message = $"{condition}\n{stackTrace}";
-            log.LogErrorEx($"{nameof(App)} : {message}");
         }
 
         #endregion
@@ -119,6 +104,24 @@ namespace CnoomFrameWork.Core
         }
 
         #endregion
+        
+        /// <summary>
+        ///     全局异常处理回调
+        /// </summary>
+        /// <param name="condition">异常信息内容</param>
+        /// <param name="stackTrace">异常调用堆栈</param>
+        /// <param name="type">Unity日志类型</param>
+        private void OnHandleException(string condition, string stackTrace, LogType type)
+        {
+            switch(type)
+            {
+                case LogType.Log:
+                case LogType.Assert:
+                    return;
+            }
+            var message = $"{condition}\n{stackTrace}";
+            log.LogErrorEx($"{nameof(App)} : {message}");
+        }
 
         public ILog Log => log;
     }
