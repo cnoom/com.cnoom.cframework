@@ -43,21 +43,21 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
             }
         }
 
-        public IEnumerator PlayEnterAnimation()
+        public virtual IEnumerator PlayEnterAnimation()
         {
             // 默认动画：渐显+缩放
             yield return StartCoroutine(CombineAnimations(
-                FadeAnimation(0, 1, 0.3f),
-                ScaleAnimation(Vector3.one * 0.8f, Vector3.one, 0.3f)
+                FadeAnimation(0, 1, 0.2f),
+                ScaleAnimation(Vector3.one * 0.8f, Vector3.one, 0.2f)
             ));
         }
 
-        public IEnumerator PlayExitAnimation()
+        public virtual IEnumerator PlayExitAnimation()
         {
             // 默认动画：渐隐+缩小
             yield return StartCoroutine(CombineAnimations(
-                FadeAnimation(1, 0, 0.25f),
-                ScaleAnimation(Vector3.one, Vector3.one * 0.8f, 0.25f)
+                FadeAnimation(1, 0, 0.15f),
+                ScaleAnimation(Vector3.one, Vector3.one * 0.8f, 0.15f)
             ));
         }
 
