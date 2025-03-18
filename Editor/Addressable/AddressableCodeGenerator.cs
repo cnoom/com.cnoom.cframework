@@ -138,7 +138,7 @@ namespace FrameWork.Editor.Addressable
             List<string> labels = settings.GetLabels();
             foreach (string label in labels)
             {
-                string varName = NamingValidator.ProcessCamelCase(label);
+                string varName = NamingValidator.SanitizeVariableName(label);
                 sb.AppendLine($"    public const string {varName} = \"{label}\";");
             }
 

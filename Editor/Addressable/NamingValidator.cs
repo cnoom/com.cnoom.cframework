@@ -40,7 +40,8 @@ namespace FrameWork.Editor.Addressable
             "virtual",
             "void",
             "volatile",
-            "while"
+            "while",
+            "default"
         };
 
         /// <summary>
@@ -72,35 +73,11 @@ namespace FrameWork.Editor.Addressable
                 sanitized = "@" + sanitized;
             }
 
-            // 第四步：格式规范化
-            sanitized = ProcessCamelCase(sanitized);
-
-            // 第五步：去除连续下划线
+            // 第四步：去除连续下划线
             sanitized = Regex.Replace(sanitized, @"_+", "_");
 
-            // 第六步：全大写格式
+            // 第五步：全大写格式
             return sanitized;
-        }
-
-        /// <summary>
-        ///     将字段转换为驼峰格式（处理包含路径分隔符的情况）
-        /// </summary>
-        public static string ProcessCamelCase(string input)
-        {
-
-            StringBuilder result = new StringBuilder();
-
-            var index = 0;
-            foreach (char part in input)
-            {
-                // 首字母大写处理
-                if(index++ == 0)
-                    result.Append(char.ToUpper(part));
-                else
-                    result.Append(char.ToLower(part));
-            }
-
-            return result.ToString();
         }
     }
 }
