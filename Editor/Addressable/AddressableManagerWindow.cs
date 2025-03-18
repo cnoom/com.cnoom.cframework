@@ -42,11 +42,6 @@ namespace FrameWork.Editor.Addressable
                 AddressableCodeGenerator.GenerateAddressableClass();
                 AddressableCodeGenerator.GenerateLabelClass();
             }
-
-            if(GUILayout.Button("简化可寻址资源路径"))
-            {
-                AddressableProcessor.SimplifyAllNames();
-            }
         }
         [MenuItem("FrameWork/资源管理器")]
         public static void ShowWindow()

@@ -10,44 +10,6 @@ namespace FrameWork.Editor.Addressable
 {
     public class AddressableProcessor
     {
-        public static void SimplifyAllNames()
-        {
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            if(!settings)
-            {
-                Debug.LogError("Addressable settings not found");
-                return;
-            }
-
-            Dictionary<string, string> renameMap = new Dictionary<string, string>();
-
-            // 第一阶段：收集所有需要重命名的条目
-            foreach (AddressableAssetGroup group in settings.groups)
-            {
-                foreach (AddressableAssetEntry entry in group.entries)
-                {
-                    string newAddress = AddressableNameSimplifier.SimplifyPath(entry.address);
-                    renameMap[entry.address] = newAddress;
-                }
-            }
-
-            // 第二阶段：应用重命名
-            foreach (AddressableAssetGroup group in settings.groups)
-            {
-                foreach (AddressableAssetEntry entry in group.entries.ToArray()) // ToArray防止修改集合
-                {
-                    if(renameMap.TryGetValue(entry.address, out string newAddress))
-                    {
-                        entry.address = newAddress;
-                    }
-                }
-            }
-
-            // 第三阶段：保存修改
-            AssetDatabase.SaveAssets();
-            Debug.Log($"Simplified {renameMap.Count} addressable entries");
-        }
-
         public static void ProcessAllMarkedFolders()
         {
             AddressableFolderMarker settings = AddressableFolderMarker.GetOrCreateSettings();

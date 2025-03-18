@@ -8,9 +8,6 @@ namespace FrameWork.Editor.Addressable
     /// </summary>
     public static class AddressableNameSimplifier
     {
-
-     
-
         /// <summary>
         ///     生成基于文件名的简化地址
         /// </summary>
@@ -20,7 +17,7 @@ namespace FrameWork.Editor.Addressable
 
             // 步骤1：清理文件名
             string cleanedName = NamingValidator.SanitizeVariableName(fileName);
-            
+                
             return cleanedName;
         }
     }
