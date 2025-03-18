@@ -31,8 +31,10 @@ namespace FrameWork.Editor.Addressable
             foreach (string assetGuid in assets)
             {
                 string path = AssetDatabase.GUIDToAssetPath(assetGuid);
-                Object asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-
+                if(AssetDatabase.IsValidFolder(path))
+                {
+                    continue;
+                }
                 // 设置可寻址路径
                 AddressableAssetEntry entry = AddressableAssetSettingsDefaultObject.Settings.CreateOrMoveEntry(
                     assetGuid,
