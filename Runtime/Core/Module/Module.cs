@@ -11,13 +11,11 @@ namespace CnoomFrameWork.Core
 
         public void Initialize()
         {
-            EventSystem.AutoRegister(this);
             OnInitialize();
         }
 
         public virtual void Dispose()
         {
-            EventSystem?.AutoUnregister(this);
         }
 
         protected virtual void OnInitialize() { }

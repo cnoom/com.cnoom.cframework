@@ -1,7 +1,4 @@
-﻿using CnoomFrameWork.Log;
-using UnityEditor;
-using UnityEditor.Search;
-using UnityEditorInternal;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace FrameWork.Editor
@@ -38,13 +35,13 @@ namespace FrameWork.Editor
         }
 
         /// <summary>
-        /// 绝对脚本路径
+        ///     绝对脚本路径
         /// </summary>
         public static string ScriptPath
         {
             get
             {
-                string path = DataPathAbsolute+"/Scripts";
+                string path = DataPathAbsolute + "/Scripts";
                 TryCreateFolder("Assets/" + DataFolderName, "Scripts");
                 return path;
             }

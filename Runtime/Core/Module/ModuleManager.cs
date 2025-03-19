@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using CnoomFrameWork.Event;
 using CnoomFrameWork.IoC;
 using CnoomFrameWork.Log;
@@ -9,7 +8,7 @@ using CnoomFrameWork.Log;
 namespace CnoomFrameWork.Core
 {
     /// <summary>
-    ///     模块管理器，后续在考虑实现初始模组替换功能
+    ///     模块管理器
     /// </summary>
     public class ModuleManager
     {
@@ -28,8 +27,9 @@ namespace CnoomFrameWork.Core
         /// <returns>当前模块管理器用于链式调用</returns>
         public ModuleManager RegisterModule(Module module)
         {
-            DiContainer.BindSingleton(module);
             modules.Add(module);
+            DiContainer.BindSingleton(module);
+            EventBus.AutoRegister(module);
             module.Initialize();
             return this;
         }
@@ -41,8 +41,9 @@ namespace CnoomFrameWork.Core
         /// <returns>当前模块管理器用于链式调用</returns>
         public ModuleManager UnRegisterModule(Module module)
         {
-            DiContainer.UnBind(module.GetType());
             modules.Remove(module);
+            EventBus.AutoUnregister(module);
+            DiContainer.UnBind(module.GetType());
             module.Dispose();
             return this;
         }
@@ -59,21 +60,10 @@ namespace CnoomFrameWork.Core
 
         internal void AutoRegisterModule()
         {
-            Type moduleType = typeof(Module);
-            List<Tuple<int, Type>> list = new List<Tuple<int, Type>>();
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                foreach (TypeInfo type in assembly.DefinedTypes)
-                {
-                    if(type.IsAbstract) continue;
-                    if(!moduleType.IsAssignableFrom(type.AsType())) continue;
-                    AutoRegisterModuleAttribute attribute = type.GetCustomAttribute<AutoRegisterModuleAttribute>();
-                    if(attribute == null) continue;
-                    list.Add(new Tuple<int, Type>(attribute.Order, type.AsType()));
-                }
-            }
-            list.Sort((x, y) => y.Item1.CompareTo(x.Item1));
-            foreach ((int _, Type type) in list)
+
+            ModuleOrderConfig config = ConfigManager.Instance.GetConfig<ModuleOrderConfig>();
+            IOrderedEnumerable<KeyValuePair<Type, int>> list = config.ModuleOrders.OrderByDescending(x => x.Value);
+            foreach ((Type type, int _) in list)
             {
                 Module module = (Module)Activator.CreateInstance(type);
                 RegisterModule(module);

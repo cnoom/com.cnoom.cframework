@@ -81,7 +81,11 @@ namespace CnoomFrameWork.IoC
         public object Resolve(Type serviceType)
         {
             if(!bindings.TryGetValue(serviceType, out BindingConfiguration config))
-                throw new InvalidOperationException($"No binding for {serviceType}");
+            {
+
+                return null;
+            }
+
 
             return config.Lifecycle switch
             {

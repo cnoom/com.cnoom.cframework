@@ -11,9 +11,37 @@ namespace CnoomFrameWork.Core
     public class App : PersistentMonoSingleton<App>
     {
         private EventBus eventBus;
-        private ILog log;
         private ModuleManager moduleManager;
         public DIContainer Container { get; private set; }
+
+        public ILog Log { get; private set; }
+
+        #region IoC
+
+        public void Inject(object obj)
+        {
+            Container.Inject(obj);
+        }
+
+        #endregion
+
+        /// <summary>
+        ///     全局异常处理回调
+        /// </summary>
+        /// <param name="condition">异常信息内容</param>
+        /// <param name="stackTrace">异常调用堆栈</param>
+        /// <param name="type">Unity日志类型</param>
+        private void OnHandleException(string condition, string stackTrace, LogType type)
+        {
+            switch(type)
+            {
+                case LogType.Log:
+                case LogType.Assert:
+                    return;
+            }
+            var message = $"{condition}\n{stackTrace}";
+            Log.LogErrorEx($"{nameof(App)} : {message}");
+        }
 
         #region 初始化
 
@@ -22,7 +50,7 @@ namespace CnoomFrameWork.Core
         /// <summary>
         ///     主入口方法，在场景加载后自动触发
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded), Preserve]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad), Preserve]
         private static void Main()
         {
             App app = Instance;
@@ -36,8 +64,10 @@ namespace CnoomFrameWork.Core
         {
             Container = new DIContainer();
             Container.BindSingleton(Container);
-            log = new BaseLog();
-            Container.Bind(() => log).In(LifecycleScope.Singleton);
+
+            Log = ConfigManager.Instance.GetConfig<LogConfig>().Log;
+
+            Container.Bind(() => Log).In(LifecycleScope.Singleton);
             Container.BindSingleton(new EventBus());
             Container.BindSingleton(new ModuleManager());
 
@@ -95,34 +125,5 @@ namespace CnoomFrameWork.Core
         }
 
         #endregion
-
-        #region IoC
-
-        public void Inject(object obj)
-        {
-            Container.Inject(obj);
-        }
-
-        #endregion
-        
-        /// <summary>
-        ///     全局异常处理回调
-        /// </summary>
-        /// <param name="condition">异常信息内容</param>
-        /// <param name="stackTrace">异常调用堆栈</param>
-        /// <param name="type">Unity日志类型</param>
-        private void OnHandleException(string condition, string stackTrace, LogType type)
-        {
-            switch(type)
-            {
-                case LogType.Log:
-                case LogType.Assert:
-                    return;
-            }
-            var message = $"{condition}\n{stackTrace}";
-            log.LogErrorEx($"{nameof(App)} : {message}");
-        }
-
-        public ILog Log => log;
     }
 }

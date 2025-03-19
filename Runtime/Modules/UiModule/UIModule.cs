@@ -6,21 +6,19 @@ using CnoomFrameWork.IoC;
 using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
-using UnityEngine.Scripting;
 using Object = UnityEngine.Object;
 
 namespace CnoomFrameWork.Modules.UiModule
 {
-    [AutoRegisterModule, Preserve]
     public partial class UIModule : Module
     {
         // 当前所有已打开的界面
         private readonly Dictionary<Type, BaseUi> activePanels = new Dictionary<Type, BaseUi>();
-        private App app;
         // 使用栈管理界面层级
         private readonly Dictionary<EUiLayer, Stack<BaseUi>> layerStack = new Dictionary<EUiLayer, Stack<BaseUi>>();
         // 界面缓存池
         private readonly Dictionary<Type, Queue<BaseUi>> panelPool = new Dictionary<Type, Queue<BaseUi>>();
+        private App app;
         private Transform canvasTransform, poolTransform;
         private UiSettings uiSettings;
 

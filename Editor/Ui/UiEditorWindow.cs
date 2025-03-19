@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using CnoomFrameWork.Core;
-using CnoomFrameWork.Extensions;
 using CnoomFrameWork.Log;
 using CnoomFrameWork.Modules.UiModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;
@@ -54,7 +52,7 @@ namespace FrameWork.Editor.Ui
                             BaseUi baseUi = prefab.GetComponent<BaseUi>();
                             if(!baseUi)
                             {
-                                EditorLog.Instance.ColorLogErrorEx(nameof(UiEditorWindow),$"{prefab.name}没有BaseUi组件");
+                                EditorLog.Instance.ColorLogErrorEx(nameof(UiEditorWindow), $"{prefab.name}没有BaseUi组件");
                                 continue;
                             }
                             TryAddPrefabToAddressable(baseUi);

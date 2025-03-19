@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using CnoomFrameWork.Core;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Modules.AddressableModule
 {
-    [AutoRegisterModule(Order = 100), Preserve]
+
     public partial class AssetsModule : Module
     {
         private readonly App app = App.Instance;

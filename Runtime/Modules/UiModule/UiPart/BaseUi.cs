@@ -1,5 +1,4 @@
-﻿using System;
-using CnoomFrameWork.Core;
+﻿using CnoomFrameWork.Core;
 using CnoomFrameWork.IoC;
 using UnityEngine;
 using UnityEngine.Scripting;
@@ -8,9 +7,10 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
 {
     public class BaseUi : MonoBehaviour
     {
-        [SerializeField] private EUiLayer _layer = EUiLayer.Normal;
-        public EUiLayer Layer => _layer;
+        [SerializeField]
+        private EUiLayer _layer = EUiLayer.Normal;
         protected App App;
+        public EUiLayer Layer => _layer;
 
         [Inject, Preserve] protected UIModule UIModule { get; set; }
         // 生命周期方法

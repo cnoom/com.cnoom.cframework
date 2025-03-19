@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 namespace FrameWork.Editor.Addressable
 {
@@ -17,7 +16,7 @@ namespace FrameWork.Editor.Addressable
 
             // 步骤1：清理文件名
             string cleanedName = NamingValidator.SanitizeVariableName(fileName);
-                
+
             return cleanedName;
         }
     }
