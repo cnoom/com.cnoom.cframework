@@ -15,6 +15,11 @@ namespace pool
         private Dictionary<int, string> indexToKey = new Dictionary<int, string>();
         private List<ObjectPool<T>> pools = new List<ObjectPool<T>>();
 
+        public bool ContainsKey(string key)
+        {
+            return keyToIndex.ContainsKey(key);
+        }
+        
         public void CreatePool(string key, ObjectPool<T> pool)
         {
             keyToIndex.Add(key, pools.Count);
