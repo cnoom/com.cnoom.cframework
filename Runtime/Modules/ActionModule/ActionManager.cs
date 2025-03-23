@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using CnoomFrameWork.Core;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace CnoomFrameWork.Modules.ActionModule
         // 优先队列（按时间排序）
         private readonly PriorityQueue<DelayTask> timeQueue = new PriorityQueue<DelayTask>((a, b) => a.ExecuteTime.CompareTo(b.ExecuteTime));
 
-        private Action update;
+        private UpdateMono updateMono;
 
         protected override void OnInitialize()
         {
@@ -35,14 +36,9 @@ namespace CnoomFrameWork.Modules.ActionModule
 
             GameObject updateGo = new GameObject("UpdateTimer");
             updateGo.transform.SetParent(actionGo.transform);
-            updateGo.AddComponent<UpdateMono>().UpdateAction = Update;
+            updateMono = updateGo.AddComponent<UpdateMono>();
         }
-
-        private void Update()
-        {
-            update?.Invoke();
-        }
-
+        
         private void UpdateTime()
         {
             while (timeQueue.Count > 0 && timeQueue.Peek().ExecuteTime <= Time.time)
@@ -65,14 +61,19 @@ namespace CnoomFrameWork.Modules.ActionModule
             task.Recycle();
         }
 
+        public void StartContinue(IEnumerator coroutine)
+        {
+            updateMono.StartCoroutine(coroutine);
+        }
+
         public void RegisterUpdate(Action callback)
         {
-            update += callback;
+            updateMono.UpdateAction += callback;
         }
 
         public void UnRegisterUpdate(Action callback)
         {
-            update -= callback;
+            updateMono.UpdateAction -= callback;
         }
 
         public DelayTask DelaySeconds(float seconds, Action callback)
