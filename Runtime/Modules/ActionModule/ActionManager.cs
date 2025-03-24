@@ -61,7 +61,7 @@ namespace CnoomFrameWork.Modules.ActionModule
             task.Recycle();
         }
 
-        public void StartContinue(IEnumerator coroutine)
+        public void StartCoroutine(IEnumerator coroutine)
         {
             updateMono.StartCoroutine(coroutine);
         }
