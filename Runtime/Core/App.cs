@@ -109,6 +109,16 @@ namespace CnoomFrameWork.Core
 
         #region 事件系统
 
+        public void AutoSubscribe(object obj)
+        {
+            eventBus.AutoRegister(obj);
+        }
+
+        public void AutoUnsubscribe(object obj)
+        {
+            eventBus.AutoUnregister(obj);
+        }
+
         public void Subscribe<T>(Action<T> action)
         {
             eventBus.Subscribe(action);
