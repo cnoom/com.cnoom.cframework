@@ -10,6 +10,8 @@ namespace Modules.ComponentContainerModule
         public string key;
         [Header("注册的组件类型")]
         public Component component;
+
+        private bool isQuit;
         private void Awake()
         {
             key = string.IsNullOrEmpty(key) ? gameObject.name : key;
@@ -22,10 +24,16 @@ namespace Modules.ComponentContainerModule
 
         private void OnDestroy()
         {
+            if(isQuit) return;
             App.Instance.Publish(new GoContainerModule.EventUnRegisterComponent
             {
                 Key = key
             });
+        }
+
+        private void OnApplicationQuit()
+        {
+            isQuit = true;
         }
     }
 }
