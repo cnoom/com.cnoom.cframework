@@ -13,7 +13,7 @@ namespace Modules.ComponentContainerModule
 
         public bool HasComponent(string key) => components.ContainsKey(key);
         
-        public T GetComponent<T>(string key) where T : Component => components[key] as T;
+        public T GetComponent<T>(string key) where T : Component => components[key] is T ? (T) components[key] : GetGameObject(key).GetComponent<T>();
         
         public GameObject GetGameObject(string key) => components[key].gameObject;
         

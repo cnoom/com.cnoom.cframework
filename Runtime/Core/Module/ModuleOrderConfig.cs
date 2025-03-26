@@ -9,7 +9,8 @@ namespace CnoomFrameWork.Core
 {
     /// <summary>
     ///     自动模块排序配置类，用于管理模块的加载顺序。
-    ///     若未模块未配置则按默认顺序加载
+    ///     模块的加载顺序由ModuleOrderConfig中的ModuleOrders字典决定。
+    ///     order大的模块优先注册,默认order为零。
     /// </summary>
     public class ModuleOrderConfig : IConfig
     {
@@ -23,7 +24,7 @@ namespace CnoomFrameWork.Core
             AddModule<UIModule>(900);
         }
         
-        public void AddModule<T>(int order) where T : Module
+        public void AddModule<T>(int order = 0) where T : Module
         {
             ModuleOrders.Add(typeof(T), order);
         }
