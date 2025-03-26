@@ -59,9 +59,9 @@ namespace FrameWork.Editor
                 Progress.Remove(progressId);
                 return;
             }
-
+            AssetDatabase.Refresh();
             UnityEngine.Debug.Log($"包 {PackageName} 已成功更新。");
-            Progress.Finish(progressId, Progress.Status.Succeeded);
+            Progress.Finish(progressId);
         }
 
         private static bool HandleRequestError(Request request, string operation)
