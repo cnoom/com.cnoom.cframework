@@ -50,7 +50,7 @@ namespace CnoomFrameWork.Core
         /// <summary>
         ///     主入口方法，在场景加载后自动触发
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad), Preserve]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad), Preserve]
         private static void Main()
         {
             App app = Instance;
