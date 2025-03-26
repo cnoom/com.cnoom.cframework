@@ -13,7 +13,7 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class ModuleOrderConfig : IConfig
     {
-        public Dictionary<Type, int> ModuleOrders { get; } = new Dictionary<Type, int>();
+        internal Dictionary<Type, int> ModuleOrders { get; } = new Dictionary<Type, int>();
 
         public ModuleOrderConfig()
         {
@@ -23,7 +23,7 @@ namespace CnoomFrameWork.Core
             AddModule<UIModule>(900);
         }
         
-        protected void AddModule<T>(int order) where T : Module
+        public void AddModule<T>(int order) where T : Module
         {
             ModuleOrders.Add(typeof(T), order);
         }
