@@ -10,11 +10,10 @@ namespace Modules.ComponentContainerModule
         public string key;
         [Header("注册的组件类型")]
         public Component component;
-        private App app;
         private void Awake()
         {
             key = string.IsNullOrEmpty(key) ? gameObject.name : key;
-            app.Publish(new GoContainerModule.EventRegisterComponent
+            App.Instance.Publish(new GoContainerModule.EventRegisterComponent
             {
                 Key = key,
                 Component = component
@@ -23,7 +22,7 @@ namespace Modules.ComponentContainerModule
 
         private void OnDestroy()
         {
-            app.Publish(new GoContainerModule.EventUnRegisterComponent
+            App.Instance.Publish(new GoContainerModule.EventUnRegisterComponent
             {
                 Key = key
             });
