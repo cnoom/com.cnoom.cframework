@@ -8,9 +8,10 @@ namespace CnoomFrameWork.Core
     {
         [Inject] public ILog Log { set; get; }
         [Inject] public EventBus EventSystem { get; set; }
-
+        protected App App;
         public void Initialize()
         {
+            App = App.Instance;
             OnInitialize();
         }
 
