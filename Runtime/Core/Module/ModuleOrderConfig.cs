@@ -4,6 +4,7 @@ using CnoomFrameWork.Modules.ActionModule;
 using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Modules.UiModule;
 using Modules.ComponentContainerModule;
+using Modules.StorageModule;
 
 namespace CnoomFrameWork.Core
 {
@@ -19,9 +20,10 @@ namespace CnoomFrameWork.Core
         public ModuleOrderConfig()
         {
             AddModule<ActionManager>(1000);
-            AddModule<GoContainerModule>(990);
-            AddModule<AssetsModule>(950);
-            AddModule<UIModule>(900);
+            AddModule<StorageModule>(990);
+            AddModule<GoContainerModule>(980);
+            AddModule<AssetsModule>(970);
+            AddModule<UIModule>(960);
         }
         
         public void AddModule<T>(int order = 0) where T : Module

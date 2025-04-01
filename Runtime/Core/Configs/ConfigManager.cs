@@ -11,11 +11,11 @@ namespace CnoomFrameWork.Core
     {
         public Dictionary<Type, IConfig> Configs { get; } = new Dictionary<Type, IConfig>();
 
-        public T GetConfig<T>() where T : class, IConfig
+        public T GetConfig<T>() where T : class, IConfig, new()
         {
             if(!Configs.ContainsKey(typeof(T)))
             {
-                return null;
+                return new T();
             }
             return (T)Configs[typeof(T)];
         }

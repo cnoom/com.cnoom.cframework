@@ -104,6 +104,16 @@ namespace CnoomFrameWork.Core
         {
             return moduleManager.UnRegisterModule(module);
         }
+        
+        /// <summary>
+        /// 获取已注册的模块实例
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetModule<T>() where T : Module
+        {
+            return moduleManager.GetModule<T>();
+        }
 
         #endregion
 
