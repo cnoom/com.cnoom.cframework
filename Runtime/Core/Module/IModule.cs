@@ -7,7 +7,7 @@ namespace CnoomFrameWork.Core
 {
     public interface IModule : IDisposable
     {
-        public EventManager EventSystem { get; set; }
+        public IEventManager EventSystem { get; set; }
         public ILog Log { get; set; }
         void Initialize();
     }

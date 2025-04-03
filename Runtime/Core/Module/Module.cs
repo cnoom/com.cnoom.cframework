@@ -8,7 +8,7 @@ namespace CnoomFrameWork.Core
     public abstract class Module : IModule
     {
         [Inject] public ILog Log { set; get; }
-        [Inject] public EventManager EventSystem { get; set; }
+        [Inject] public IEventManager EventSystem { get; set; }
         protected App App;
         public void Initialize()
         {
