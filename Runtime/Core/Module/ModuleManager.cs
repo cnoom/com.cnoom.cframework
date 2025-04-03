@@ -36,7 +36,7 @@ namespace CnoomFrameWork.Core
         {
             container.Bind<TInterface, TModule>(ELifecycleType.Singleton);
             TModule module = container.Resolve<TModule>();
-            eventManager.AutoRegister(module);
+            eventManager.AutoSubscribe(module);
             module.Initialize();
             return this;
         }
@@ -49,7 +49,7 @@ namespace CnoomFrameWork.Core
         public ModuleManager UnRegisterModule(Module module)
         {
             container.UnBindInstance(module);
-            eventManager.AutoUnregister(module);
+            eventManager.AutoUnSubscribe(module);
             module.Dispose();
             return this;
         }
@@ -58,7 +58,7 @@ namespace CnoomFrameWork.Core
         {
             T module = container.Resolve<T>();
             container.UnBindInstance<T>();
-            eventManager.AutoUnregister(module);
+            eventManager.AutoUnSubscribe(module);
             module.Dispose();
             return this;
         }
@@ -79,7 +79,9 @@ namespace CnoomFrameWork.Core
             IOrderedEnumerable<KeyValuePair<int, IIocRegister>> list = config.Registers.OrderByDescending(x => x.Key);
             foreach ((int _, IIocRegister handler) in list)
             {
-                eventManager.AutoRegister(handler.Register(container));
+                Module module = handler.Register(container) as Module;
+                eventManager.AutoSubscribe(module);
+                module.Initialize();
             }
         }
     }

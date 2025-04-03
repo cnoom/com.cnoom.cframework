@@ -22,7 +22,7 @@ namespace CnoomFrameWork.Core
         {
             container.Bind<TInterface, TService>(ELifecycleType.Singleton);
             TInterface service = container.Resolve<TInterface>();
-            eventManager.AutoRegister(service);
+            eventManager.AutoSubscribe(service);
             service.OnRegister();
         }
 
@@ -39,7 +39,7 @@ namespace CnoomFrameWork.Core
             IOrderedEnumerable<KeyValuePair<int, IIocRegister>> list = config.Registers.OrderByDescending(x => x.Key);
             foreach ((int _, IIocRegister handler) in list)
             {
-                eventManager.AutoRegister(handler.Register(container));
+                eventManager.AutoSubscribe(handler.Register(container));
             }
         }
     }

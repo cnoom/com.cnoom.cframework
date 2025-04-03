@@ -94,7 +94,7 @@ namespace CnoomFrameWork.Base.Event
         ///     private void OnEvent(MyEvent e) { /* 处理逻辑 */ }
         ///     }
         /// </example>
-        public void AutoRegister(object subscriber)
+        public void AutoSubscribe(object subscriber)
         {
             IEnumerable<MethodInfo> methods = subscriber.GetType().GetMethods(
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -128,7 +128,7 @@ namespace CnoomFrameWork.Base.Event
         /// <remarks>
         ///     应在对象销毁前调用以避免内存泄漏
         /// </remarks>
-        public void AutoUnregister(object subscriber)
+        public void AutoUnSubscribe(object subscriber)
         {
             IEnumerable<MethodInfo> methods = subscriber.GetType().GetMethods(
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)

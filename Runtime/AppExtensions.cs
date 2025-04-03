@@ -42,22 +42,22 @@ namespace CnoomFrameWork.Core
 
         public static void UnRegisterSubscriber(this App app, object subscriber)
         {
-            app.EventManager.AutoUnregister(subscriber);
+            app.EventManager.AutoUnSubscribe(subscriber);
         }
         
         public static void RegisterSubscriber(this App app, object subscriber)
         {
-            app.EventManager.AutoUnregister(subscriber);
+            app.EventManager.AutoUnSubscribe(subscriber);
         }
 
-        public static void AutoRegisterSubscriber(this App app, object subscriber)
+        public static void AutoSubscribe(this App app, object subscriber)
         {
-            app.EventManager.AutoRegister(subscriber);
+            app.EventManager.AutoSubscribe(subscriber);
         }
 
-        public static void AutoUnSubscriber(this App app, object subscriber)
+        public static void AutoUnSubscribe(this App app, object subscriber)
         {
-            app.EventManager.AutoUnregister(subscriber);
+            app.EventManager.AutoUnSubscribe(subscriber);
         }
 
         public static void Publish<TEvent>(this App app, TEvent evt)
