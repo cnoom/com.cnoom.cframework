@@ -5,35 +5,35 @@ namespace CnoomFrameWork.Services.ComponentContainerService
 {
     public class ComponentContainerService : IComponentContainerService
     {
-        private static Dictionary<string, Dictionary<string, MonoRegister>> monoregisters = new Dictionary<string, Dictionary<string, MonoRegister>>();
-        private static List<MonoHolder> globalmono = new List<MonoHolder>();
+        private static Dictionary<string, Dictionary<string, Component>> monoregisters = new Dictionary<string, Dictionary<string, Component>>();
+        private static Dictionary<string,Component> globalmono = new Dictionary<string,Component>();
         #region static
 
-        public static void RegisterMono(string key, string sceneName, MonoRegister mono)
+        public static void RegisterMono(string key, string sceneName, Component component)
         {
             if(string.IsNullOrEmpty(sceneName))
             {
-                globalmono.Add(new MonoHolder(sceneName, key, mono));
+                globalmono.Add(key, component);
                 return;
             }
 
             if(!monoregisters.ContainsKey(sceneName))
             {
-                monoregisters.Add(sceneName, new Dictionary<string, MonoRegister>());
+                monoregisters.Add(sceneName, new Dictionary<string, Component>());
             }
             if(monoregisters[sceneName].ContainsKey(key))
             {
                 //todo 提示重复注册
                 monoregisters[sceneName].Remove(key);
             }
-            monoregisters[sceneName].Add(key, mono);
+            monoregisters[sceneName].Add(key, component);
         }
 
         public static void UnRegisterMono(string key, string sceneName)
         {
             if(string.IsNullOrEmpty(sceneName))
             {
-                globalmono.RemoveAll(mono => mono.Key == key);
+                globalmono.Remove(key);
                 return;
             }
             if(monoregisters.ContainsKey(sceneName) && monoregisters[sceneName].ContainsKey(key))
@@ -68,19 +68,19 @@ namespace CnoomFrameWork.Services.ComponentContainerService
 
         public GameObject FindGameObject(string key, string sceneName)
         {
-            MonoRegister mono = FindMono(key, sceneName);
+            Component mono = FindComponent(key, sceneName);
             if(mono) return mono.gameObject;
             return null;
         }
 
         public T FindComponent<T>(string key, string sceneName) where T : Component
         {
-            MonoRegister mono = FindMono(key, sceneName);
+            Component mono = FindComponent(key, sceneName);
             if(!mono)
             {
                 return null;
             }
-            if(mono.component is T component)
+            if(mono is T component)
             {
                 return component;
             }
@@ -89,16 +89,20 @@ namespace CnoomFrameWork.Services.ComponentContainerService
 
         public T FindTransform<T>(string key, string sceneName) where T : Transform
         {
-            MonoRegister mono = FindMono(key, sceneName);
+            Component mono = FindComponent(key, sceneName);
             if(mono) return mono.transform as T;
             return null;
         }
 
-        private MonoRegister FindMono(string key, string sceneName)
+        private Component FindComponent(string key, string sceneName)
         {
             if(string.IsNullOrEmpty(sceneName))
             {
-                return globalmono.Find(mono => mono.Key == key).Mono;
+                if(globalmono.ContainsKey(key))
+                {
+                    return globalmono[key];
+                }
+                return null;
             }
             if(monoregisters.ContainsKey(sceneName) && monoregisters[sceneName].ContainsKey(key))
             {

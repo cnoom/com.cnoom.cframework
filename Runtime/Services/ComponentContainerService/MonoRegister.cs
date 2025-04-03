@@ -16,6 +16,7 @@ namespace CnoomFrameWork.Services.ComponentContainerService
         private void Awake()
         {
             string sceneName = gameObject.scene.name;
+            key = string.IsNullOrEmpty(key) ? gameObject.name : key;
             ComponentContainerService.RegisterMono(key, sceneName, this);
         }
 
