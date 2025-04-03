@@ -30,11 +30,6 @@ namespace CnoomFrameWork.Core
             app.ModuleManager.UnRegisterModule<TModule>();
         }
 
-        public static void RegisterSubscriber(this App app, object subscriber)
-        {
-            app.EventManager.AutoUnregister(subscriber);
-        }
-
         public static void RegisterService<TInterface, TService>(this App app) where TInterface : class, IService where TService : TInterface
         {
             app.ServiceLocator.RegisterService<TInterface, TService>();
@@ -46,6 +41,21 @@ namespace CnoomFrameWork.Core
         }
 
         public static void UnRegisterSubscriber(this App app, object subscriber)
+        {
+            app.EventManager.AutoUnregister(subscriber);
+        }
+        
+        public static void RegisterSubscriber(this App app, object subscriber)
+        {
+            app.EventManager.AutoUnregister(subscriber);
+        }
+
+        public static void AutoRegisterSubscriber(this App app, object subscriber)
+        {
+            app.EventManager.AutoRegister(subscriber);
+        }
+
+        public static void AutoUnSubscriber(this App app, object subscriber)
         {
             app.EventManager.AutoUnregister(subscriber);
         }

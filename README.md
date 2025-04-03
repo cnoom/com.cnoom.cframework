@@ -1,61 +1,99 @@
-#Cnoom Framework (CFramework)
+# CFramework (v0.5.1)
 
-Unity模块化开发框架，提供模块管理、依赖注入、事件总线等核心功能。
+Unity模块化游戏开发框架，基于控制反转容器实现，提供完整的模块管理、服务集成和资源管理解决方案。
 
-## 功能特性
-- 🧩 模块化架构管理
-- 📡 事件总线系统
-- 🔍 基于配置的模块注册机制
-- 📦 控制反转容器支持
+## 核心功能
 
-## 安装
-1. 在manifest.json中添加：
+### 1. 应用入口 (App.cs)
+- 单例管理
+- 全局异常处理
+- 核心系统初始化
+- 模块自动注册
+
+### 2. 模块系统
+- 模块生命周期管理
+- 自动依赖注入
+- 支持链式调用
+- 内置常用模块：
+    - UI模块：分层管理、动画支持
+    - 动作管理：优先级队列、延时任务
+
+### 3. 服务系统
+- **资源服务**：基于Addressable的智能资源管理
+    - 自动引用计数
+    - 实例生命周期追踪
+    - 异常处理
+- **组件容器服务**：MonoBehaviour组件管理
+- **存储服务**：加密存储解决方案
+
+### 4. 编辑器工具
+- 框架配置管理
+- 一键更新框架包
+- 开发日志系统
+
+## 安装指南
+
+1. 添加包依赖到manifest.json:
 ```json
 {
   "dependencies": {
-    "com.cnoom.cframework": "https://github.com/cnoom/com.cnoom.cframework.git"
+    "com.cnoom.cframework": "https://github.com/cnoom/com.cnoom.cframework.git#0.5.1",
+    "com.unity.addressables": "1.22.3"
   }
 }
 ```
-2.通过包管理器->添加来自git URL的包
-3.直接在下载并放置于项目/Packages文件夹下
 
-## 功能介绍
-### App(框架集成核心)
-App是CFramework的核心，将在场景加载后自动初始化。App包含以下功能：
-- 模块管理 具有一个模块管理类，用于注册和加载模块。
-- 控制反转容器 提供一个简单的控制反转容器，用于管理依赖注入。
-- 事件总线 提供一个事件总线系统，用于在模块之间传递事件。
-- 日志输出 提供一个日志输出系统，用于输出日志信息。
-#### 模块管理
-模块管理是CFramework的核心功能之一，用于管理和加载模块。模块管理包含以下功能：
-- 模块注册 注册时自动将其加入到App的控制反转容器中并自动注入所需依赖和监听事件
-- 模块取消注册 取消注册时自动将其从App的控制反转容器中移除并停止监听事件
-- 模块自动注册 通过配置文件在App初始化时自动注册模块(可以在此时用自己的模块替代框架模块)
-#### 控制反转容器
-控制反转容器是CFramework的核心功能之一，用于管理依赖注入(单例/瞬时)。控制反转容器包含以下功能：
-- 依赖注入 可以手动注入依赖也可以通过```InjectAttribute```属性自动注入依赖
-- 依赖注册 可以手动注册依赖
-- 依赖取消注册 可以手动取消注册依赖
-#### 事件总线
-事件总线是CFramework的核心功能之一，用于在模块之间传递事件也可以用于一些全局事件的注册监听。事件总线包含以下功能：
-- 事件监听 可以监听指定类型的事件
-- 事件取消监听 可以取消监听指定类型的事件
-- 事件触发 可以触发指定类型的事件
-- 通过属性自动注册 可以通过```SubscribeAttribute```属性注册事件监听,同时该属性也负责取消监听
-### 现有模块介绍
-#### ActionManager
-ActionManager是CFramework的一个模块，用于主线程延迟执行的Action。ActionManager包含以下功能：
-- 延迟秒执行 可以延迟指定时间执行Action
-- 延迟帧执行 可以延迟指定帧执行Action
-- 可以自由链式组合
-#### AssetsModule
-AssetsModule是CFramework的一个模块，通过Addressable加载资源。AssetsModule包含以下特色功能：
-- 通过标记文件夹将文件夹下的所有资源一键加入到Addressable中,同时将文件夹作为资源的标签
-- 生成资源地址的静态类:以文件名作为字段名,以资源地址作为字段值
-- 自动计数引用 加载资源时会自动计数引用,释放资源时会自动计数减一,当引用计数为0时会自动释放缓存资源
-### UIModule
-UIModule是CFramework的一个模块，用于管理UI。UIModule包含以下功能：
-- 分层处理打开的ui
-- 自动缓存ui
-- 内置ui动画集成
+2. 初始化框架:
+```csharp
+// 启动框架
+App.Instance.Initialize();
+
+// 注册模块
+App.Instance.RegisterModule<UIModule>();
+App.Instance.RegisterModule<AssetsService>();
+```
+
+## 使用示例
+
+### 资源加载示例
+```csharp
+// 加载资源
+var handle = App.Instance.GetService<AssetsService>().LoadAssetAsync<GameObject>("Prefabs/Character");
+
+// 实例化并自动追踪
+handle.Completed += op => {
+    var instance = App.Instance.GetService<AssetsService>().Instantiate(op.Result);
+};
+```
+
+### UI模块示例
+```csharp
+public class MainPanel : BaseUi {
+    [Inject]
+    public ILog Logger { get; set; }
+    
+    protected override void OnShow() {
+        Logger.Log("MainPanel shown");
+    }
+}
+
+// 打开面板
+App.Instance.GetModule<UIModule>().Open<MainPanel>();
+```
+
+## 最佳实践
+
+1. **资源管理**
+- 使用Addressable作为资源加载方案
+- 通过服务管理资源生命周期
+- 避免直接使用Resources.Load
+
+2. **模块设计**
+- 保持单一职责原则
+- 通过接口定义契约
+- 使用依赖注入而非直接实例化
+
+3. **性能优化**
+- 缓存频繁使用的服务引用
+- 合理使用Singleton生命周期
+- 避免在热路径中使用反射
