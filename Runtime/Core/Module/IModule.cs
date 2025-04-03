@@ -1,12 +1,13 @@
 ﻿using System;
-using CnoomFrameWork.Event;
-using CnoomFrameWork.Log;
+using CnoomFrameWork.Base.Event;
+using CnoomFrameWork.Base.Log;
+
 
 namespace CnoomFrameWork.Core
 {
     public interface IModule : IDisposable
     {
-        public EventBus EventSystem { get; set; }
+        public EventManager EventSystem { get; set; }
         public ILog Log { get; set; }
         void Initialize();
     }

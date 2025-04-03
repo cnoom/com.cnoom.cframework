@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CnoomFrameWork.Event;
-using CnoomFrameWork.IoC;
-using CnoomFrameWork.Log;
+using CnoomFrameWork.Base.Config;
+using CnoomFrameWork.Base.Event;
+using CnoomFrameWork.Base.IoC;
+
 
 namespace CnoomFrameWork.Core
 {
@@ -12,24 +13,30 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class ModuleManager
     {
-        private readonly List<Module> modules = new List<Module>();
-        internal ModuleManager()
-        {
-        }
-        [Inject] private EventBus EventBus { get; set; }
-        [Inject] private ILog Log { get; set; }
-        [Inject] private DIContainer DiContainer { get; set; }
+        private IIoCContainer container;
+        private readonly IEventManager eventManager;
 
+        internal ModuleManager(IIoCContainer container,IEventManager eventManager)
+        {
+            this.container = container;
+            this.eventManager = eventManager;
+        }
         /// <summary>
         ///     注册模块到DI容器并初始化
         /// </summary>
         /// <param name="module">需要注册的模块实例</param>
         /// <returns>当前模块管理器用于链式调用</returns>
-        public ModuleManager RegisterModule(Module module)
+        public ModuleManager RegisterModule<TModule>() where TModule : Module
         {
-            modules.Add(module);
-            DiContainer.BindSingleton(module);
-            EventBus.AutoRegister(module);
+            RegisterModule<TModule, TModule>();
+            return this;
+        }
+        
+        public ModuleManager RegisterModule<TInterface,TModule>() where TModule : TInterface where TInterface : Module
+        {
+            container.Bind<TInterface, TModule>(ELifecycleType.Singleton);
+            TModule module = container.Resolve<TModule>();
+            eventManager.AutoRegister(module);
             module.Initialize();
             return this;
         }
@@ -41,9 +48,17 @@ namespace CnoomFrameWork.Core
         /// <returns>当前模块管理器用于链式调用</returns>
         public ModuleManager UnRegisterModule(Module module)
         {
-            modules.Remove(module);
-            EventBus.AutoUnregister(module);
-            DiContainer.UnBind(module.GetType());
+            container.UnBindInstance(module);
+            eventManager.AutoUnregister(module);
+            module.Dispose();
+            return this;
+        }
+        
+        public ModuleManager UnRegisterModule<T>() where T : Module
+        {
+            T module = container.Resolve<T>();
+            container.UnBindInstance<T>();
+            eventManager.AutoUnregister(module);
             module.Dispose();
             return this;
         }
@@ -55,18 +70,16 @@ namespace CnoomFrameWork.Core
         /// <returns>找到的模块实例，未找到时返回null</returns>
         public T GetModule<T>() where T : Module
         {
-            return modules.OfType<T>().FirstOrDefault();
+            return container.Resolve<T>();
         }
 
         internal void AutoRegisterModule()
         {
-
             ModuleOrderConfig config = ConfigManager.Instance.GetConfig<ModuleOrderConfig>();
-            IOrderedEnumerable<KeyValuePair<Type, int>> list = config.ModuleOrders.OrderByDescending(x => x.Value);
-            foreach ((Type type, int _) in list)
+            IOrderedEnumerable<KeyValuePair<int, IIocRegister>> list = config.Registers.OrderByDescending(x => x.Key);
+            foreach ((int _, IIocRegister handler) in list)
             {
-                Module module = (Module)Activator.CreateInstance(type);
-                RegisterModule(module);
+                eventManager.AutoRegister(handler.Register(container));
             }
         }
     }

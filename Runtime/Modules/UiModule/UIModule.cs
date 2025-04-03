@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CnoomFrameWork.Base.IoC;
 using CnoomFrameWork.Core;
-using CnoomFrameWork.IoC;
 using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
@@ -22,7 +22,7 @@ namespace CnoomFrameWork.Modules.UiModule
         private Transform canvasTransform, poolTransform;
         private UiSettings uiSettings;
 
-        [Inject] private AssetsModule AssetsModule { get; set; }
+        [Inject] private AssetsService AssetsService { get; set; }
 
         protected override void OnInitialize()
         {
@@ -30,7 +30,7 @@ namespace CnoomFrameWork.Modules.UiModule
             poolTransform = new GameObject("PanelPool").transform;
             poolTransform.SetParent(app.transform);
 
-            uiSettings = AssetsModule.LoadAsset<UiSettings>(UiSettings.FileName);
+            uiSettings = AssetsService.LoadAsset<UiSettings>(UiSettings.FileName);
             canvasTransform = Object.Instantiate(uiSettings.canvas, app.transform).transform;
 
             foreach (EUiLayer layer in Enum.GetValues(typeof(EUiLayer)))

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CnoomFrameWork.Log;
+using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Modules.UiModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEditor;

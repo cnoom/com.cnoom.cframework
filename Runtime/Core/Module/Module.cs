@@ -1,13 +1,14 @@
-using CnoomFrameWork.Event;
-using CnoomFrameWork.IoC;
-using CnoomFrameWork.Log;
+using CnoomFrameWork.Base.Event;
+using CnoomFrameWork.Base.IoC;
+using CnoomFrameWork.Base.Log;
+
 
 namespace CnoomFrameWork.Core
 {
     public abstract class Module : IModule
     {
         [Inject] public ILog Log { set; get; }
-        [Inject] public EventBus EventSystem { get; set; }
+        [Inject] public EventManager EventSystem { get; set; }
         protected App App;
         public void Initialize()
         {

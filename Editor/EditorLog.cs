@@ -1,4 +1,4 @@
-﻿using CnoomFrameWork.Log;
+﻿using CnoomFrameWork.Base.Log;
 
 namespace FrameWork.Editor
 {

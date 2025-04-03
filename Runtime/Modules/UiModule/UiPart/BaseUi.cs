@@ -1,5 +1,5 @@
-﻿using CnoomFrameWork.Core;
-using CnoomFrameWork.IoC;
+﻿using CnoomFrameWork.Base.IoC;
+using CnoomFrameWork.Core;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -9,7 +9,6 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
     {
         [SerializeField]
         private EUiLayer _layer = EUiLayer.Normal;
-        protected App App;
         public EUiLayer Layer => _layer;
 
         [Inject, Preserve] protected UIModule UIModule { get; set; }
@@ -18,8 +17,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         private void Start() { }
         public virtual void OnGenerate()
         {
-            App = App.Instance;
-            App.Inject(this);
+            App.Instance.Inject(this);
         }
         public virtual void OnEnter(object param = null) { }
         public virtual void OnPause() { }
