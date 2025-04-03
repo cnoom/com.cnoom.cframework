@@ -3,20 +3,15 @@ using System.Linq;
 using CnoomFrameWork.Base.Config;
 using CnoomFrameWork.Base.Event;
 using CnoomFrameWork.Base.IoC;
+using UnityEngine.Scripting;
 
 
 namespace CnoomFrameWork.Core
 {
     public class ServiceLocator
     {
-        private IIoCContainer container;
-        private IEventManager eventManager;
-
-        internal ServiceLocator(IIoCContainer container, IEventManager eventManager)
-        {
-            this.container = container;
-            this.eventManager = eventManager;
-        }
+        [Inject,Preserve]private IIoCContainer container;
+        [Inject,Preserve]private IEventManager eventManager;
 
         public void RegisterService<TInterface, TService>() where TInterface : class, IService where TService : TInterface
         {

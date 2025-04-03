@@ -100,7 +100,7 @@ namespace CnoomFrameWork.Base.IoC
         private object BuildInstance(Type implementationType)
         {
             // 使用反射创建实例并注入依赖
-            var constructor = implementationType.GetConstructors().First();
+            var constructor = implementationType.GetConstructors(BindingFlags.Instance| BindingFlags.Public | BindingFlags.NonPublic).First();
             var parameters = constructor.GetParameters()
                 .Select(p => Resolve(p.ParameterType))
                 .ToArray();
@@ -125,6 +125,12 @@ namespace CnoomFrameWork.Base.IoC
             // 字段注入
             var fields = instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
                 .Where(f => f.GetCustomAttributes(typeof(InjectAttribute), true).Any());
+
+            foreach (var field in fields)
+            {
+                var value = Resolve(field.FieldType);
+                field.SetValue(instance, value);
+            }
 
             // 方法注入
             var methods = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)

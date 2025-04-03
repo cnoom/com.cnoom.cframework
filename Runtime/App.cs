@@ -53,13 +53,20 @@ namespace CnoomFrameWork.Core
         {
             ConfigManager configManager = ConfigManager.Instance;
             IocContainer = new IoCContainer();
-            EventManager = new EventManager();
-            Log = configManager.GetConfig<LogConfig>().Log;
+            IocContainer.BindInstance<IIoCContainer>(IocContainer);
 
-            ServiceLocator = new ServiceLocator(IocContainer,EventManager);
+            EventManager = new EventManager();
+            IocContainer.BindInstance(EventManager);
+
+            Log = configManager.GetConfig<LogConfig>().Log;
+            IocContainer.BindInstance(Log);
+
+            IocContainer.Bind<ServiceLocator,ServiceLocator>();
+            ServiceLocator = IocContainer.Resolve<ServiceLocator>();
             ServiceLocator.AutoRegister();
             
-            ModuleManager = new ModuleManager(IocContainer,EventManager);
+            IocContainer.Bind<ModuleManager,ModuleManager>();
+            ModuleManager = IocContainer.Resolve<ModuleManager>();
             ModuleManager.AutoRegisterModule();
         }
 

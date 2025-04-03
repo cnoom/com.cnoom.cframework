@@ -4,6 +4,7 @@ using System.Linq;
 using CnoomFrameWork.Base.Config;
 using CnoomFrameWork.Base.Event;
 using CnoomFrameWork.Base.IoC;
+using UnityEngine.Scripting;
 
 
 namespace CnoomFrameWork.Core
@@ -13,14 +14,9 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class ModuleManager
     {
-        private IIoCContainer container;
-        private readonly IEventManager eventManager;
-
-        internal ModuleManager(IIoCContainer container,IEventManager eventManager)
-        {
-            this.container = container;
-            this.eventManager = eventManager;
-        }
+        [Inject,Preserve]private IIoCContainer container;
+        [Inject,Preserve]private readonly IEventManager eventManager;
+        
         /// <summary>
         ///     注册模块到DI容器并初始化
         /// </summary>
