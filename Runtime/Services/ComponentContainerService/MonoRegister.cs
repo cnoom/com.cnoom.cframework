@@ -11,8 +11,8 @@ namespace CnoomFrameWork.Services.ComponentContainerService
         public string key;
         [Header("注册的组件类型")]
         public Component component;
-        [Inject, Preserve] private EventManager EventManager { get; set; }
         private bool isQuit;
+        [Inject, Preserve] private EventManager EventManager { get; set; }
         private void Awake()
         {
             string sceneName = gameObject.scene.name;

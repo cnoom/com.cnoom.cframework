@@ -1,9 +1,14 @@
-﻿namespace CnoomFrameWork.Services.StorageService
+﻿using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace CnoomFrameWork.Services.StorageService
 {
     public class EncryptTool
     {
-        private readonly byte[] _key;
         private readonly byte[] _iv;
+        private readonly byte[] _key;
 
         // 构造函数（支持自定义密钥和IV）
         public EncryptTool(byte[] key, byte[] iv)
@@ -13,51 +18,51 @@
         }
 
         /// <summary>
-        /// 加密
+        ///     加密
         /// </summary>
         public string Encrypt(string encryptStr)
         {
-            using (var aes = System.Security.Cryptography.Aes.Create())
+            using (Aes aes = Aes.Create())
             {
                 aes.Key = _key;
                 aes.IV = _iv;
-                aes.Mode = System.Security.Cryptography.CipherMode.CBC;
-                aes.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
 
-                var encryptor = aes.CreateEncryptor();
-                var plainBytes = System.Text.Encoding.UTF8.GetBytes(encryptStr);
+                ICryptoTransform encryptor = aes.CreateEncryptor();
+                byte[] plainBytes = Encoding.UTF8.GetBytes(encryptStr);
 
-                using (var ms = new System.IO.MemoryStream())
-                using (var cs = new System.Security.Cryptography.CryptoStream(ms, encryptor, System.Security.Cryptography.CryptoStreamMode.Write))
+                using (MemoryStream ms = new MemoryStream())
+                using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                 {
                     cs.Write(plainBytes, 0, plainBytes.Length);
                     cs.FlushFinalBlock();
-                    return System.Convert.ToBase64String(ms.ToArray());
+                    return Convert.ToBase64String(ms.ToArray());
                 }
             }
         }
 
         /// <summary>
-        /// 解密
+        ///     解密
         /// </summary>
         public string Decrypt(string decryptStr)
         {
-            using (var aes = System.Security.Cryptography.Aes.Create())
+            using (Aes aes = Aes.Create())
             {
                 aes.Key = _key;
                 aes.IV = _iv;
-                aes.Mode = System.Security.Cryptography.CipherMode.CBC;
-                aes.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
 
-                var decryptor = aes.CreateDecryptor();
-                var cipherBytes = System.Convert.FromBase64String(decryptStr);
+                ICryptoTransform decryptor = aes.CreateDecryptor();
+                byte[] cipherBytes = Convert.FromBase64String(decryptStr);
 
-                using (var ms = new System.IO.MemoryStream())
-                using (var cs = new System.Security.Cryptography.CryptoStream(ms, decryptor, System.Security.Cryptography.CryptoStreamMode.Write))
+                using (MemoryStream ms = new MemoryStream())
+                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
                 {
                     cs.Write(cipherBytes, 0, cipherBytes.Length);
                     cs.FlushFinalBlock();
-                    return System.Text.Encoding.UTF8.GetString(ms.ToArray());
+                    return Encoding.UTF8.GetString(ms.ToArray());
                 }
             }
         }

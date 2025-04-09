@@ -7,21 +7,18 @@ namespace CnoomFrameWork.Base.IoC
 {
     public class IoCContainer : IIoCContainer
     {
-        private class Registration
-        {
-            public Type ImplementationType { get; set; }
-            public object Instance { get; set; }
-            public ELifecycleType ELifecycle { get; set; }
-        }
 
-        private readonly Dictionary<Type, Registration> _registrations = new();
+        private readonly Dictionary<Type, Registration> _registrations = new Dictionary<Type, Registration>();
 
         public IIoCContainer Bind<TInterface, TImplementation>(ELifecycleType eLifecycle = ELifecycleType.Transient)
-            where TImplementation : TInterface => Bind<TInterface>(typeof(TImplementation), eLifecycle);
-        
+            where TImplementation : TInterface
+        {
+            return Bind<TInterface>(typeof(TImplementation), eLifecycle);
+        }
+
         public IIoCContainer Bind<TInterface>(Type implementationType, ELifecycleType eLifecycle = ELifecycleType.Transient)
         {
-            var interfaceType = typeof(TInterface);
+            Type interfaceType = typeof(TInterface);
             _registrations[interfaceType] = new Registration
             {
                 ImplementationType = implementationType,
@@ -32,7 +29,7 @@ namespace CnoomFrameWork.Base.IoC
 
         public IIoCContainer BindInstance<TInterface>(TInterface instance)
         {
-            var interfaceType = typeof(TInterface);
+            Type interfaceType = typeof(TInterface);
             _registrations[interfaceType] = new Registration
             {
                 Instance = instance,
@@ -56,13 +53,13 @@ namespace CnoomFrameWork.Base.IoC
         public IIoCContainer ClearLifecycle(ELifecycleType lifecycle)
         {
             // 获取所有生命周期类型匹配的注册键
-            var keysToRemove = _registrations
+            List<Type> keysToRemove = _registrations
                 .Where(kv => kv.Value.ELifecycle == lifecycle)
                 .Select(kv => kv.Key)
                 .ToList();
 
             // 移除所有匹配的注册项
-            foreach (var key in keysToRemove)
+            foreach (Type key in keysToRemove)
             {
                 _registrations.Remove(key);
             }
@@ -70,15 +67,54 @@ namespace CnoomFrameWork.Base.IoC
             return this;
         }
 
-        public T Resolve<T>() => (T)Resolve(typeof(T));
+        public T Resolve<T>()
+        {
+            return (T)Resolve(typeof(T));
+        }
 
         public object Resolve(Type type)
         {
-            if(!_registrations.TryGetValue(type, out var registration))
+            if(!_registrations.TryGetValue(type, out Registration registration))
             {
                 return null;
             }
             return CreateInstance(registration);
+        }
+
+        public void InjectDependencies(object instance)
+        {
+            // 属性注入
+            IEnumerable<PropertyInfo> properties = instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .Where(p => p.CanWrite && p.GetCustomAttributes(typeof(InjectAttribute), true).Any());
+
+            foreach (PropertyInfo property in properties)
+            {
+                object value = Resolve(property.PropertyType);
+                property.SetValue(instance, value, null);
+            }
+
+            // 字段注入
+            IEnumerable<FieldInfo> fields = instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .Where(f => f.GetCustomAttributes(typeof(InjectAttribute), true).Any());
+
+            foreach (FieldInfo field in fields)
+            {
+                object value = Resolve(field.FieldType);
+                field.SetValue(instance, value);
+            }
+
+            // 方法注入
+            IEnumerable<MethodInfo> methods = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .Where(m => m.GetCustomAttributes(typeof(PostConstructAttribute), true).Any());
+
+            foreach (MethodInfo method in methods)
+            {
+                object[] parameters = method.GetParameters()
+                    .Select(p => Resolve(p.ParameterType))
+                    .ToArray();
+
+                method.Invoke(instance, parameters);
+            }
         }
 
         private object CreateInstance(Registration registration)
@@ -100,50 +136,20 @@ namespace CnoomFrameWork.Base.IoC
         private object BuildInstance(Type implementationType)
         {
             // 使用反射创建实例并注入依赖
-            var constructor = implementationType.GetConstructors(BindingFlags.Instance| BindingFlags.Public | BindingFlags.NonPublic).First();
-            var parameters = constructor.GetParameters()
+            ConstructorInfo constructor = implementationType.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).First();
+            object[] parameters = constructor.GetParameters()
                 .Select(p => Resolve(p.ParameterType))
                 .ToArray();
 
-            var instance = Activator.CreateInstance(implementationType, parameters);
+            object instance = Activator.CreateInstance(implementationType, parameters);
             InjectDependencies(instance);
             return instance;
         }
-
-        public void InjectDependencies(object instance)
+        private class Registration
         {
-            // 属性注入
-            var properties = instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                .Where(p => p.CanWrite && p.GetCustomAttributes(typeof(InjectAttribute), true).Any());
-
-            foreach (var property in properties)
-            {
-                var value = Resolve(property.PropertyType);
-                property.SetValue(instance, value, null);
-            }
-
-            // 字段注入
-            var fields = instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                .Where(f => f.GetCustomAttributes(typeof(InjectAttribute), true).Any());
-
-            foreach (var field in fields)
-            {
-                var value = Resolve(field.FieldType);
-                field.SetValue(instance, value);
-            }
-
-            // 方法注入
-            var methods = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                .Where(m => m.GetCustomAttributes(typeof(PostConstructAttribute), true).Any());
-
-            foreach (var method in methods)
-            {
-                var parameters = method.GetParameters()
-                    .Select(p => Resolve(p.ParameterType))
-                    .ToArray();
-
-                method.Invoke(instance, parameters);
-            }
+            public Type ImplementationType { get; set; }
+            public object Instance { get; set; }
+            public ELifecycleType ELifecycle { get; set; }
         }
     }
 

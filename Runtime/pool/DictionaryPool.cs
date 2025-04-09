@@ -6,20 +6,20 @@ using Object = UnityEngine.Object;
 namespace pool
 {
     /// <summary>
-    /// 用于管理多个同类型ObjectPool的字典池 
+    ///     用于管理多个同类型ObjectPool的字典池
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class DictionaryPool<T> where T : Object
     {
-        private Dictionary<string, int> keyToIndex = new Dictionary<string, int>();
-        private Dictionary<int, string> indexToKey = new Dictionary<int, string>();
-        private List<ObjectPool<T>> pools = new List<ObjectPool<T>>();
+        private readonly Dictionary<int, string> indexToKey = new Dictionary<int, string>();
+        private readonly Dictionary<string, int> keyToIndex = new Dictionary<string, int>();
+        private readonly List<ObjectPool<T>> pools = new List<ObjectPool<T>>();
 
         public bool ContainsKey(string key)
         {
             return keyToIndex.ContainsKey(key);
         }
-        
+
         public void CreatePool(string key, ObjectPool<T> pool)
         {
             keyToIndex.Add(key, pools.Count);

@@ -1,6 +1,4 @@
 ﻿using CnoomFrameWork.Base.IoC;
-using CnoomFrameWork.Modules.ActionModule;
-using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Modules.UiModule;
 
 namespace CnoomFrameWork.Core
@@ -15,7 +13,6 @@ namespace CnoomFrameWork.Core
 
         public ModuleOrderConfig()
         {
-            Register<ActionManager>(1000);
             Register<UIModule>(960);
         }
     }

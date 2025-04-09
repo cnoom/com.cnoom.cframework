@@ -2,7 +2,6 @@
 using CnoomFrameWork.Base.Event;
 using CnoomFrameWork.Base.Log;
 
-
 namespace CnoomFrameWork.Core
 {
     public interface IModule : IDisposable

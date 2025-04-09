@@ -1,5 +1,4 @@
 ﻿using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Core;
 
 namespace CnoomFrameWork.Base.Log
 {

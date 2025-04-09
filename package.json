@@ -1,7 +1,7 @@
 {
   "name": "com.cnoom.cframework",
   "displayName": "CFramework",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "description": "一个基于控制反转容器实现的unity游戏框架",
   "main": "index.js",
   "scripts": {

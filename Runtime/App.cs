@@ -10,11 +10,18 @@ namespace CnoomFrameWork.Core
 {
     public class App : PersistentMonoSingleton<App>
     {
+
+        private App() { }
         public IEventManager EventManager { get; private set; }
         public ModuleManager ModuleManager { get; private set; }
         public ServiceLocator ServiceLocator { get; private set; }
         public ILog Log { get; private set; }
-        internal IIoCContainer IocContainer{get;set;}
+        internal IIoCContainer IocContainer { get; set; }
+
+        private void OnDestroy()
+        {
+            Application.logMessageReceived -= OnHandleException;
+        }
 
         /// <summary>
         ///     全局异常处理回调
@@ -34,8 +41,6 @@ namespace CnoomFrameWork.Core
             Log.LogErrorEx($"{nameof(App)} : {message}");
         }
 
-        private App() { }
-
         /// <summary>
         ///     主入口方法，在场景加载后自动触发
         /// </summary>
@@ -53,7 +58,7 @@ namespace CnoomFrameWork.Core
         {
             ConfigManager configManager = ConfigManager.Instance;
             IocContainer = new IoCContainer();
-            IocContainer.BindInstance<IIoCContainer>(IocContainer);
+            IocContainer.BindInstance(IocContainer);
 
             EventManager = new EventManager();
             IocContainer.BindInstance(EventManager);
@@ -61,18 +66,13 @@ namespace CnoomFrameWork.Core
             Log = configManager.GetConfig<LogConfig>().Log;
             IocContainer.BindInstance(Log);
 
-            IocContainer.Bind<ServiceLocator,ServiceLocator>();
+            IocContainer.Bind<ServiceLocator, ServiceLocator>();
             ServiceLocator = IocContainer.Resolve<ServiceLocator>();
             ServiceLocator.AutoRegister();
-            
-            IocContainer.Bind<ModuleManager,ModuleManager>();
+
+            IocContainer.Bind<ModuleManager, ModuleManager>();
             ModuleManager = IocContainer.Resolve<ModuleManager>();
             ModuleManager.AutoRegisterModule();
-        }
-
-        private void OnDestroy()
-        {
-            Application.logMessageReceived -= OnHandleException;
         }
     }
 }

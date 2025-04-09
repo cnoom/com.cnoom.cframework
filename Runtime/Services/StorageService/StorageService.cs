@@ -13,11 +13,11 @@ namespace CnoomFrameWork.Services.StorageService
     {
         private const string EncryptKey = "encryptkey";
         private const string EncryptIv = "encryptiv";
-        private string storagePath;
-        private StorageData storageData;
-        private StorageModuleHolder storageGameObject;
         private EncryptTool encryptTool;
         private bool isDirty;
+        private StorageData storageData;
+        private StorageModuleHolder storageGameObject;
+        private string storagePath;
 
         public void OnRegister()
         {
@@ -30,30 +30,13 @@ namespace CnoomFrameWork.Services.StorageService
                 ManualSave();
             });
         }
-        
-        private void InitEncryptTool()
-        {
-            StorageConfig config = ConfigManager.Instance.GetConfig<StorageConfig>();
-            if(PlayerPrefs.HasKey(EncryptKey) && PlayerPrefs.HasKey(EncryptIv) && !config.IsUpdateKeyIv)
-            {
-                var key = Convert.FromBase64String(PlayerPrefs.GetString(EncryptKey));
-                var iv = Convert.FromBase64String(PlayerPrefs.GetString(EncryptIv));
-                encryptTool = new EncryptTool(key, iv);
-                return;
-            }
-            RandomNumberGenerator.Fill(config.Key);
-            RandomNumberGenerator.Fill(config.Iv);
-            PlayerPrefs.SetString(EncryptKey, Convert.ToBase64String(config.Key));
-            PlayerPrefs.SetString(EncryptIv, Convert.ToBase64String(config.Iv));
-            encryptTool = new EncryptTool(config.Key, config.Iv);
-        }
-        
+
         public void OnUnRegister()
         {
             Application.quitting -= ManualSave;
             StorageModuleHolder.Instance.SetOnApplicationPauseCallback(null);
         }
-        
+
         public void Save(string key, object value, string section = IStorageService.DefaultSection)
         {
             if(value == null) return;
@@ -68,28 +51,45 @@ namespace CnoomFrameWork.Services.StorageService
             return storageData.Load(key, defaultValue);
         }
 
-        public void ManualSave()
-        {
-            if(!isDirty) return;
-            SaveToDisk();
-        }
-
         public void ClearSection(string section)
         {
             var prefix = $"{section}.";
-            var keyToMove = new List<string>();
-            foreach (var key in storageData.dataDict.Keys)
+            List<string> keyToMove = new List<string>();
+            foreach (string key in storageData.dataDict.Keys)
             {
                 if(key.StartsWith(prefix))
                 {
                     keyToMove.Add(key);
                 }
             }
-            foreach (var key in keyToMove)
+            foreach (string key in keyToMove)
             {
                 storageData.dataDict.Remove(key);
             }
             MakeDirty();
+        }
+
+        private void InitEncryptTool()
+        {
+            StorageConfig config = ConfigManager.Instance.GetConfig<StorageConfig>();
+            if(PlayerPrefs.HasKey(EncryptKey) && PlayerPrefs.HasKey(EncryptIv) && !config.IsUpdateKeyIv)
+            {
+                byte[] key = Convert.FromBase64String(PlayerPrefs.GetString(EncryptKey));
+                byte[] iv = Convert.FromBase64String(PlayerPrefs.GetString(EncryptIv));
+                encryptTool = new EncryptTool(key, iv);
+                return;
+            }
+            RandomNumberGenerator.Fill(config.Key);
+            RandomNumberGenerator.Fill(config.Iv);
+            PlayerPrefs.SetString(EncryptKey, Convert.ToBase64String(config.Key));
+            PlayerPrefs.SetString(EncryptIv, Convert.ToBase64String(config.Iv));
+            encryptTool = new EncryptTool(config.Key, config.Iv);
+        }
+
+        public void ManualSave()
+        {
+            if(!isDirty) return;
+            SaveToDisk();
         }
 
         private void MakeDirty()
@@ -173,14 +173,14 @@ namespace CnoomFrameWork.Services.StorageService
         {
             private Action<bool> onApplicationPauseCallback;
 
-            public void SetOnApplicationPauseCallback(Action<bool> callback)
-            {
-                onApplicationPauseCallback = callback;
-            }
-
             private void OnApplicationPause(bool pauseStatus)
             {
                 onApplicationPauseCallback?.Invoke(pauseStatus);
+            }
+
+            public void SetOnApplicationPauseCallback(Action<bool> callback)
+            {
+                onApplicationPauseCallback = callback;
             }
         }
     }

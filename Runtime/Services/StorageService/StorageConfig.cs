@@ -1,28 +1,26 @@
-﻿using System;
-using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Core;
+﻿using CnoomFrameWork.Base.Config;
 
 namespace CnoomFrameWork.Services.StorageService
 {
     public class StorageConfig : IConfig
     {
-        public Byte[] Key { get; private set;} = new Byte[32];
-        public Byte[] Iv { get; private set;} = new Byte[16];
-        public bool IsUpdateKeyIv { get; private set; } = false;
+        public byte[] Key { get; private set; } = new byte[32];
+        public byte[] Iv { get; private set; } = new byte[16];
+        public bool IsUpdateKeyIv { get; private set; }
 
         public void SetUpdateKeyIv(bool isUpdate)
         {
             IsUpdateKeyIv = isUpdate;
         }
-        
+
         public void SetKeyLength(int length)
         {
-            Key = new Byte[length];
+            Key = new byte[length];
         }
 
         public void SetIvLength(int length)
         {
-            Iv = new Byte[length];
+            Iv = new byte[length];
         }
     }
 }

@@ -13,7 +13,5 @@ namespace CnoomFrameWork.Core
             Register<AssetsService>(970);
             Register<IComponentContainerService, ComponentContainerService>(980);
         }
-
-
     }
 }

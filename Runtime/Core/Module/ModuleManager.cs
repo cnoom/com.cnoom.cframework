@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CnoomFrameWork.Base.Config;
 using CnoomFrameWork.Base.Event;
 using CnoomFrameWork.Base.IoC;
 using UnityEngine.Scripting;
-
 
 namespace CnoomFrameWork.Core
 {
@@ -14,9 +12,11 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class ModuleManager
     {
-        [Inject,Preserve]private IIoCContainer container;
-        [Inject,Preserve]private readonly IEventManager eventManager;
-        
+        [Inject, Preserve]
+        private readonly IEventManager eventManager;
+        [Inject, Preserve]
+        private IIoCContainer container;
+
         /// <summary>
         ///     注册模块到DI容器并初始化
         /// </summary>
@@ -27,8 +27,8 @@ namespace CnoomFrameWork.Core
             RegisterModule<TModule, TModule>();
             return this;
         }
-        
-        public ModuleManager RegisterModule<TInterface,TModule>() where TModule : TInterface where TInterface : Module
+
+        public ModuleManager RegisterModule<TInterface, TModule>() where TModule : TInterface where TInterface : Module
         {
             container.Bind<TInterface, TModule>(ELifecycleType.Singleton);
             TModule module = container.Resolve<TModule>();
@@ -49,7 +49,7 @@ namespace CnoomFrameWork.Core
             module.Dispose();
             return this;
         }
-        
+
         public ModuleManager UnRegisterModule<T>() where T : Module
         {
             T module = container.Resolve<T>();

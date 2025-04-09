@@ -6,6 +6,6 @@
     public enum ELifecycleType
     {
         Transient,
-        Singleton,
+        Singleton
     }
 }
