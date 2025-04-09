@@ -12,9 +12,23 @@ namespace CnoomFrameWork.Services.ComponentContainerService
         public void OnRegister()
         {
         }
+
         public void OnUnRegister()
         {
             Clear();
+        }
+        
+        public bool Remove(string key, string sceneName = null)
+        {
+            if(string.IsNullOrEmpty(sceneName))
+            {
+                return globalmono.Remove(key);
+            }
+            if(monoregisters.ContainsKey(sceneName))
+            {
+                return monoregisters[sceneName].Remove(key);
+            }
+            return false;
         }
 
         public void Clear(string sceneName = null)
@@ -104,7 +118,7 @@ namespace CnoomFrameWork.Services.ComponentContainerService
             }
             if(monoregisters[sceneName].ContainsKey(key))
             {
-                App.Instance.LogWarning("重复注册MonoRegister[" + key+"],将移除旧物体!", nameof(ComponentContainerService));
+                App.Instance.LogWarning("重复注册MonoRegister[" + key + "],将移除旧物体!", nameof(ComponentContainerService));
                 monoregisters[sceneName].Remove(key);
             }
             monoregisters[sceneName].Add(key, component);
