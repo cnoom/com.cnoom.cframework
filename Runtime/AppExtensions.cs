@@ -77,6 +77,11 @@ namespace CnoomFrameWork.Core
         {
             app.ServiceLocator.UnRegisterService<TInterface>();
         }
+        
+        public static TInterface GetService<TInterface>(this App app) where TInterface : class, IService
+        {
+            return app.IocContainer.Resolve<TInterface>();
+        }
 
         #endregion
 
