@@ -32,8 +32,7 @@ namespace CnoomFrameWork.Core
         internal void AutoRegister()
         {
             ServiceConfig config = ConfigManager.Instance.GetConfig<ServiceConfig>();
-            IOrderedEnumerable<KeyValuePair<int, IIocRegister>> list = config.Registers.OrderByDescending(x => x.Key);
-            foreach ((int _, IIocRegister handler) in list)
+            foreach (IIocRegister handler in config.Registers)
             {
                 eventManager.AutoSubscribe(handler.Register(container));
             }

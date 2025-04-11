@@ -72,8 +72,7 @@ namespace CnoomFrameWork.Core
         internal void AutoRegisterModule()
         {
             ModuleOrderConfig config = ConfigManager.Instance.GetConfig<ModuleOrderConfig>();
-            IOrderedEnumerable<KeyValuePair<int, IIocRegister>> list = config.Registers.OrderByDescending(x => x.Key);
-            foreach ((int _, IIocRegister handler) in list)
+            foreach (IIocRegister handler in config.Registers)
             {
                 Module module = handler.Register(container) as Module;
                 eventManager.AutoSubscribe(module);

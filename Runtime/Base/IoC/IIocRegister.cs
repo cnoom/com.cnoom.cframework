@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CnoomFrameWork.Base.Config;
 
 namespace CnoomFrameWork.Base.IoC
@@ -27,19 +28,23 @@ namespace CnoomFrameWork.Base.IoC
             return container.Resolve<TInterface>();
         }
     }
+    
+    
 
     public class IocRegisterConfig : IConfig
     {
-        public Dictionary<int, IIocRegister> Registers { get; } = new Dictionary<int, IIocRegister>();
+        public List<IIocRegister> Registers => registers.OrderByDescending(r => r.Order).ToList();
+        
+        private List<IIocRegister> registers = new List<IIocRegister>();
 
         public void Register<TInterface, TRegister>(int order = 0) where TRegister : TInterface
         {
-            Registers.Add(order, new IocRegister<TInterface, TRegister>(order));
+            registers.Add(new IocRegister<TInterface, TRegister>(order));
         }
 
         public void Register<TInterface>(int order = 0) where TInterface : class
         {
-            Registers.Add(order, new IocRegister<TInterface, TInterface>(order));
+            registers.Add(new IocRegister<TInterface, TInterface>(order));
         }
     }
 }
