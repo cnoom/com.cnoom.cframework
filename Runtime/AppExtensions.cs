@@ -70,6 +70,11 @@ namespace CnoomFrameWork.Core
 
         public static void RegisterService<TInterface>(this App app) where TInterface : class, IService
         {
+            app.ServiceLocator.RegisterService<TInterface,TInterface>();
+        }
+
+        public static void UnRegisterService<TInterface>(this App app) where TInterface : class, IService
+        {
             app.ServiceLocator.UnRegisterService<TInterface>();
         }
 
