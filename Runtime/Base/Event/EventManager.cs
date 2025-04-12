@@ -61,22 +61,26 @@ namespace CnoomFrameWork.Base.Event
         public void Publish<TEvent>(TEvent @event)
         {
             System.Exception firstException = null;
+            List<Delegate> delegatesCopy;  // 创建副本用于遍历
             lock (@lock)
             {
                 if(!handlers.TryGetValue(typeof(TEvent), out List<Delegate> delegates)) return;
-                // 遍历处理程序时捕获首个异常
-                foreach (Delegate handler in delegates)
+                delegatesCopy = delegates.ToList();  // 创建副本
+            }
+            
+            // 使用副本进行遍历
+            foreach (Delegate handler in delegatesCopy)
+            {
+                try
                 {
-                    try
-                    {
-                        (handler as Action<TEvent>)?.Invoke(@event);
-                    }
-                    catch (System.Exception e)
-                    {
-                        firstException ??= e;
-                    }
+                    (handler as Action<TEvent>)?.Invoke(@event);
+                }
+                catch (System.Exception e)
+                {
+                    firstException ??= e;
                 }
             }
+            
             if(firstException != null)
             {
                 throw new AggregateException(firstException);
