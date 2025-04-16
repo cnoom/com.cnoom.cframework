@@ -1,4 +1,5 @@
 ﻿using System;
+using CnoomFrameWork.Base.IoC;
 using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Core.Base.DelayManager;
 using UnityEngine;
@@ -39,6 +40,16 @@ namespace CnoomFrameWork.Core
             app.IocContainer.InjectDependencies(o);
         }
 
+        public static void BindInstance<TInterface>(this App app, TInterface instance)
+        {
+            app.IocContainer.BindInstance(instance);
+        }
+
+        public static void UnBindInstance<TInterface>(this App app)
+        {
+            app.IocContainer.UnBindInstance<TInterface>();
+        }
+
         #endregion
 
         #region ModuleManager
@@ -70,14 +81,14 @@ namespace CnoomFrameWork.Core
 
         public static void RegisterService<TInterface>(this App app) where TInterface : class, IService
         {
-            app.ServiceLocator.RegisterService<TInterface,TInterface>();
+            app.ServiceLocator.RegisterService<TInterface, TInterface>();
         }
 
         public static void UnRegisterService<TInterface>(this App app) where TInterface : class, IService
         {
             app.ServiceLocator.UnRegisterService<TInterface>();
         }
-        
+
         public static TInterface GetService<TInterface>(this App app) where TInterface : class, IService
         {
             return app.IocContainer.Resolve<TInterface>();
