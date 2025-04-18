@@ -22,6 +22,7 @@ namespace CnoomFrameWork.Services.StorageService
         public void OnRegister()
         {
             storagePath = Path.Combine(Application.persistentDataPath, "Storage.json");
+            InitEncryptTool();
             LoadFromDisk();
             Application.quitting += ManualSave;
             StorageModuleHolder.Instance.SetOnApplicationPauseCallback(isPaused =>
