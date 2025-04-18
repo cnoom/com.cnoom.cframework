@@ -73,12 +73,15 @@ namespace CnoomFrameWork.Services.StorageService
         private void InitEncryptTool()
         {
             StorageConfig config = ConfigManager.Instance.GetConfig<StorageConfig>();
-            if(PlayerPrefs.HasKey(EncryptKey) && PlayerPrefs.HasKey(EncryptIv) && !config.IsUpdateKeyIv)
+            if(PlayerPrefs.HasKey(EncryptKey) && PlayerPrefs.HasKey(EncryptIv) )
             {
                 byte[] key = Convert.FromBase64String(PlayerPrefs.GetString(EncryptKey));
                 byte[] iv = Convert.FromBase64String(PlayerPrefs.GetString(EncryptIv));
-                encryptTool = new EncryptTool(key, iv);
-                return;
+                if(key.Length == config.Key.Length && iv.Length == config.Iv.Length)
+                {
+                    encryptTool = new EncryptTool(key, iv);
+                    return;
+                }
             }
             RandomNumberGenerator.Fill(config.Key);
             RandomNumberGenerator.Fill(config.Iv);
