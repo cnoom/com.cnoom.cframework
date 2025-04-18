@@ -18,8 +18,7 @@ namespace CnoomFrameWork.Core
         {
             container.Bind<TInterface, TService>(ELifecycleType.Singleton);
             TInterface service = container.Resolve<TInterface>();
-            eventManager.AutoSubscribe(service);
-            service.OnRegister();
+            RegiterService(service);
         }
 
         public void UnRegisterService<TInterface>() where TInterface : class, IService
@@ -29,12 +28,20 @@ namespace CnoomFrameWork.Core
             service.OnUnRegister();
         }
 
+        private void RegiterService(IService service)
+        {
+            eventManager.AutoSubscribe(service);
+            service.OnRegister();
+        }
+
         internal void AutoRegister()
         {
             ServiceConfig config = ConfigManager.Instance.GetConfig<ServiceConfig>();
             foreach (IIocRegister handler in config.Registers)
             {
-                eventManager.AutoSubscribe(handler.Register(container));
+                var service = handler.Register(container);
+                if (service is not IService iService) continue;
+                RegiterService(iService);
             }
         }
     }
