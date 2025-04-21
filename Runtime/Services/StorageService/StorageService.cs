@@ -107,7 +107,7 @@ namespace CnoomFrameWork.Services.StorageService
         {
             try
             {
-                string json = JsonUtility.ToJson(storageData);
+                string json = JsonConvert.SerializeObject(storageData);
                 json = encryptTool.Encrypt(json);
                 File.WriteAllText(storagePath, json);
             }
@@ -126,7 +126,7 @@ namespace CnoomFrameWork.Services.StorageService
                 {
                     string json = File.ReadAllText(storagePath);
                     json = encryptTool.Decrypt(json);
-                    storageData = JsonUtility.FromJson<StorageData>(json);
+                    storageData = JsonConvert.DeserializeObject<StorageData>(json);
                     if(storageData == null) throw new System.Exception("Invalid JSON format");
                 }
                 else
