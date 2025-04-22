@@ -8,7 +8,6 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
     public class AnimationUi : BaseUi
     {
         // 新增动画控制组件
-        private CanvasGroup _canvasGroup;
         private Coroutine _currentAnimation;
         /// <summary>
         ///     需要动画的子对象列表
@@ -23,10 +22,6 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
 
         protected virtual void InitAnimationPart()
         {
-            _canvasGroup = GetComponent<CanvasGroup>();
-            if(_canvasGroup == null)
-                _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-
             Animations = new List<CanvasGroup>();
             // 为需要动画的子对象初始化CanvasGroup（跳过标记忽略的）
             foreach (Transform child in transform)
