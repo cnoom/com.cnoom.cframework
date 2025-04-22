@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CnoomFrameWork.Core.Utilities
 {
-    public static class ColorUtilities
+    public static class ColorUtility
     {
         /// <summary>
         /// 将十六进制转化为颜色
@@ -12,9 +12,9 @@ namespace CnoomFrameWork.Core.Utilities
         /// <param name="color"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        private static Color ParseColor(string color)
+        public static Color ParseColor(string color)
         {
-            if(ColorUtility.TryParseHtmlString("#" + color, out Color result))
+            if(UnityEngine.ColorUtility.TryParseHtmlString("#" + color, out Color result))
             {
                 return result;
             }
