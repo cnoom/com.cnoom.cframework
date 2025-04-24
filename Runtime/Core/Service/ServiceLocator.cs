@@ -24,6 +24,7 @@ namespace CnoomFrameWork.Core
         public void UnRegisterService<TInterface>() where TInterface : class, IService
         {
             TInterface service = container.Resolve<TInterface>();
+            eventManager.AutoUnSubscribe(service);
             container.UnBind<TInterface>();
             service.OnUnRegister();
         }
