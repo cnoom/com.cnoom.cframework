@@ -19,6 +19,12 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         {
             App.Instance.Inject(this);
         }
+
+        public void CloseSelf(bool immediate = true)
+        {
+            UIModule.Close(this,immediate);
+        }
+
         public virtual void OnEnter(object param = null) { }
         public virtual void OnPause() { }
         public virtual void OnResume() { }

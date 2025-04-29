@@ -10,10 +10,11 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         /// </summary>
         public static UnityAction OnAllClick;
 
-        public CButton()
+        protected override void Awake()
         {
             onClick.AddListener(OnClick);
         }
+        
 
         private void OnClick()
         {
