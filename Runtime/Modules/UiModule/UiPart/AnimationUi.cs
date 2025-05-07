@@ -14,11 +14,18 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         /// </summary>
         protected List<CanvasGroup> Animations;
 
+
         public override void OnGenerate()
         {
             base.OnGenerate();
             InitAnimationPart();
         }
+
+        /// <summary>
+        /// 动画播放前
+        /// </summary>
+        /// <param name="para"></param>
+        public virtual void OnBeforePlay(object para = null) { }
 
         protected virtual void InitAnimationPart()
         {
