@@ -2,6 +2,9 @@
 
 Unity模块化游戏开发框架，基于控制反转容器实现，提供完整的模块管理、服务集成和资源管理解决方案。
 
+## 帮助文档
+https://deepwiki.com/cnoom/com.cnoom.cframework/1-cnoomframework-overview
+
 ## 核心功能
 
 ### 1. 应用入口 (App.cs)
