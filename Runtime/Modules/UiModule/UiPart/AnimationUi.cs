@@ -24,8 +24,8 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         /// <summary>
         /// 动画播放前
         /// </summary>
-        /// <param name="para"></param>
-        public virtual void OnBeforePlay(object para = null) { }
+        /// <param name="param"></param>
+        public virtual void OnBeforePlay(object param = null) { }
 
         protected virtual void InitAnimationPart()
         {

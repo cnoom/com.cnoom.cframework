@@ -98,6 +98,16 @@ namespace CnoomFrameWork.Core
 
         #region EventManager
 
+        public static void Subscribe<TEvent>(this App app, Action<TEvent> subscriber)
+        {
+            app.EventManager.Subscribe(subscriber);
+        }
+
+        public static void UnSubscribe<TEvent>(this App app, Action<TEvent> subscriber)
+        {
+            app.EventManager.Unsubscribe(subscriber);
+        }
+
         public static void AutoSubscribe(this App app, object subscriber)
         {
             app.EventManager.AutoSubscribe(subscriber);
