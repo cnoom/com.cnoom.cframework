@@ -50,7 +50,7 @@ namespace CnoomFrameWork.Modules.UiModule
             // 播放进入动画
             if(ui is AnimationUi animationUi)
             {
-                animationUi.OnBeforePlay();
+                animationUi.OnBeforePlay(param);
                 yield return animationUi.PlayEnterAnimation();
             }
 
