@@ -42,10 +42,9 @@ namespace CnoomFrameWork.Core
         }
 
         /// <summary>
-        ///     主入口方法，在场景加载后自动触发
+        ///  入口方法
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad), Preserve]
-        private static void Main()
+        public static void Boot()
         {
             App app = Instance;
             Application.logMessageReceived += app.OnHandleException;
