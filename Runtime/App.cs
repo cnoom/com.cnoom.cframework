@@ -10,7 +10,7 @@ namespace CnoomFrameWork.Core
 {
     public class App : PersistentMonoSingleton<App>
     {
-
+        public static bool IsTest;
         private App() { }
         public IEventManager EventManager { get; private set; }
         public ModuleManager ModuleManager { get; private set; }
@@ -55,6 +55,7 @@ namespace CnoomFrameWork.Core
         /// </summary>
         protected override void OnInitialized()
         {
+            if(IsTest) return;
             ConfigManager configManager = ConfigManager.Instance;
             IocContainer = new IoCContainer();
             IocContainer.BindInstance(IocContainer);
