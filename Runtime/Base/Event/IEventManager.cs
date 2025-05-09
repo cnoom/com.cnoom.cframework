@@ -7,7 +7,7 @@ namespace CnoomFrameWork.Base.Event
     /// </summary>
     public interface IEventManager
     {
-        public void Subscribe<TEvent>(Action<TEvent> handler);
+        public void Subscribe<TEvent>(Action<TEvent> @delegate,int priority = 0);
         public void Unsubscribe<TEvent>(Action<TEvent> handler);
         public void Publish<TEvent>(TEvent @event);
         public void AutoSubscribe(object subscriber);

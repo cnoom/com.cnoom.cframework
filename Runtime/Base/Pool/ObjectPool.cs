@@ -65,13 +65,13 @@ public sealed class ObjectPool<T> : IDisposable where T : class
     /// <param name="onGet">从池中获取对象时的回调</param>
     /// <param name="onRelease">将对象放回池中时的回调</param>
     /// <param name="onDestroy">当对象被销毁时的回调</param>
-    /// <param name="maxSize">对象池最大容量（默认int.MaxValue）</param>
+    /// <param name="maxSize">对象池最大容量</param>
     public ObjectPool(
         Func<T> createFunc,
         Action<T> onGet = null,
         Action<T> onRelease = null,
         Action<T> onDestroy = null,
-        int maxSize = int.MaxValue)
+        int maxSize = 999)
     {
         _createFunc = createFunc ?? throw new ArgumentNullException(nameof(createFunc));
         _onGet = onGet;

@@ -8,5 +8,6 @@ namespace CnoomFrameWork.Base.Event
     [AttributeUsage(AttributeTargets.Method)]
     public class SubscribeAttribute : Attribute
     {
+        public int Priority { get; set; } = 0;
     }
 }
