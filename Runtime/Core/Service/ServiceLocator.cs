@@ -28,6 +28,11 @@ namespace CnoomFrameWork.Core
             container.UnBind<TInterface>();
             service.OnUnRegister();
         }
+        
+        public TInterface GetService<TInterface>() where TInterface : class, IService
+        {
+            return container.Resolve<TInterface>();
+        }
 
         private void RegiterService(IService service)
         {

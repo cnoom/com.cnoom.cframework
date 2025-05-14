@@ -50,6 +50,11 @@ namespace CnoomFrameWork.Core
             app.IocContainer.UnBindInstance<TInterface>();
         }
 
+        public static T Resolve<T>(this App app)
+        {
+            return app.IocContainer.Resolve<T>();
+        }
+
         #endregion
 
         #region ModuleManager
@@ -68,6 +73,11 @@ namespace CnoomFrameWork.Core
         public static void UnRegisterModule<TModule>(this App app) where TModule : Module
         {
             app.ModuleManager.UnRegisterModule<TModule>();
+        }
+        
+        public static T GetModule<T>(this App app) where T : Module
+        {
+            return app.ModuleManager.GetModule<T>();
         }
 
         #endregion
@@ -91,7 +101,7 @@ namespace CnoomFrameWork.Core
 
         public static TInterface GetService<TInterface>(this App app) where TInterface : class, IService
         {
-            return app.IocContainer.Resolve<TInterface>();
+            return app.ServiceLocator.GetService<TInterface>();
         }
 
         #endregion
