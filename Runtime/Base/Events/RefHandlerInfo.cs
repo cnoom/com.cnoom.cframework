@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CnoomFrameWork.Core.Base.Events
+namespace CnoomFrameWork.Base.Events
 {
     internal class RefHandlerInfo
     {

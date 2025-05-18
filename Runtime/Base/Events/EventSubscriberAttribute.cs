@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CnoomFrameWork.Core.Base.Events
+namespace CnoomFrameWork.Base.Events
 {
     /// <summary>
     /// 用于标记普通事件订阅方法。

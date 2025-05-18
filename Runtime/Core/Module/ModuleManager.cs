@@ -2,7 +2,7 @@
 using System.Linq;
 using CnoomFrameWork.Base.Config;
 using CnoomFrameWork.Base.IoC;
-using CnoomFrameWork.Core.Base.Events;
+using CnoomFrameWork.Base.Events;
 using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Core

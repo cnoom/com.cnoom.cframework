@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace CnoomFrameWork.Core.Base.Events
+namespace CnoomFrameWork.Base.Events
 {
     public class EventManager
     {
