@@ -1,7 +1,4 @@
-﻿using CnoomFrameWork.Base.Event;
-using CnoomFrameWork.Base.IoC;
-using UnityEngine;
-using UnityEngine.Scripting;
+﻿using UnityEngine;
 
 namespace CnoomFrameWork.Services.ComponentContainerService
 {
@@ -12,7 +9,6 @@ namespace CnoomFrameWork.Services.ComponentContainerService
         [Header("注册的组件类型")]
         public Component component;
         private bool isQuit;
-        [Inject, Preserve] private EventManager EventManager { get; set; }
         private void Awake()
         {
             string sceneName = gameObject.scene.name;

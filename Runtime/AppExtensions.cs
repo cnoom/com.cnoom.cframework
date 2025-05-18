@@ -106,35 +106,6 @@ namespace CnoomFrameWork.Core
 
         #endregion
 
-        #region EventManager
-
-        public static void Subscribe<TEvent>(this App app, Action<TEvent> subscriber)
-        {
-            app.EventManager.Subscribe(subscriber);
-        }
-
-        public static void UnSubscribe<TEvent>(this App app, Action<TEvent> subscriber)
-        {
-            app.EventManager.Unsubscribe(subscriber);
-        }
-
-        public static void AutoSubscribe(this App app, object subscriber)
-        {
-            app.EventManager.AutoSubscribe(subscriber);
-        }
-
-        public static void AutoUnSubscribe(this App app, object subscriber)
-        {
-            app.EventManager.AutoUnSubscribe(subscriber);
-        }
-
-        public static void Publish<TEvent>(this App app, TEvent evt)
-        {
-            app.EventManager.Publish(evt);
-        }
-
-        #endregion
-
         #region Delay
 
         public static DelayManager.CancellationToken Delay(this App app, float delay, Action action, GameObject bindGameObject = null)

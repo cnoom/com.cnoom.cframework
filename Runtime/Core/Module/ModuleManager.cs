@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Base.Event;
 using CnoomFrameWork.Base.IoC;
+using CnoomFrameWork.Core.Base.Events;
 using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Core
@@ -12,8 +12,6 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class ModuleManager
     {
-        [Inject, Preserve]
-        private readonly IEventManager eventManager;
         [Inject, Preserve]
         private IIoCContainer container;
 
@@ -32,7 +30,7 @@ namespace CnoomFrameWork.Core
         {
             container.Bind<TInterface, TModule>(ELifecycleType.Singleton);
             TModule module = container.Resolve<TModule>();
-            eventManager.AutoSubscribe(module);
+            EventManager.Register(module);
             module.Initialize();
             return this;
         }
@@ -44,8 +42,7 @@ namespace CnoomFrameWork.Core
         /// <returns>当前模块管理器用于链式调用</returns>
         public ModuleManager UnRegisterModule(Module module)
         {
-            container.UnBindInstance(module);
-            eventManager.AutoUnSubscribe(module);
+            EventManager.Unregister(module);
             module.Dispose();
             return this;
         }
@@ -54,7 +51,7 @@ namespace CnoomFrameWork.Core
         {
             T module = container.Resolve<T>();
             container.UnBindInstance<T>();
-            eventManager.AutoUnSubscribe(module);
+            EventManager.Unregister(module);
             module.Dispose();
             return this;
         }
@@ -75,7 +72,7 @@ namespace CnoomFrameWork.Core
             foreach (IIocRegister handler in config.Registers)
             {
                 Module module = handler.Register(container) as Module;
-                eventManager.AutoSubscribe(module);
+                EventManager.Register(module);
                 module.Initialize();
             }
         }

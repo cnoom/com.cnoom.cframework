@@ -1,10 +1,8 @@
 using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Base.Event;
 using CnoomFrameWork.Base.IoC;
 using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Singleton;
 using UnityEngine;
-using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Core
 {
@@ -12,7 +10,6 @@ namespace CnoomFrameWork.Core
     {
         public static bool IsTest;
         private App() { }
-        public IEventManager EventManager { get; private set; }
         public ModuleManager ModuleManager { get; private set; }
         public ServiceLocator ServiceLocator { get; private set; }
         public ILog Log { get; private set; }
@@ -59,9 +56,6 @@ namespace CnoomFrameWork.Core
             ConfigManager configManager = ConfigManager.Instance;
             IocContainer = new IoCContainer();
             IocContainer.BindInstance(IocContainer);
-
-            EventManager = new EventManager();
-            IocContainer.BindInstance(EventManager);
 
             Log = configManager.GetConfig<LogConfig>().Log;
             IocContainer.BindInstance(Log);

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Base.Event;
 using CnoomFrameWork.Base.IoC;
+using CnoomFrameWork.Core.Base.Events;
 using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Core
@@ -11,8 +11,6 @@ namespace CnoomFrameWork.Core
     {
         [Inject, Preserve]
         private IIoCContainer container;
-        [Inject, Preserve]
-        private IEventManager eventManager;
 
         public void RegisterService<TInterface, TService>() where TInterface : class, IService where TService : TInterface
         {
@@ -24,7 +22,7 @@ namespace CnoomFrameWork.Core
         public void UnRegisterService<TInterface>() where TInterface : class, IService
         {
             TInterface service = container.Resolve<TInterface>();
-            eventManager.AutoUnSubscribe(service);
+            EventManager.Unregister(service);
             container.UnBind<TInterface>();
             service.OnUnRegister();
         }
@@ -36,7 +34,7 @@ namespace CnoomFrameWork.Core
 
         private void RegiterService(IService service)
         {
-            eventManager.AutoSubscribe(service);
+            EventManager.Register(service);
             service.OnRegister();
         }
 
