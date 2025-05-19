@@ -37,7 +37,7 @@ namespace CnoomFrameWork.Core
 
         public static void Inject(this App app, object o)
         {
-            app.IocContainer.InjectDependencies(o);
+            Injector.Inject(o,app.IocContainer);
         }
 
         public static void BindInstance<TInterface>(this App app, TInterface instance)
