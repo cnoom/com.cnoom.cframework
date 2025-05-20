@@ -1,4 +1,4 @@
-﻿using CnoomFrameWork.Base.IoC;
+﻿using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Core;
 using UnityEngine;
 using UnityEngine.Scripting;
@@ -17,7 +17,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         private void Start() { }
         public virtual void OnGenerate()
         {
-            App.Instance.Inject(this);
+            Injector.Inject(this,App.Instance.RootContainer);
         }
 
         public void CloseSelf(bool immediate = true)

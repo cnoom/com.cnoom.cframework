@@ -1,19 +1,18 @@
 using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Base.IoC;
 using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Singleton;
+using CnoomFrameWork.Base.Container;
 using UnityEngine;
 
 namespace CnoomFrameWork.Core
 {
     public class App : PersistentMonoSingleton<App>
     {
-        public static bool IsTest;
         private App() { }
         public ModuleManager ModuleManager { get; private set; }
         public ServiceLocator ServiceLocator { get; private set; }
         public ILog Log { get; private set; }
-        internal IIoCContainer IocContainer { get; set; }
+        public RootContainer RootContainer { get; private set; }
 
         private void OnDestroy()
         {
@@ -52,20 +51,16 @@ namespace CnoomFrameWork.Core
         /// </summary>
         protected override void OnInitialized()
         {
-            if(IsTest) return;
+            RootContainer = new RootContainer();
+            
             ConfigManager configManager = ConfigManager.Instance;
-            IocContainer = new IoCContainer();
-            IocContainer.BindInstance(IocContainer);
 
             Log = configManager.GetConfig<LogConfig>().Log;
-            IocContainer.BindInstance(Log);
 
-            IocContainer.Bind<ServiceLocator, ServiceLocator>();
-            ServiceLocator = IocContainer.Resolve<ServiceLocator>();
+            ServiceLocator = new ServiceLocator(RootContainer);
             ServiceLocator.AutoRegister();
 
-            IocContainer.Bind<ModuleManager, ModuleManager>();
-            ModuleManager = IocContainer.Resolve<ModuleManager>();
+            ModuleManager = new ModuleManager(RootContainer);
             ModuleManager.AutoRegisterModule();
         }
     }

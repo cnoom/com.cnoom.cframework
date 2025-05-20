@@ -1,41 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Base.IoC;
+﻿using CnoomFrameWork.Base.Config;
 using CnoomFrameWork.Base.Events;
-using UnityEngine.Scripting;
+using CnoomFrameWork.Base.Container;
 
 namespace CnoomFrameWork.Core
 {
     public class ServiceLocator
     {
-        [Inject, Preserve]
-        private IIoCContainer container;
+        private RootContainer _rootContainer;
+
+        internal ServiceLocator(RootContainer rootContainer)
+        {
+            _rootContainer = rootContainer;
+        }
 
         public void RegisterService<TInterface, TService>() where TInterface : class, IService where TService : TInterface
         {
-            container.Bind<TInterface, TService>(ELifecycleType.Singleton);
-            TInterface service = container.Resolve<TInterface>();
+            TService service = InstanceFactory.CreateInstance<TService>(_rootContainer);
+            _rootContainer.BindSingleton<TInterface,TService>(service);
             RegiterService(service);
         }
 
         public void UnRegisterService<TInterface>() where TInterface : class, IService
         {
-            TInterface service = container.Resolve<TInterface>();
+            TInterface service = _rootContainer.Resolve<TInterface>();
             EventManager.Unregister(service);
-            container.UnBind<TInterface>();
-            service.OnUnRegister();
+            _rootContainer.UnBindSingleton<TInterface>();
         }
         
         public TInterface GetService<TInterface>() where TInterface : class, IService
         {
-            return container.Resolve<TInterface>();
+            return _rootContainer.Resolve<TInterface>();
         }
 
         private void RegiterService(IService service)
         {
             EventManager.Register(service);
-            service.OnRegister();
         }
 
         internal void AutoRegister()
@@ -43,7 +42,7 @@ namespace CnoomFrameWork.Core
             ServiceConfig config = ConfigManager.Instance.GetConfig<ServiceConfig>();
             foreach (IIocRegister handler in config.Registers)
             {
-                var service = handler.Register(container);
+                var service = handler.Register(_rootContainer);
                 if (service is not IService iService) continue;
                 RegiterService(iService);
             }

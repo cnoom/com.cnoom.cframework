@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Reflection;
 
-namespace CnoomFrameWork.Base.IoC
+namespace CnoomFrameWork.Base.Container
 {
     public static class Injector
     {
-        public static void Inject(object instance,IIoCContainer cContainer)
+        public static void Inject(object instance,BaseContainer container)
         {
             // 属性注入
             IEnumerable<PropertyInfo> properties = instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
@@ -14,7 +14,7 @@ namespace CnoomFrameWork.Base.IoC
 
             foreach (PropertyInfo property in properties)
             {
-                object value = cContainer.Resolve(property.PropertyType);
+                object value = container.Resolve(property.PropertyType);
                 property.SetValue(instance, value, null);
             }
 
@@ -24,7 +24,7 @@ namespace CnoomFrameWork.Base.IoC
 
             foreach (FieldInfo field in fields)
             {
-                object value = cContainer.Resolve(field.FieldType);
+                object value = container.Resolve(field.FieldType);
                 field.SetValue(instance, value);
             }
 
@@ -35,7 +35,7 @@ namespace CnoomFrameWork.Base.IoC
             foreach (MethodInfo method in methods)
             {
                 object[] parameters = method.GetParameters()
-                    .Select(p => cContainer.Resolve(p.ParameterType))
+                    .Select(p => container.Resolve(p.ParameterType))
                     .ToArray();
 
                 method.Invoke(instance, parameters);

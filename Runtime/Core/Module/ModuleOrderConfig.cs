@@ -1,4 +1,4 @@
-﻿using CnoomFrameWork.Base.IoC;
+﻿using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Modules.UiModule;
 
 namespace CnoomFrameWork.Core

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CnoomFrameWork.Base.IoC
+namespace CnoomFrameWork.Base.Container
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class InjectAttribute : Attribute

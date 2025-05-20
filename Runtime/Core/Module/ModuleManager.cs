@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CnoomFrameWork.Base.Config;
-using CnoomFrameWork.Base.IoC;
+﻿using CnoomFrameWork.Base.Config;
 using CnoomFrameWork.Base.Events;
-using UnityEngine.Scripting;
+using CnoomFrameWork.Base.Container;
 
 namespace CnoomFrameWork.Core
 {
@@ -12,48 +9,55 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class ModuleManager
     {
-        [Inject, Preserve]
-        private IIoCContainer container;
+        
+        private RootContainer _rootContainer;
+
+        internal ModuleManager(RootContainer rootContainer)
+        {
+            _rootContainer = rootContainer;
+        }
 
         /// <summary>
-        ///     注册模块到DI容器并初始化
+        /// 注册模块到依赖注入容器并完成初始化。
+        /// 模块实例通过工厂创建，并绑定为单例服务，同时注册为事件处理器。
         /// </summary>
-        /// <param name="module">需要注册的模块实例</param>
-        /// <returns>当前模块管理器用于链式调用</returns>
-        public ModuleManager RegisterModule<TModule>() where TModule : Module
+        /// <typeparam name="TModule">模块的具体实现类型，必须继承自 Module</typeparam>
+        public void RegisterModule<TModule>() where TModule : Module
         {
             RegisterModule<TModule, TModule>();
-            return this;
-        }
-
-        public ModuleManager RegisterModule<TInterface, TModule>() where TModule : TInterface where TInterface : Module
-        {
-            container.Bind<TInterface, TModule>(ELifecycleType.Singleton);
-            TModule module = container.Resolve<TModule>();
-            EventManager.Register(module);
-            module.Initialize();
-            return this;
         }
 
         /// <summary>
-        ///     从管理器移除模块并释放资源
+        /// 注册模块到依赖注入容器并完成初始化。
+        /// 模块实例通过工厂创建，并绑定为单例服务，同时注册为事件处理器。
         /// </summary>
-        /// <param name="module">需要移除的模块实例</param>
-        /// <returns>当前模块管理器用于链式调用</returns>
-        public ModuleManager UnRegisterModule(Module module)
+        /// <typeparam name="TInterface">模块的接口类型，必须继承自 Module</typeparam>
+        /// <typeparam name="TModule">模块的具体实现类型，必须实现 TInterface</typeparam>
+        public void RegisterModule<TInterface, TModule>() where TModule : TInterface where TInterface : Module
         {
-            EventManager.Unregister(module);
-            module.Dispose();
-            return this;
+            TModule module = InstanceFactory.CreateInstance<TModule>(_rootContainer);
+            _rootContainer.BindSingleton<TInterface,TModule>(module);
+            EventManager.Register(module);
+            module.Initialize();
         }
 
-        public ModuleManager UnRegisterModule<T>() where T : Module
+        /// <summary>
+        /// 从DI容器中注销指定模块，并清理相关资源
+        /// </summary>
+        /// <typeparam name="TInterface">要注销的模块类型，必须实现 Module 接口</typeparam>
+        /// <remarks>
+        /// 该方法会执行以下操作：
+        /// 1. 从 RootContainer 中解析指定类型的模块实例。
+        /// 2. 解绑该模块在 RootContainer 中的单例注册。
+        /// 3. 从事件管理系统中注销该模块的所有事件处理器。
+        /// 4. 调用模块的 Dispose 方法以释放其占用的资源。
+        /// </remarks>
+        public void UnRegisterModule<TInterface>() where TInterface : Module
         {
-            T module = container.Resolve<T>();
-            container.UnBindInstance<T>();
+            TInterface module = _rootContainer.Resolve<TInterface>();
+            _rootContainer.UnBindSingleton<TInterface>();
             EventManager.Unregister(module);
             module.Dispose();
-            return this;
         }
 
         /// <summary>
@@ -63,15 +67,16 @@ namespace CnoomFrameWork.Core
         /// <returns>找到的模块实例，未找到时返回null</returns>
         public T GetModule<T>() where T : Module
         {
-            return container.Resolve<T>();
+            return _rootContainer.Resolve<T>();
         }
 
+        
         internal void AutoRegisterModule()
         {
             ModuleOrderConfig config = ConfigManager.Instance.GetConfig<ModuleOrderConfig>();
             foreach (IIocRegister handler in config.Registers)
             {
-                Module module = handler.Register(container) as Module;
+                Module module = handler.Register(_rootContainer) as Module;
                 EventManager.Register(module);
                 module.Initialize();
             }

@@ -2,7 +2,7 @@
 using System.Linq;
 using CnoomFrameWork.Base.Config;
 
-namespace CnoomFrameWork.Base.IoC
+namespace CnoomFrameWork.Base.Container
 {
     /// <summary>
     ///     用于配置使用IoC容器的类，通常用于绑定依赖项。
@@ -10,10 +10,10 @@ namespace CnoomFrameWork.Base.IoC
     public interface IIocRegister
     {
         int Order { get; set; }
-        object Register(IIoCContainer container);
+        object Register(BaseContainer container);
     }
 
-    public struct IocRegister<TInterface, TRegister> : IIocRegister where TRegister : TInterface
+    public struct IocRegister<TInterface, TInstance> : IIocRegister where TInstance : TInterface
     {
         public int Order { get; set; }
 
@@ -22,10 +22,11 @@ namespace CnoomFrameWork.Base.IoC
             Order = order;
         }
 
-        public object Register(IIoCContainer container)
+        public object Register(BaseContainer container)
         {
-            container.Bind<TInterface, TRegister>(ELifecycleType.Singleton);
-            return container.Resolve<TInterface>();
+            TInstance instance = InstanceFactory.CreateInstance<TInstance>(container);
+            container.BindSingleton<TInterface, TInstance>(instance);
+            return instance;
         }
     }
     

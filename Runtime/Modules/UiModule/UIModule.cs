@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CnoomFrameWork.Base.IoC;
+using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Core;
 using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;

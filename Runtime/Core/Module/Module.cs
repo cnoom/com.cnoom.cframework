@@ -1,4 +1,4 @@
-using CnoomFrameWork.Base.IoC;
+using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Base.Log;
 
 namespace CnoomFrameWork.Core
