@@ -15,7 +15,7 @@ namespace CnoomFrameWork.Core.UnityExtensions
     {
         private readonly Dictionary<string, GameObjectContainer> _gameObjects = new Dictionary<string, GameObjectContainer>();
 
-        public T GetGameObject<T>(string name) where T : Component => _gameObjects[name].GetComponent<T>();
+        public T GetComponent<T>(string name) where T : Component => _gameObjects[name].GetComponent<T>();
 
         public Transform GetTransform(string name) => _gameObjects[name].Transform;
 
