@@ -7,7 +7,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 namespace CnoomFrameWork.Modules.AddressableModule
 {
 
-    public partial class AssetsService : Module
+    public partial class AssetsService : IService
     {
         private readonly App app = App.Instance;
         // 资源追踪数据结构
@@ -75,5 +75,24 @@ namespace CnoomFrameWork.Modules.AddressableModule
         }
 
         #endregion
+        public void Dispose()
+        {
+            foreach (var asyncOperationHandle in assetHandles)
+            {
+                asyncOperationHandle.Value.Release();
+            }
+            assetHandles.Clear();
+            foreach (var gameObject in instanceMap.Keys)
+            {
+                GameObject.Destroy(gameObject);
+            }
+            instanceMap.Clear();
+            foreach (var asyncOperationHandle in loadingHandles)
+            {
+                asyncOperationHandle.Value.Release();
+            }
+            loadingHandles.Clear();
+            referenceCount.Clear();
+        }
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace CnoomFrameWork.Core
+﻿using System;
+
+namespace CnoomFrameWork.Core
 {
-    public interface IService
+    public interface IService : IDisposable
     {
     }
 }

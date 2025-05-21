@@ -24,6 +24,7 @@ namespace CnoomFrameWork.Core
         {
             TInterface service = _rootContainer.Resolve<TInterface>();
             EventManager.Unregister(service);
+            service.Dispose();
             _rootContainer.UnBindSingleton<TInterface>();
         }
         

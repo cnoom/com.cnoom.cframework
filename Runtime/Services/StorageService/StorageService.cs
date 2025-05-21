@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CnoomFrameWork.Services.StorageService
 {
-    public class StorageService : IStorageService
+    public class StorageService : IStorageService,IDisposable
     {
         private const string EncryptKey = "encryptkey";
         private const string EncryptIv = "encryptiv";
@@ -19,7 +19,7 @@ namespace CnoomFrameWork.Services.StorageService
         private StorageModuleHolder storageGameObject;
         private string storagePath;
 
-        public void OnRegister()
+        public StorageService()
         {
             storagePath = Path.Combine(Application.persistentDataPath, "Storage.json");
             InitEncryptTool();
@@ -32,7 +32,7 @@ namespace CnoomFrameWork.Services.StorageService
             });
         }
 
-        public void OnUnRegister()
+        public void Dispose()
         {
             Application.quitting -= ManualSave;
             StorageModuleHolder.Instance.SetOnApplicationPauseCallback(null);
