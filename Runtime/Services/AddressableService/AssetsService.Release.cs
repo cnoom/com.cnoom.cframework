@@ -34,7 +34,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
             }
             else
             {
-                Log.ColorLogWarningEx(nameof(AssetsService), "尝试释放未追踪的实例对象");
+                LogError("尝试释放未追踪的实例对象");
                 Object.Destroy(instance);
             }
         }
@@ -55,7 +55,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
             if(locationHandle.Status != AsyncOperationStatus.Succeeded)
             {
-                Log.ColorLogErrorEx(nameof(AssetsService), $"Failed to release assets by label: {label}");
+                LogError("按标签释放资产失败: " + label);
                 yield break;
             }
             foreach (IResourceLocation location in locationHandle.Result)
@@ -77,7 +77,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
                 }
                 else
                 {
-                    Log.ColorLogErrorEx(nameof(AssetsService), $"Type mismatch when releasing {key}");
+                    LogError($"释放时类型不匹配 {key}");
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
                 Addressables.Release(handle);
                 assetHandles.Remove(key);
                 referenceCount.Remove(key);
-                Log.ColorLogWarningEx(nameof(AssetsService), $"Force released: {key}");
+                LogWarning($"强制释放: {key}");
             }
         }
 
@@ -103,7 +103,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         {
             if(!referenceCount.TryGetValue(key, out int count))
             {
-                Log.ColorLogWarningEx(nameof(AssetsService), $"Attempted to release untracked asset: {key}");
+                LogWarning($"尝试释放未追踪的资产: {key}");
                 return;
             }
             count--;

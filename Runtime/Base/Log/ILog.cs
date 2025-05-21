@@ -4,57 +4,49 @@ namespace CnoomFrameWork.Base.Log
 {
     public interface ILog
     {
-        void Log(string message, ELogType logType);
+        void Log(string message, ELogType logType = ELogType.Log);
     }
 
     public static class LogExtension
     {
 
-        public static void LogTestEx(this ILog log, string message)
+        /// <summary>
+        /// 使用发送者信息记录日志
+        /// </summary>
+        /// <param name="sender">日志发送者对象</param>
+        /// <param name="message">日志内容</param>
+        /// <param name="logType">日志类型（默认Log）</param>
+        public static void LogWithSender(this ILog log, string sender, string message,ELogType logType = ELogType.Log)
         {
-            log.Log(message, ELogType.Test);
+            log.Log(CombineMessage(sender, message),logType);
         }
 
-        public static void LogEx(this ILog log, string message)
+        public static void LogWithColor(this ILog log, string message,Color color, ELogType logType = ELogType.Log)
         {
-            log.Log(message, ELogType.Log);
+            log.Log(ColorText(message,color),logType);
         }
 
-        public static void LogErrorEx(this ILog log, string message)
+        public static void LogWithSenderAndColor(this ILog log, string sender, string message, Color color, ELogType logType = ELogType.Log)
         {
-            log.Log(message, ELogType.Error);
+            log.Log(ColorText(CombineMessage(sender, message),color),logType);
+        }
+        
+        public static void LogWithSenderAndColor(this ILog log, string sender, string message, Color senderColor,Color messageColor, ELogType logType = ELogType.Log)
+        {
+            string senderString = ColorText(sender, senderColor);
+            string messageString = ColorText(message, messageColor);
+            log.Log(CombineMessage(senderString, messageString),logType);
         }
 
-        public static void LogWarningEx(this ILog log, string message)
+        private static string CombineMessage(string sender, string message)
         {
-            log.Log(message, ELogType.Warning);
+            return $"{sender}: {message}";
         }
-
-        public static void ColorLogEx(this ILog log, string sender, string message)
+        
+        private static string ColorText(string message,Color color)
         {
-            log.Log(ColorText(sender, message, Color.green, Color.white), ELogType.Log);
-        }
-
-        public static void ColorLogErrorEx(this ILog log, string sender, string message)
-        {
-            log.Log(ColorText(sender, message, Color.green, Color.red), ELogType.Error);
-        }
-
-        public static void ColorLogWarningEx(this ILog log, string sender, string message)
-        {
-            log.Log(ColorText(sender, message, Color.green, Color.yellow), ELogType.Warning);
-        }
-
-        public static void ColorLogTestEx(this ILog log, string sender, string message)
-        {
-            log.Log(ColorText(sender, message, Color.green, Color.cyan), ELogType.Test);
-        }
-
-        private static string ColorText(string sender, string message, Color senderColor, Color messageColor)
-        {
-            string senderColorStr = ColorUtility.ToHtmlStringRGB(senderColor);
-            string messageColorStr = ColorUtility.ToHtmlStringRGB(messageColor);
-            return $"<color=#{senderColorStr}>{sender}</color>: <color=#{messageColorStr}>{message}</color>";
+            string colorStr = ColorUtility.ToHtmlStringRGB(color);
+            return $"<color=#{colorStr}>{message}</color>";
         }
     }
 }

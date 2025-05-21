@@ -34,7 +34,7 @@ namespace CnoomFrameWork.Core
                     return;
             }
             var message = $"{condition}\n{stackTrace}";
-            Log.LogErrorEx($"{nameof(App)} : {message}");
+            Log.LogWithSender(nameof(App), message);
         }
 
         /// <summary>
@@ -56,6 +56,7 @@ namespace CnoomFrameWork.Core
             ConfigManager configManager = ConfigManager.Instance;
 
             Log = configManager.GetConfig<LogConfig>().Log;
+            RootContainer.BindSingleton<ILog,ILog>(Log);
 
             ServiceLocator = new ServiceLocator(RootContainer);
             ServiceLocator.AutoRegister();
