@@ -16,7 +16,6 @@ namespace CnoomFrameWork.Core
         public void RegisterService<TInterface, TService>() where TInterface : class, IService where TService : TInterface
         {
             TService service = InstanceFactory.CreateInstance<TService>(_rootContainer);
-			service.Initialize?.Invoke();
             _rootContainer.BindSingleton<TInterface,TService>(service);
             RegiterService(service);
         }
@@ -36,7 +35,8 @@ namespace CnoomFrameWork.Core
 
         private void RegiterService(IService service)
         {
-            EventManager.Register(service);
+           EventManager.Register(service);
+           service.Initialize?.Invoke();
         }
 
         internal void AutoRegister()
