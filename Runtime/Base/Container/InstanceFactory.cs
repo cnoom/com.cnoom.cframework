@@ -20,7 +20,7 @@ namespace CnoomFrameWork.Base.Container
                 .ToArray();
 
             object instance = Activator.CreateInstance(implementationType, parameters);
-            Injector.Inject(instance,container);
+            Injector.Inject(instance);
             return instance;
         }
     }

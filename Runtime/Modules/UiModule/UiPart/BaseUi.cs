@@ -17,7 +17,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         private void Start() { }
         public virtual void OnGenerate()
         {
-            Injector.Inject(this,App.Instance.RootContainer);
+            Injector.Inject(this);
         }
 
         public void CloseSelf(bool immediate = true)

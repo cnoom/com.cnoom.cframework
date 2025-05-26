@@ -130,9 +130,8 @@ namespace CnoomFrameWork.Base.Container
                     Inject(newInstance);
                     return newInstance;
                 }
-
-                // 未找到注册项，抛出异常
-                throw new InvalidOperationException($"类型 {type.FullName} 未在容器中注册");
+                // 未找到注册项，返回null
+                return null;
             }
         }
 
@@ -159,7 +158,7 @@ namespace CnoomFrameWork.Base.Container
 
         private void Inject(object instance)
         {
-            Injector.Inject(instance, this);
+            Injector.Inject(instance);
         }
 
         #endregion
