@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CnoomFrameWork.Base.Container;
+using CnoomFrameWork.Base.Events;
 using UnityEngine;
 
 namespace CnoomFrameWork.Core.UnityExtensions
@@ -13,6 +14,8 @@ namespace CnoomFrameWork.Core.UnityExtensions
     /// </summary>
     public class UnityContainer : IDisposable
     {
+        public readonly string SceneName;
+        
         private readonly Dictionary<string, GameObjectContainer> _gameObjects = new Dictionary<string, GameObjectContainer>();
 
         public T GetComponent<T>(string name) where T : Component => _gameObjects[name].GetComponent<T>();
@@ -20,6 +23,12 @@ namespace CnoomFrameWork.Core.UnityExtensions
         public Transform GetTransform(string name) => _gameObjects[name].Transform;
 
         public GameObject GetGameObject(string name) => _gameObjects[name].GameObject;
+
+        public UnityContainer(string sceneName)
+        {
+            SceneName = sceneName;
+            EventManager.PublishAsync(this);
+        }
 
         public void AddGameObject(GameObject gameObject) => _gameObjects.Add(gameObject.name, new GameObjectContainer
         {

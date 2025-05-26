@@ -7,57 +7,59 @@ namespace Editor.Base
 {
     public class CodeGameObjectRegisterGenerator
     {
-        public const string FileName = "GameObjectRegister";
+        public const string FileName = "GameObjectRegisterOnStart";
 
-        [MenuItem("FrameWork/脚本生成/自动注册游戏对象脚本")]
-        private static void CreateSceneContainer()
+        [MenuItem("FrameWork/脚本生成/自动注册游戏对象脚本(Start)")]
+        private static void CreateGameObjectRegisterOnStart()
         {
-
-
-            // 如果文件已存在，则提示用户
-            if(File.Exists(FrameWorkConfig.ScriptPath))
-            {
-                Debug.LogWarning($"脚本 {FileName}.cs 已存在！将覆盖生成!");
-            }
-
-            // 脚本内容
-            string scriptContent = $@"
-using System;
+            string fileName = "GameObjectRegisterOnStart";
+            string scriptContent = $@"using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Core;
+using CnoomFrameWork.Core.UnityExtensions;
 using UnityEngine;
 
-namespace Editor.Base
+public class {fileName} : MonoBehaviour
 {{
-    /// <summary>
-    /// 自动生成的场景容器注册脚本
-    /// </summary>
-    public class {FileName} : MonoBehaviour
+    private void Start()
     {{
-        private App app;
-
-        private void Awake()
-        {{
-            app = App.Instance;
-            app.RootContainer.CreateChildContainer(gameObject.scene.name);
-        }}
-
-        private void OnDestroy()
-        {{
-            app.RootContainer.RemoveChildContainer(gameObject.scene.name);
-        }}
+        ChildContainer childContainer = App.Instance.RootContainer.GetChildContainer(gameObject.scene.name);
+        childContainer.Resolve<UnityContainer>().AddGameObject(gameObject);
     }}
-}}
-";
+}}";
+            CodeCreator.CreateScript(fileName, scriptContent);
+        }
 
-            string filePath = Path.Combine(FrameWorkConfig.ScriptPath, $"{FileName}.cs");
-            // 写入文件
-            File.WriteAllText(filePath, scriptContent);
+        
+        [MenuItem("FrameWork/脚本生成/自动注册游戏对象脚本(Trigger)")]
+        private static void CreateGameObjectRegisterOnTrigger()
+        {
+            string fileName = "GameObjectRegisterOnTrigger";
+            string scriptContent = $@"using CnoomFrameWork.Base.Events;
+using CnoomFrameWork.Core.UnityExtensions;
+using UnityEngine;
+using UnityEngine.Scripting;
 
-            // 刷新 AssetDatabase 以使 Unity 识别新文件
-            AssetDatabase.Refresh();
+public class {fileName} : MonoBehaviour
+{{
+    private void Awake()
+    {{
+        EventManager.Register(this);
+    }}
 
-            // 提示用户生成成功
-            EditorUtility.DisplayDialog("生成成功", $"脚本 {FileName}.cs 已生成！", "确定");
+    [EventSubscriber(typeof(UnityContainer)),Preserve]
+    private void OnTrigger(UnityContainer unityContainer)
+    {{
+        if (unityContainer.SceneName != gameObject.scene.name) return;
+        unityContainer.AddGameObject(gameObject.name, gameObject);
+        EventManager.Unregister(this);
+    }}
+
+    private void OnDestroy()
+    {{
+        EventManager.Unregister(this);
+    }}
+}}";
+            CodeCreator.CreateScript(fileName, scriptContent);
         }
     }
 }

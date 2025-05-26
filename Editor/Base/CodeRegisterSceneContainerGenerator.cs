@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using System.IO;
+using Editor.Base;
 using UnityEngine;
 
 namespace FrameWork.Editor.Base
@@ -11,8 +12,6 @@ namespace FrameWork.Editor.Base
         [MenuItem("FrameWork/脚本生成/生成场景容器脚本")]
         private static void CreateSceneContainer()
         {
-            
-
             // 如果文件已存在，则提示用户
             if(File.Exists(FrameWorkConfig.ScriptPath))
             {
@@ -20,9 +19,7 @@ namespace FrameWork.Editor.Base
             }
 
             // 脚本内容
-            string scriptContent = $@"
-using System;
-using CnoomFrameWork.Core;
+            string scriptContent = $@"using CnoomFrameWork.Core;
 using UnityEngine;
 
 namespace Editor.Base
@@ -48,15 +45,7 @@ namespace Editor.Base
 }}
 ";
 
-            string filePath = Path.Combine(FrameWorkConfig.ScriptPath, $"{FileName}.cs");
-            // 写入文件
-            File.WriteAllText(filePath, scriptContent);
-
-            // 刷新 AssetDatabase 以使 Unity 识别新文件
-            AssetDatabase.Refresh();
-
-            // 提示用户生成成功
-            EditorUtility.DisplayDialog("生成成功", $"脚本 {FileName}.cs 已生成！", "确定");
+            CodeCreator.CreateScript(FileName, scriptContent);
         }
     }
 }
