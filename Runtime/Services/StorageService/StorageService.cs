@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using CnoomFrameWork.Base.Config;
+using CnoomFrameWork.Core;
 using CnoomFrameWork.Singleton;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace CnoomFrameWork.Services.StorageService
 {
-    public class StorageService : IStorageService,IDisposable
+    public class StorageService : IStorageService
     {
         private const string EncryptKey = "encryptkey";
         private const string EncryptIv = "encryptiv";
@@ -18,8 +19,9 @@ namespace CnoomFrameWork.Services.StorageService
         private StorageData storageData;
         private StorageModuleHolder storageGameObject;
         private string storagePath;
-
-        public StorageService()
+        public Action Initialize => Init;
+        
+        private void Init()
         {
             storagePath = Path.Combine(Application.persistentDataPath, "Storage.json");
             InitEncryptTool();
@@ -101,7 +103,6 @@ namespace CnoomFrameWork.Services.StorageService
             isDirty = true;
         }
 
-
         // 磁盘持久化
         private void SaveToDisk()
         {
@@ -116,6 +117,7 @@ namespace CnoomFrameWork.Services.StorageService
                 Debug.LogError($"Storage save failed: {e.Message}");
             }
         }
+
 
         // 反持久化
         private void LoadFromDisk()

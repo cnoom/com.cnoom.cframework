@@ -7,7 +7,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 namespace CnoomFrameWork.Modules.AddressableModule
 {
 
-    public partial class AssetsService : IService
+    public partial class AssetsService : AService
     {
         private readonly App app = App.Instance;
         // 资源追踪数据结构
@@ -64,6 +64,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
 
 
+
         // 实例化对象追踪
         private void TrackInstance(string key, GameObject instance)
         {
@@ -75,7 +76,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         }
 
         #endregion
-        public void Dispose()
+        public override void Dispose()
         {
             foreach (var asyncOperationHandle in assetHandles)
             {

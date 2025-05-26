@@ -16,6 +16,7 @@ namespace CnoomFrameWork.Core
         public void RegisterService<TInterface, TService>() where TInterface : class, IService where TService : TInterface
         {
             TService service = InstanceFactory.CreateInstance<TService>(_rootContainer);
+			service.Initialize?.Invoke();
             _rootContainer.BindSingleton<TInterface,TService>(service);
             RegiterService(service);
         }
