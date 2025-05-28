@@ -8,5 +8,6 @@ namespace CnoomFrameWork.Base.Events
         public int Priority;
         public bool Once;
         public object Target;
+        public bool IsAsync;
     }
 }
