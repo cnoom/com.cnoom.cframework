@@ -109,7 +109,7 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 同步或异步发布事件（普通类/结构体）给所有订阅者。
+        /// 异步发布事件给所有订阅者。
         /// </summary>
         public static async Task PublishAsync<T>(T e)
         {
@@ -154,6 +154,53 @@ namespace CnoomFrameWork.Base.Events
             }
         }
 
+        /// <summary>
+        /// 同步发布事件给所有订阅者。
+        /// </summary>
+        public static void Publish<T>(T e)
+        {
+            List<HandlerInfo> snapshot;
+            lock (_lock)
+            {
+                if(!_handlers.TryGetValue(typeof(T), out var list)) return;
+                snapshot = new List<HandlerInfo>(list);
+            }
+
+            HashSet<HandlerInfo> toRemove = new();
+
+            foreach (var h in snapshot)
+            {
+                if(!ShouldInvokeHandler(e, h.Handler)) continue;
+                try
+                {
+                    if(h.Handler is Action<T> syncHandler)
+                        syncHandler(e);
+                    if (h.Handler is Func<T, Task> asyncHandler)
+                        asyncHandler(e).ConfigureAwait(true);
+
+
+                    if(h.Once)
+                        toRemove.Add(h);
+                }
+                catch (System.Exception ex)
+                {
+                    Console.WriteLine($"[EventManager] Error: {ex.Message}");
+                }
+            }
+
+            if(toRemove.Count > 0)
+            {
+                lock (_lock)
+                {
+                    if(_handlers.TryGetValue(typeof(T), out var list))
+                    {
+                        foreach (var r in toRemove)
+                            list.Remove(r);
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// 注册结构体事件处理器（ref 传参）。
         /// </summary>
