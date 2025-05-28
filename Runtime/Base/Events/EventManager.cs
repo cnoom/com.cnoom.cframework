@@ -63,7 +63,6 @@ namespace CnoomFrameWork.Base.Events
                     Handler = handler,
                     Priority = priority,
                     Once = once,
-                    IsAsync = isAsync,
                     Target = handler.Target
                 });
                 list.Sort((a, b) => b.Priority.CompareTo(a.Priority));
@@ -127,11 +126,8 @@ namespace CnoomFrameWork.Base.Events
                 if(!ShouldInvokeHandler(e, h.Handler)) continue;
                 try
                 {
-                    if(h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
-                        await asyncHandler(e).ConfigureAwait(false);
-                    else if(h.Handler is Action<T> syncHandler)
+                    if(h.Handler is Action<T> syncHandler)
                         syncHandler(e);
-
                     if(h.Once)
                         toRemove.Add(h);
                 }
