@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace CnoomFrameWork.Base.Events
 {
@@ -13,12 +14,12 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         public delegate void RefEventHandler<T>(ref T e) where T : struct;
 
-        private static readonly Dictionary<Type, List<HandlerInfo>> _handlers = new();
-        private static readonly Dictionary<Type, List<RefHandlerInfo>> _refHandlers = new();
-        private static readonly Dictionary<Type, List<Delegate>> _filters = new();
-        private static readonly Dictionary<Type, List<Delegate>> _refFilters = new();
-        private static readonly object _lock = new();
-        private static readonly object _refLock = new();
+        private static readonly Dictionary<Type, List<HandlerInfo>> Handlers = new();
+        private static readonly Dictionary<Type, List<RefHandlerInfo>> RefHandlers = new();
+        private static readonly Dictionary<Type, List<Delegate>> Filters = new();
+        private static readonly Dictionary<Type, List<Delegate>> RefFilters = new();
+        private static readonly object Lock = new();
+        private static readonly object RefLock = new();
 
         /// <summary>
         /// 注册异步普通事件处理器。
@@ -42,9 +43,9 @@ namespace CnoomFrameWork.Base.Events
         public static void Unsubscribe<T>(Action<T> handler)
         {
             var type = typeof(T);
-            lock (_lock)
+            lock (Lock)
             {
-                if (_handlers.TryGetValue(type, out var list))
+                if (Handlers.TryGetValue(type, out var list))
                 {
                     list.RemoveAll(h => h.Handler == (Delegate)handler);
                 }
@@ -53,10 +54,10 @@ namespace CnoomFrameWork.Base.Events
 
         private static void AddHandler(Type type, Delegate handler, int priority, bool once, bool isAsync)
         {
-            lock (_lock)
+            lock (Lock)
             {
-                if(!_handlers.TryGetValue(type, out var list))
-                    list = _handlers[type] = new List<HandlerInfo>();
+                if(!Handlers.TryGetValue(type, out var list))
+                    list = Handlers[type] = new List<HandlerInfo>();
 
                 list.Add(new HandlerInfo
                 {
@@ -75,7 +76,7 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         private static bool ShouldInvokeHandler<T>(T e, Delegate handler)
         {
-            if(_filters.TryGetValue(typeof(T), out var filterList))
+            if(Filters.TryGetValue(typeof(T), out var filterList))
             {
                 foreach (Func<T, Delegate, bool> filter in filterList.Cast<Func<T, Delegate, bool>>())
                 {
@@ -90,7 +91,7 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         private static bool ShouldInvokeRefHandler<T>(T e, Delegate handler) where T : struct
         {
-            if(_refFilters.TryGetValue(typeof(T), out var filterList))
+            if(RefFilters.TryGetValue(typeof(T), out var filterList))
             {
                 foreach (Delegate filterObject in filterList)
                 {
@@ -109,14 +110,14 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 同步或异步发布事件（普通类/结构体）给所有订阅者。
+        /// 同步或异步发布事件给所有订阅者。
         /// </summary>
         public static async Task PublishAsync<T>(T e)
         {
             List<HandlerInfo> snapshot;
-            lock (_lock)
+            lock (Lock)
             {
-                if(!_handlers.TryGetValue(typeof(T), out var list)) return;
+                if(!Handlers.TryGetValue(typeof(T), out var list)) return;
                 snapshot = new List<HandlerInfo>(list);
             }
 
@@ -137,15 +138,15 @@ namespace CnoomFrameWork.Base.Events
                 }
                 catch (System.Exception ex)
                 {
-                    Console.WriteLine($"[EventManager] Error: {ex.Message}");
+                    Debug.LogError($"[EventManager] Error: {ex.Message}");
                 }
             }
 
             if(toRemove.Count > 0)
             {
-                lock (_lock)
+                lock (Lock)
                 {
-                    if(_handlers.TryGetValue(typeof(T), out var list))
+                    if(Handlers.TryGetValue(typeof(T), out var list))
                     {
                         foreach (var r in toRemove)
                             list.Remove(r);
@@ -160,10 +161,10 @@ namespace CnoomFrameWork.Base.Events
         public static void SubscribeRef<T>(RefEventHandler<T> handler, int priority = 0, bool once = false) where T : struct
         {
             var type = typeof(T);
-            lock (_refLock)
+            lock (RefLock)
             {
-                if(!_refHandlers.TryGetValue(type, out var list))
-                    list = _refHandlers[type] = new List<RefHandlerInfo>();
+                if(!RefHandlers.TryGetValue(type, out var list))
+                    list = RefHandlers[type] = new List<RefHandlerInfo>();
 
                 list.Add(new RefHandlerInfo
                 {
@@ -182,9 +183,9 @@ namespace CnoomFrameWork.Base.Events
         public static void UnSubscribeRef<T>(RefEventHandler<T> handler) where T : struct
         {
             var type = typeof(T);
-            lock (_refLock)
+            lock (RefLock)
             {
-                if(_refHandlers.TryGetValue(type, out var list))
+                if(RefHandlers.TryGetValue(type, out var list))
                 {
                     list.RemoveAll(h => h.Handler == (Delegate)handler);
                 }
@@ -198,9 +199,9 @@ namespace CnoomFrameWork.Base.Events
         {
             var type = typeof(T);
             List<RefHandlerInfo> snapshot;
-            lock (_refLock)
+            lock (RefLock)
             {
-                if(!_refHandlers.TryGetValue(type, out var list)) return;
+                if(!RefHandlers.TryGetValue(type, out var list)) return;
                 snapshot = new List<RefHandlerInfo>(list);
             }
 
@@ -210,19 +211,26 @@ namespace CnoomFrameWork.Base.Events
             {
                 if(!ShouldInvokeRefHandler(e, h.Handler)) continue;
 
-                if(h.Handler is RefEventHandler<T> handler)
+                try
                 {
-                    handler(ref e);
-                    if(h.Once)
-                        toRemove.Add(h);
+                    if(h.Handler is RefEventHandler<T> handler)
+                    {
+                        handler(ref e);
+                        if(h.Once)
+                            toRemove.Add(h);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[EventManager] Error: {ex.Message}");
                 }
             }
 
             if(toRemove.Count > 0)
             {
-                lock (_refLock)
+                lock (RefLock)
                 {
-                    if(_refHandlers.TryGetValue(type, out var list))
+                    if(RefHandlers.TryGetValue(type, out var list))
                     {
                         foreach (var r in toRemove)
                             list.Remove(r);
@@ -237,10 +245,10 @@ namespace CnoomFrameWork.Base.Events
         public static void AddFilter<T>(Func<T, Delegate, bool> filter)
         {
             var type = typeof(T);
-            lock (_lock)
+            lock (Lock)
             {
-                if(!_filters.TryGetValue(type, out var list))
-                    list = _filters[type] = new List<Delegate>();
+                if(!Filters.TryGetValue(type, out var list))
+                    list = Filters[type] = new List<Delegate>();
                 list.Add(filter);
             }
         }
@@ -251,10 +259,10 @@ namespace CnoomFrameWork.Base.Events
         public static void AddRefFilter<T>(Func<T, Delegate, bool> filter) where T : struct
         {
             var type = typeof(T);
-            lock (_refLock)
+            lock (RefLock)
             {
-                if(!_refFilters.TryGetValue(type, out var list))
-                    list = _refFilters[type] = new List<Delegate>();
+                if(!RefFilters.TryGetValue(type, out var list))
+                    list = RefFilters[type] = new List<Delegate>();
                 list.Add(filter);
             }
         }
@@ -282,7 +290,7 @@ namespace CnoomFrameWork.Base.Events
                     }
                     catch (System.Exception ex)
                     {
-                        Console.WriteLine($"[Register] Failed to bind method {m.Name}: {ex.Message}");
+                        Debug.LogError($"[Register] Failed to bind method {m.Name}: {ex.Message}");
                     }
                 }
 
@@ -305,7 +313,7 @@ namespace CnoomFrameWork.Base.Events
                     }
                     catch (System.Exception ex)
                     {
-                        Console.WriteLine($"[Register] Failed to bind ref method {m.Name}: {ex.Message}");
+                        Debug.LogError($"[Register] Failed to bind ref method {m.Name}: {ex.Message}");
                     }
                 }
             }
@@ -316,17 +324,17 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         public static void Unregister(object subscriber)
         {
-            lock (_lock)
+            lock (Lock)
             {
-                foreach (var list in _handlers.Values)
+                foreach (var list in Handlers.Values)
                 {
                     list.RemoveAll(h => h.Target == subscriber);
                 }
             }
 
-            lock (_refLock)
+            lock (RefLock)
             {
-                foreach (var list in _refHandlers.Values)
+                foreach (var list in RefHandlers.Values)
                 {
                     list.RemoveAll(h => h.Target == subscriber);
                 }
