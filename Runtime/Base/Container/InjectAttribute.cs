@@ -6,5 +6,12 @@ namespace CnoomFrameWork.Base.Container
     public class InjectAttribute : Attribute
     {
         public string ContainerName { get; set; } = "";
+
+        public InjectAttribute(){}
+        
+        public InjectAttribute(string containerName = "")
+        {
+            ContainerName = containerName;
+        }
     }
 }
