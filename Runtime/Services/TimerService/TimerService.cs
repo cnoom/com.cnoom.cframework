@@ -12,14 +12,15 @@ namespace CnoomFrameWork.Services.TimerService
         private GameObject _updateGameObject;
         private readonly TimerCollections<FrameTimer> _frameTimers = new();
         private readonly TimerCollections<SecondsTimer> _secondsTimers = new();
-        
-        void Update() {
+
+        void Update()
+        {
             foreach (FrameTimer timer in _frameTimers.Timers)
             {
                 timer.Update(Time.frameCount);
             }
-            
-            foreach (SecondsTimer timer in _secondsTimers.Timers)   
+
+            foreach (SecondsTimer timer in _secondsTimers.Timers)
             {
                 timer.Update(Time.deltaTime);
             }
@@ -31,33 +32,37 @@ namespace CnoomFrameWork.Services.TimerService
             _secondsTimers.UpdateToAdd();
         }
 
-        public SecondsTimer AddSecondsTimer(float delay, Action callback, bool loop = false) {
-            SecondsTimer t = _secondsTimers.Pool.Count > 0? _secondsTimers.Pool.Pop() : new SecondsTimer();
-            t.Init(delay, callback, loop);
+        public SecondsTimer AddSecondsTimer(float delay, Action callback, bool loop = false)
+        {
+            SecondsTimer t = _secondsTimers.Pool.Count > 0 ? _secondsTimers.Pool.Pop() : new SecondsTimer();
+            t.Init(delay, callback, loop, this);
             _secondsTimers.AddToWait(t);
             return t;
         }
-        
-        public FrameTimer AddFrameTimer(int delay, Action callback, bool loop = false) {
-            FrameTimer t = _frameTimers.Pool.Count > 0? _frameTimers.Pool.Pop() : new FrameTimer();
-            t.Init(delay, callback, loop,this);
-            _frameTimers.AddToWait(t);      
+
+        public FrameTimer AddFrameTimer(int delay, Action callback, bool loop = false)
+        {
+            FrameTimer t = _frameTimers.Pool.Count > 0 ? _frameTimers.Pool.Pop() : new FrameTimer();
+            t.Init(delay, callback, loop, this);
+            _frameTimers.AddToWait(t);
             return t;
         }
 
-        public void RemoveTimer(ITimer target) {
+        public void RemoveTimer(ITimer target)
+        {
             target?.Cancel();
         }
 
-        internal void Recycle(ITimer t) {
-            if(t == null) return;
+        internal void Recycle(ITimer t)
+        {
+            if (t == null) return;
             if (t is FrameTimer frameTimer) _frameTimers.Pool.Push(frameTimer);
             if (t is SecondsTimer secondsTimer) _secondsTimers.Pool.Push(secondsTimer);
         }
-        
+
         public void Initialize()
         {
-            _updateGameObject =  new GameObject("TimerService");
+            _updateGameObject = new GameObject("TimerService");
             _updateGameObject.AddComponent<UpdateGameObject>().SetAction(Update);
             Object.DontDestroyOnLoad(_updateGameObject);
         }
@@ -69,14 +74,13 @@ namespace CnoomFrameWork.Services.TimerService
             _secondsTimers.Dispose();
             _frameTimers.Dispose();
         }
-        
+
         private class TimerCollections<TTimer> : IDisposable where TTimer : ITimer
         {
-            
             private readonly Queue<TTimer> _waitQueue = new();
             public readonly Stack<TTimer> Pool = new();
-            public readonly List<TTimer>  Timers = new();
-            
+            public readonly List<TTimer> Timers = new();
+
             /// <summary>
             /// 添加计时器，会在更新时添加到Timers中。
             /// </summary>

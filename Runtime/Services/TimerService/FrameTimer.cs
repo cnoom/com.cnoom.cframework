@@ -16,6 +16,7 @@ namespace CnoomFrameWork.Services.TimerService
         public int Duration => _duration;
         public int Elapsed => _elapsed;
         public bool IsCompleted => _isCancelled || (!_isLoop && _elapsed >= _duration);
+        public Action OnCancel { get; set; }
 
         internal void Init(int delay, Action cb, bool loop,TimerService timerService)
         {
@@ -26,6 +27,7 @@ namespace CnoomFrameWork.Services.TimerService
             _elapsed = 0;
             _isPaused = false;
             _isCancelled = false;
+            OnCancel = null;
         }
 
         public void Update(int frame)
@@ -38,14 +40,15 @@ namespace CnoomFrameWork.Services.TimerService
                 if (_isLoop) _elapsed = 0;
                 else
                 {
-                    _isCancelled = true;
-                    _timerService?.Recycle(this);
+                    Cancel();
                 }
             }
         }
 
         public void Cancel()
         {
+            OnCancel?.Invoke();
+            OnCancel = null;
             _isCancelled = true;
             _timerService?.Recycle(this);
         }
