@@ -5,6 +5,10 @@ using CnoomFrameWork.Base.Container;
 
 namespace CnoomFrameWork.Core
 {
+    /// <summary>
+    ///     应用程序入口类，用于初始化核心系统
+    ///     在游戏启动时需实例化该类
+    /// </summary>
     public class App : PersistentMonoSingleton<App>
     {
         private App() { }
@@ -12,14 +16,6 @@ namespace CnoomFrameWork.Core
         public ServiceLocator ServiceLocator { get; private set; }
         public ILog Log { get; private set; }
         public RootContainer RootContainer { get; private set; }
-
-        /// <summary>
-        ///  入口方法
-        /// </summary>
-        public static void Boot()
-        {
-            App app = Instance;
-        }
 
         /// <summary>
         ///     单例初始化时调用，完成核心系统注册
