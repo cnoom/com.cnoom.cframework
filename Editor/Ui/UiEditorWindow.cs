@@ -52,7 +52,7 @@ namespace FrameWork.Editor.Ui
                             BaseUi baseUi = prefab.GetComponent<BaseUi>();
                             if(!baseUi)
                             {
-                                EditorLog.Instance.LogWithSender(nameof(UiEditorWindow), $"{prefab.name}没有BaseUi组件", ELogType.Error);
+                                Debug.LogError($"[{nameof(UiEditorWindow)}] {prefab.name} 没有{nameof(BaseUi)}组件]",this);
                                 continue;
                             }
                             TryAddPrefabToAddressable(baseUi);
@@ -102,7 +102,7 @@ namespace FrameWork.Editor.Ui
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
             if(!settings)
             {
-                EditorLog.Instance.LogWithSender(nameof(UiEditorWindow), "Addressable settings not found.", ELogType.Error);
+                Debug.LogError($"[{nameof(UiEditorWindow)}] Addressable settings not found.",this);
                 return;
             }
 
@@ -110,7 +110,7 @@ namespace FrameWork.Editor.Ui
             AddressableAssetGroup defaultGroup = settings.DefaultGroup;
             if(!defaultGroup)
             {
-                EditorLog.Instance.LogWithSender(nameof(UiEditorWindow), "Default Addressable group not found.",ELogType.Error);
+                Debug.LogError($"[{nameof(UiEditorWindow)}] Default group not found.",this);
                 return;
             }
 
@@ -135,7 +135,7 @@ namespace FrameWork.Editor.Ui
                 AddressableAssetSettingsDefaultObject.Settings.AddLabel(UILabel);
             }
             newEntry.labels.Add(UILabel);
-            EditorLog.Instance.LogWithSender(nameof(UiEditorWindow), $"Added {obj.name} to Addressable with key: {obj.name}",ELogType.Warning);
+            Debug.Log($"[{nameof(UiEditorWindow)}] {obj.name} 成功添加!");
         }
     }
 }

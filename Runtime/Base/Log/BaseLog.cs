@@ -4,45 +4,62 @@ namespace CnoomFrameWork.Base.Log
 {
     public class BaseLog : ILog
     {
-        public void Log(string message, ELogType logType = ELogType.Log)
+        public bool EnableTest { get; set; } = true;
+        public bool EnableLog { get; set; }  = true;
+        public bool EnableWarning { get; set; } = true;
+        public bool EnableError { get; set; } = true;
+
+        internal BaseLog()
         {
-            switch(logType)
+            if (!Application.isEditor)
+            {
+                EnableTest = false;
+                EnableWarning = false;
+                EnableLog = false;
+            }
+        }
+
+        public void Log(string message, ELogType logType = ELogType.Log, Object context = null)
+        {
+            switch (logType)
             {
                 case ELogType.Log:
-                    Log(message, LogType.Log);
+                    LogLog(message, context);
                     break;
                 case ELogType.Warning:
-                    Log(message, LogType.Warning);
+                    LogWarning(message, context);
                     break;
                 case ELogType.Error:
-                    Log(message, LogType.Error);
+                    LogError(message, context);
                     break;
-                default:
-                    Log($"Test: {message}", LogType.Log);
+                case ELogType.Test:
+                    LogTest(message, context);
                     break;
             }
         }
 
-        private void Log(string message, LogType logType)
+        private void LogTest(string message, Object context)
         {
-            switch(logType)
-            {
-                case LogType.Log:
-                    Debug.Log(message);
-                    break;
-                case LogType.Warning:
-                    Debug.LogWarning(message);
-                    break;
-                case LogType.Error:
-                    Debug.LogError(message);
-                    break;
-                case LogType.Assert:
-                case LogType.Exception:
-                    break;
-                default:
-                    Debug.Log(message);
-                    break;
-            }
+            if (!EnableTest) return;
+            Debug.Log(LogExtension.ColorText("[Test]:", Color.cyan) + $" {message}", context);
+        }
+
+        private void LogLog(string message, Object context)
+        {
+            if (!EnableLog) return;
+            Debug.Log(LogExtension.ColorText("[Log]:", Color.green) + $" {message}", context);
+        }
+
+        private void LogWarning(string message, Object context)
+        {
+            if (!EnableWarning) return;
+            Debug.LogWarning(LogExtension.ColorText("[Warning]:", Color.yellow) + $" {message}", context);
+        }
+
+        private void LogError(string message, Object context)
+        {
+            if (!EnableError) return;
+            Debug.LogError(LogExtension.ColorText("[Error]:", Color.red) + $" {message}", context);
         }
     }
 }

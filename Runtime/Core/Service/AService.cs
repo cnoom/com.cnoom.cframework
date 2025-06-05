@@ -2,11 +2,13 @@
 
 namespace CnoomFrameWork.Core
 {
+    /// <summary>
+    /// 抽象服务类，实现接口的初始化和释放方法。
+    /// </summary>
     public class AService : IService
     {
-        public Action Initialize => Init;
-
-        protected virtual void Init()
+        
+        public virtual void Initialize()
         {
         }
         

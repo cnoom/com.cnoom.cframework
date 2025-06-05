@@ -36,7 +36,7 @@ namespace CnoomFrameWork.Core
         private void RegiterService(IService service)
         {
            EventManager.Register(service);
-           service.Initialize?.Invoke();
+           service.Initialize();
         }
 
         internal void AutoRegister()

@@ -19,9 +19,8 @@ namespace CnoomFrameWork.Services.StorageService
         private StorageData storageData;
         private StorageModuleHolder storageGameObject;
         private string storagePath;
-        public Action Initialize => Init;
-        
-        private void Init()
+
+        void IService.Initialize()
         {
             storagePath = Path.Combine(Application.persistentDataPath, "Storage.json");
             InitEncryptTool();
@@ -29,7 +28,7 @@ namespace CnoomFrameWork.Services.StorageService
             Application.quitting += ManualSave;
             StorageModuleHolder.Instance.SetOnApplicationPauseCallback(isPaused =>
             {
-                if(!isPaused) return;
+                if (!isPaused) return;
                 ManualSave();
             });
         }
@@ -42,7 +41,7 @@ namespace CnoomFrameWork.Services.StorageService
 
         public void Save(string key, object value, string section = IStorageService.DefaultSection)
         {
-            if(value == null) return;
+            if (value == null) return;
             key = $"{section}.{key}";
             storageData.Save(key, value);
             MakeDirty();
@@ -60,31 +59,34 @@ namespace CnoomFrameWork.Services.StorageService
             List<string> keyToMove = new List<string>();
             foreach (string key in storageData.dataDict.Keys)
             {
-                if(key.StartsWith(prefix))
+                if (key.StartsWith(prefix))
                 {
                     keyToMove.Add(key);
                 }
             }
+
             foreach (string key in keyToMove)
             {
                 storageData.dataDict.Remove(key);
             }
+
             MakeDirty();
         }
 
         private void InitEncryptTool()
         {
             StorageConfig config = ConfigManager.Instance.GetConfig<StorageConfig>();
-            if(PlayerPrefs.HasKey(EncryptKey) && PlayerPrefs.HasKey(EncryptIv) )
+            if (PlayerPrefs.HasKey(EncryptKey) && PlayerPrefs.HasKey(EncryptIv))
             {
                 byte[] key = Convert.FromBase64String(PlayerPrefs.GetString(EncryptKey));
                 byte[] iv = Convert.FromBase64String(PlayerPrefs.GetString(EncryptIv));
-                if(key.Length == config.Key.Length && iv.Length == config.Iv.Length)
+                if (key.Length == config.Key.Length && iv.Length == config.Iv.Length)
                 {
                     encryptTool = new EncryptTool(key, iv);
                     return;
                 }
             }
+
             RandomNumberGenerator.Fill(config.Key);
             RandomNumberGenerator.Fill(config.Iv);
             PlayerPrefs.SetString(EncryptKey, Convert.ToBase64String(config.Key));
@@ -94,7 +96,7 @@ namespace CnoomFrameWork.Services.StorageService
 
         public void ManualSave()
         {
-            if(!isDirty) return;
+            if (!isDirty) return;
             SaveToDisk();
         }
 
@@ -124,12 +126,12 @@ namespace CnoomFrameWork.Services.StorageService
         {
             try
             {
-                if(File.Exists(storagePath))
+                if (File.Exists(storagePath))
                 {
                     string json = File.ReadAllText(storagePath);
                     json = encryptTool.Decrypt(json);
                     storageData = JsonConvert.DeserializeObject<StorageData>(json);
-                    if(storageData == null) throw new System.Exception("Invalid JSON format");
+                    if (storageData == null) throw new System.Exception("Invalid JSON format");
                 }
                 else
                 {
@@ -152,24 +154,24 @@ namespace CnoomFrameWork.Services.StorageService
             public void Save(string key, object value)
             {
                 dataDict[key] = JsonConvert.SerializeObject(value);
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 Debug.Log("Save StorageData: " + key + " " + dataDict[key]);
-                #endif
+#endif
             }
 
             public T Load<T>(string key, T defaultValue)
             {
-                if(!dataDict.TryGetValue(key, out string json)) return defaultValue;
+                if (!dataDict.TryGetValue(key, out string json)) return defaultValue;
                 try
                 {
                     return JsonConvert.DeserializeObject<T>(json);
                 }
                 catch (System.Exception e)
                 {
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     Debug.LogError("Load StorageData failed: " + e.Message);
                     Debug.LogError("Key: " + key + " Value: " + json);
-                    #endif
+#endif
                     return defaultValue;
                 }
             }

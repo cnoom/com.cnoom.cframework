@@ -4,7 +4,6 @@ using System.Linq;
 using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Base.Events;
 using CnoomFrameWork.Core;
-using CnoomFrameWork.Core.Base.DelayManager;
 using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
@@ -44,7 +43,7 @@ namespace CnoomFrameWork.Modules.UiModule
                 layerStack[layer] = new Stack<BaseUi>();
             }
 
-            DelayManager.Instance.RegisterFrameDelay(1, () => EventManager.PublishAsync(this));
+            EventManager.PublishAsync(this);
         }
 
         // 从缓存池获取界面
