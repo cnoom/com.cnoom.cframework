@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using CnoomFrameWork.Base.Log;
+using CnoomFrameWork.Core;
 using UnityEngine;
 
 namespace CnoomFrameWork.Base.Events
@@ -56,7 +58,7 @@ namespace CnoomFrameWork.Base.Events
         {
             lock (Lock)
             {
-                if(!Handlers.TryGetValue(type, out var list))
+                if (!Handlers.TryGetValue(type, out var list))
                     list = Handlers[type] = new List<HandlerInfo>();
 
                 list.Add(new HandlerInfo
@@ -76,13 +78,14 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         private static bool ShouldInvokeHandler<T>(T e, Delegate handler)
         {
-            if(Filters.TryGetValue(typeof(T), out var filterList))
+            if (Filters.TryGetValue(typeof(T), out var filterList))
             {
                 foreach (Func<T, Delegate, bool> filter in filterList.Cast<Func<T, Delegate, bool>>())
                 {
-                    if(!filter(e, handler)) return false;
+                    if (!filter(e, handler)) return false;
                 }
             }
+
             return true;
         }
 
@@ -91,21 +94,23 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         private static bool ShouldInvokeRefHandler<T>(T e, Delegate handler) where T : struct
         {
-            if(RefFilters.TryGetValue(typeof(T), out var filterList))
+            if (RefFilters.TryGetValue(typeof(T), out var filterList))
             {
                 foreach (Delegate filterObject in filterList)
                 {
                     // 确保过滤器是正确的类型
-                    if(filterObject is Func<T, Delegate, bool> filter)
+                    if (filterObject is Func<T, Delegate, bool> filter)
                     {
-                        if(!filter(e, handler)) return false;
+                        if (!filter(e, handler)) return false;
                     }
                     else
                     {
-                        throw new InvalidOperationException($"过滤器类型不匹配: {filterObject.GetType()} 不是 Func<{typeof(T)}, Delegate, bool>");
+                        throw new InvalidOperationException(
+                            $"过滤器类型不匹配: {filterObject.GetType()} 不是 Func<{typeof(T)}, Delegate, bool>");
                     }
                 }
             }
+
             return true;
         }
 
@@ -117,7 +122,7 @@ namespace CnoomFrameWork.Base.Events
             List<HandlerInfo> snapshot;
             lock (Lock)
             {
-                if(!Handlers.TryGetValue(typeof(T), out var list)) return;
+                if (!Handlers.TryGetValue(typeof(T), out var list)) return;
                 snapshot = new List<HandlerInfo>(list);
             }
 
@@ -125,28 +130,38 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var h in snapshot)
             {
-                if(!ShouldInvokeHandler(e, h.Handler)) continue;
+                if (!ShouldInvokeHandler(e, h.Handler)) continue;
+#if UNITY_EDITOR
+                if (h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
+                    await asyncHandler(e).ConfigureAwait(false);
+                else if (h.Handler is Action<T> syncHandler)
+                    syncHandler(e);
+
+                if (h.Once)
+                    toRemove.Add(h);
+#else
                 try
                 {
-                    if(h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
+                    if (h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
                         await asyncHandler(e).ConfigureAwait(false);
-                    else if(h.Handler is Action<T> syncHandler)
+                    else if (h.Handler is Action<T> syncHandler)
                         syncHandler(e);
 
-                    if(h.Once)
+                    if (h.Once)
                         toRemove.Add(h);
                 }
                 catch (System.Exception ex)
                 {
-                    Debug.LogError($"[EventManager] Error: {ex.Message}");
+                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}",ELogType.Error);
                 }
+#endif
             }
 
-            if(toRemove.Count > 0)
+            if (toRemove.Count > 0)
             {
                 lock (Lock)
                 {
-                    if(Handlers.TryGetValue(typeof(T), out var list))
+                    if (Handlers.TryGetValue(typeof(T), out var list))
                     {
                         foreach (var r in toRemove)
                             list.Remove(r);
@@ -158,12 +173,13 @@ namespace CnoomFrameWork.Base.Events
         /// <summary>
         /// 注册结构体事件处理器（ref 传参）。
         /// </summary>
-        public static void SubscribeRef<T>(RefEventHandler<T> handler, int priority = 0, bool once = false) where T : struct
+        public static void SubscribeRef<T>(RefEventHandler<T> handler, int priority = 0, bool once = false)
+            where T : struct
         {
             var type = typeof(T);
             lock (RefLock)
             {
-                if(!RefHandlers.TryGetValue(type, out var list))
+                if (!RefHandlers.TryGetValue(type, out var list))
                     list = RefHandlers[type] = new List<RefHandlerInfo>();
 
                 list.Add(new RefHandlerInfo
@@ -176,7 +192,7 @@ namespace CnoomFrameWork.Base.Events
                 list.Sort((a, b) => b.Priority.CompareTo(a.Priority));
             }
         }
-        
+
         /// <summary>
         /// 取消注册结构体事件处理器。
         /// </summary>
@@ -185,7 +201,7 @@ namespace CnoomFrameWork.Base.Events
             var type = typeof(T);
             lock (RefLock)
             {
-                if(RefHandlers.TryGetValue(type, out var list))
+                if (RefHandlers.TryGetValue(type, out var list))
                 {
                     list.RemoveAll(h => h.Handler == (Delegate)handler);
                 }
@@ -201,7 +217,7 @@ namespace CnoomFrameWork.Base.Events
             List<RefHandlerInfo> snapshot;
             lock (RefLock)
             {
-                if(!RefHandlers.TryGetValue(type, out var list)) return;
+                if (!RefHandlers.TryGetValue(type, out var list)) return;
                 snapshot = new List<RefHandlerInfo>(list);
             }
 
@@ -209,28 +225,36 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var h in snapshot)
             {
-                if(!ShouldInvokeRefHandler(e, h.Handler)) continue;
-
-                try
+                if (!ShouldInvokeRefHandler(e, h.Handler)) continue;
+#if UNITY_EDITOR
+                if (h.Handler is RefEventHandler<T> handler)
                 {
-                    if(h.Handler is RefEventHandler<T> handler)
+                    handler(ref e);
+                    if (h.Once)
+                        toRemove.Add(h);
+                }
+#else
+               try
+                {
+                    if (h.Handler is RefEventHandler<T> handler)
                     {
                         handler(ref e);
-                        if(h.Once)
+                        if (h.Once)
                             toRemove.Add(h);
                     }
                 }
                 catch (System.Exception ex)
                 {
-                    Debug.LogError($"[EventManager] Error: {ex.Message}");
+                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}",ELogType.Error);
                 }
+#endif
             }
 
-            if(toRemove.Count > 0)
+            if (toRemove.Count > 0)
             {
                 lock (RefLock)
                 {
-                    if(RefHandlers.TryGetValue(type, out var list))
+                    if (RefHandlers.TryGetValue(type, out var list))
                     {
                         foreach (var r in toRemove)
                             list.Remove(r);
@@ -247,7 +271,7 @@ namespace CnoomFrameWork.Base.Events
             var type = typeof(T);
             lock (Lock)
             {
-                if(!Filters.TryGetValue(type, out var list))
+                if (!Filters.TryGetValue(type, out var list))
                     list = Filters[type] = new List<Delegate>();
                 list.Add(filter);
             }
@@ -261,7 +285,7 @@ namespace CnoomFrameWork.Base.Events
             var type = typeof(T);
             lock (RefLock)
             {
-                if(!RefFilters.TryGetValue(type, out var list))
+                if (!RefFilters.TryGetValue(type, out var list))
                     list = RefFilters[type] = new List<Delegate>();
                 list.Add(filter);
             }
@@ -283,7 +307,8 @@ namespace CnoomFrameWork.Base.Events
                     try
                     {
                         Delegate del = attr.IsAsync
-                            ? Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(type, typeof(Task)), subscriber, m)
+                            ? Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(type, typeof(Task)), subscriber,
+                                m)
                             : Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
 
                         AddHandler(type, del, attr.Priority, attr.Once, attr.IsAsync);
@@ -318,7 +343,7 @@ namespace CnoomFrameWork.Base.Events
                 }
             }
         }
-        
+
         /// <summary>
         /// 从事件系统中注销某个对象的所有事件处理器。
         /// </summary>
