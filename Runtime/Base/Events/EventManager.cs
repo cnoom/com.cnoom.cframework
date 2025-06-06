@@ -131,15 +131,6 @@ namespace CnoomFrameWork.Base.Events
             foreach (var h in snapshot)
             {
                 if (!ShouldInvokeHandler(e, h.Handler)) continue;
-#if UNITY_EDITOR
-                if (h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
-                    await asyncHandler(e).ConfigureAwait(false);
-                else if (h.Handler is Action<T> syncHandler)
-                    syncHandler(e);
-
-                if (h.Once)
-                    toRemove.Add(h);
-#else
                 try
                 {
                     if (h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
@@ -152,9 +143,8 @@ namespace CnoomFrameWork.Base.Events
                 }
                 catch (System.Exception ex)
                 {
-                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}",ELogType.Error);
+                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
                 }
-#endif
             }
 
             if (toRemove.Count > 0)
@@ -226,15 +216,7 @@ namespace CnoomFrameWork.Base.Events
             foreach (var h in snapshot)
             {
                 if (!ShouldInvokeRefHandler(e, h.Handler)) continue;
-#if UNITY_EDITOR
-                if (h.Handler is RefEventHandler<T> handler)
-                {
-                    handler(ref e);
-                    if (h.Once)
-                        toRemove.Add(h);
-                }
-#else
-               try
+                try
                 {
                     if (h.Handler is RefEventHandler<T> handler)
                     {
@@ -245,9 +227,8 @@ namespace CnoomFrameWork.Base.Events
                 }
                 catch (System.Exception ex)
                 {
-                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}",ELogType.Error);
+                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
                 }
-#endif
             }
 
             if (toRemove.Count > 0)
@@ -301,6 +282,7 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var m in methods)
             {
+                bool canSkip = false;
                 foreach (var attr in m.GetCustomAttributes<EventSubscriberAttribute>())
                 {
                     var type = attr.EventType;
@@ -312,12 +294,15 @@ namespace CnoomFrameWork.Base.Events
                             : Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
 
                         AddHandler(type, del, attr.Priority, attr.Once, attr.IsAsync);
+                        canSkip = true;
                     }
                     catch (System.Exception ex)
                     {
                         Debug.LogError($"[Register] Failed to bind method {m.Name}: {ex.Message}");
                     }
                 }
+
+                if (canSkip) continue;
 
                 foreach (var attr in m.GetCustomAttributes<RefEventSubscriberAttribute>())
                 {
