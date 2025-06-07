@@ -16,6 +16,8 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         public delegate void RefEventHandler<T>(ref T e) where T : struct;
 
+        internal static App App;
+
         private static readonly Dictionary<Type, List<HandlerInfo>> Handlers = new();
         private static readonly Dictionary<Type, List<RefHandlerInfo>> RefHandlers = new();
         private static readonly Dictionary<Type, List<Delegate>> Filters = new();
@@ -143,7 +145,7 @@ namespace CnoomFrameWork.Base.Events
                 }
                 catch (System.Exception ex)
                 {
-                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
+                    App.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
                 }
             }
 
@@ -227,7 +229,7 @@ namespace CnoomFrameWork.Base.Events
                 }
                 catch (System.Exception ex)
                 {
-                    App.Instance.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
+                    App.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
                 }
             }
 
@@ -298,7 +300,7 @@ namespace CnoomFrameWork.Base.Events
                     }
                     catch (System.Exception ex)
                     {
-                        Debug.LogError($"[Register] Failed to bind method {m.Name}: {ex.Message}");
+                        App.Log.Log($"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
                     }
                 }
 
@@ -323,7 +325,7 @@ namespace CnoomFrameWork.Base.Events
                     }
                     catch (System.Exception ex)
                     {
-                        Debug.LogError($"[Register] Failed to bind ref method {m.Name}: {ex.Message}");
+                        App.Log.Log($"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
                     }
                 }
             }
