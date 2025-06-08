@@ -21,15 +21,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
         public IEnumerator LoadSceneCoroutine(string sceneKey, LoadSceneMode loadMode, Action<SceneInstance> onLoaded, Action<string> onError = null)
         {
-            if(assetHandles.TryGetValue(sceneKey, out AsyncOperationHandle handle))
-            {
-                referenceCount[sceneKey]++;
-                onLoaded?.Invoke((SceneInstance)handle.Result);
-                yield break;
-            }
-
             AsyncOperationHandle<SceneInstance> operation = Addressables.LoadSceneAsync(sceneKey, loadMode);
-            TrackHandle(sceneKey, operation);
             yield return operation;
 
             if(operation.Status != AsyncOperationStatus.Succeeded)
