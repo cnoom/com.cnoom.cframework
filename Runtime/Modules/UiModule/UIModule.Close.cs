@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using CnoomFrameWork.Base.Events;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
 
@@ -72,6 +73,7 @@ namespace CnoomFrameWork.Modules.UiModule
             {
                 ui.OnExit();
                 FinalizeClose(ui);
+                
             }
             if(ui is AnimationUi animationUi)
             {
@@ -155,6 +157,13 @@ namespace CnoomFrameWork.Modules.UiModule
 
             // 刷新层级
             RefreshPanelDepths();
+            
+            // 触发关闭ui事件
+            EventManager.PublishAsync(new CloseUiEvent
+            {
+                LayerType = ui.Layer,
+                LayerCount = layerStack[ui.Layer].Count
+            });
 
             // 恢复栈顶界面
             if(layerStack[layer].Count > 0)
@@ -173,6 +182,21 @@ namespace CnoomFrameWork.Modules.UiModule
                 canvasGroup.interactable = state;
                 canvasGroup.blocksRaycasts = state;
             }
+        }
+        
+        /// <summary>
+        ///     关闭界面事件
+        /// </summary>
+        public struct CloseUiEvent
+        {
+            /// <summary>
+            ///     关闭的界面层级
+            /// </summary>
+            public EUiLayer  LayerType;
+            /// <summary>
+            /// 该层级剩余的界面数量
+            /// </summary>
+            public int LayerCount;
         }
     }
 }
