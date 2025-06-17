@@ -133,13 +133,20 @@ namespace CnoomFrameWork.Base.Events
             foreach (var h in snapshot)
             {
                 if (!ShouldInvokeHandler(e, h.Handler)) continue;
-                if (h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
-                    await asyncHandler(e).ConfigureAwait(false);
-                else if (h.Handler is Action<T> syncHandler)
-                    syncHandler(e);
+                try
+                {
+                    if (h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
+                        await asyncHandler(e).ConfigureAwait(false);
+                    else if (h.Handler is Action<T> syncHandler)
+                        syncHandler(e);
 
-                if (h.Once)
-                    toRemove.Add(h);
+                    if (h.Once)
+                        toRemove.Add(h);
+                }
+                catch (System.Exception ex)
+                {
+                    App.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
+                }
             }
 
             if (toRemove.Count > 0)
@@ -211,11 +218,18 @@ namespace CnoomFrameWork.Base.Events
             foreach (var h in snapshot)
             {
                 if (!ShouldInvokeRefHandler(e, h.Handler)) continue;
-                if (h.Handler is RefEventHandler<T> handler)
+                try
                 {
-                    handler(ref e);
-                    if (h.Once)
-                        toRemove.Add(h);
+                    if (h.Handler is RefEventHandler<T> handler)
+                    {
+                        handler(ref e);
+                        if (h.Once)
+                            toRemove.Add(h);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    App.Log.Log($"[EventManager] Error: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
                 }
             }
 
@@ -274,13 +288,20 @@ namespace CnoomFrameWork.Base.Events
                 foreach (var attr in m.GetCustomAttributes<EventSubscriberAttribute>())
                 {
                     var type = attr.EventType;
-                    Delegate del = attr.IsAsync
-                        ? Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(type, typeof(Task)), subscriber,
-                            m)
-                        : Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
+                    try
+                    {
+                        Delegate del = attr.IsAsync
+                            ? Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(type, typeof(Task)), subscriber,
+                                m)
+                            : Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
 
-                    AddHandler(type, del, attr.Priority, attr.Once, attr.IsAsync);
-                    canSkip = true;
+                        AddHandler(type, del, attr.Priority, attr.Once, attr.IsAsync);
+                        canSkip = true;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        App.Log.Log($"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
+                    }
                 }
 
                 if (canSkip) continue;
@@ -288,17 +309,24 @@ namespace CnoomFrameWork.Base.Events
                 foreach (var attr in m.GetCustomAttributes<RefEventSubscriberAttribute>())
                 {
                     var type = attr.EventType;
-                    var handlerType = typeof(RefEventHandler<>).MakeGenericType(type);
-                    var del = Delegate.CreateDelegate(handlerType, subscriber, m);
-                    typeof(EventManager)
-                        .GetMethod(nameof(SubscribeRef))
-                        ?.MakeGenericMethod(type)
-                        .Invoke(null, new object[]
-                        {
-                            del,
-                            attr.Priority,
-                            attr.Once
-                        });
+                    try
+                    {
+                        var handlerType = typeof(RefEventHandler<>).MakeGenericType(type);
+                        var del = Delegate.CreateDelegate(handlerType, subscriber, m);
+                        typeof(EventManager)
+                            .GetMethod(nameof(SubscribeRef))
+                            ?.MakeGenericMethod(type)
+                            .Invoke(null, new object[]
+                            {
+                                del,
+                                attr.Priority,
+                                attr.Once
+                            });
+                    }
+                    catch (System.Exception ex)
+                    {
+                        App.Log.Log($"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
+                    }
                 }
             }
         }
