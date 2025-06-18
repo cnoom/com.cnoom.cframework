@@ -69,7 +69,7 @@ namespace CnoomFrameWork.Base.Events
                     Priority = priority,
                     Once = once,
                     IsAsync = isAsync,
-                    Target = handler.Target
+                    Target = new WeakReference<object>(handler.Target)
                 });
                 list.Sort((a, b) => b.Priority.CompareTo(a.Priority));
             }
@@ -132,6 +132,11 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var h in snapshot)
             {
+                if (!h.Target.TryGetTarget(out _))
+                {
+                    toRemove.Add(h);
+                    continue;
+                }
                 if (!ShouldInvokeHandler(e, h.Handler)) continue;
                 try
                 {
