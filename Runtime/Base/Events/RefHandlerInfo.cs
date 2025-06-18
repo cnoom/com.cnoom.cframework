@@ -7,6 +7,6 @@ namespace CnoomFrameWork.Base.Events
         public Delegate Handler;
         public int Priority;
         public bool Once;
-        public object Target;
+        public WeakReference<object> Target;
     }
 }

@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Core;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CnoomFrameWork.Base.Events
 {
@@ -132,7 +132,7 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var h in snapshot)
             {
-                if (!h.Target.TryGetTarget(out _))
+                if (!h.Target.TryGetTarget(out object t) || t is Object o && !o)
                 {
                     toRemove.Add(h);
                     continue;
@@ -184,7 +184,7 @@ namespace CnoomFrameWork.Base.Events
                     Handler = handler,
                     Priority = priority,
                     Once = once,
-                    Target = handler.Target
+                    Target = new WeakReference<object>(handler.Target)
                 });
                 list.Sort((a, b) => b.Priority.CompareTo(a.Priority));
             }
@@ -222,6 +222,11 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var h in snapshot)
             {
+                if (!h.Target.TryGetTarget(out object t) || t is Object o && !o)
+                {
+                    toRemove.Add(h);
+                    continue;
+                }
                 if (!ShouldInvokeRefHandler(e, h.Handler)) continue;
                 try
                 {
