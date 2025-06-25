@@ -350,7 +350,14 @@ namespace CnoomFrameWork.Base.Events
             {
                 foreach (var list in Handlers.Values)
                 {
-                    list.RemoveAll(h => ReferenceEquals(h, subscriber));
+                    list.RemoveAll(h =>
+                    {
+                        if (h.Target.TryGetTarget(out var target))
+                        {
+                            return ReferenceEquals(target, subscriber);
+                        }
+                        return true;
+                    });
                 }
             }
 
@@ -358,7 +365,14 @@ namespace CnoomFrameWork.Base.Events
             {
                 foreach (var list in RefHandlers.Values)
                 {
-                    list.RemoveAll(h => ReferenceEquals(h, subscriber));
+                    list.RemoveAll(h =>
+                    {
+                        if (h.Target.TryGetTarget(out var target))
+                        {
+                            return ReferenceEquals(target, subscriber);
+                        }
+                        return true;
+                    });
                 }
             }
         }
