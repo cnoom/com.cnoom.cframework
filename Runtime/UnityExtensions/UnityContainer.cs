@@ -27,7 +27,7 @@ namespace CnoomFrameWork.Core.UnityExtensions
         public UnityContainer(string sceneName)
         {
             SceneName = sceneName;
-            EventManager.PublishAsync(this);
+            EventManager.Publish(this);
         }
 
         public void AddGameObject(GameObject gameObject) => _gameObjects.Add(gameObject.name, new GameObjectContainer

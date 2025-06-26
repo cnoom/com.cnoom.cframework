@@ -159,7 +159,7 @@ namespace CnoomFrameWork.Modules.UiModule
             RefreshPanelDepths();
             
             // 触发关闭ui事件
-            EventManager.PublishAsync(new CloseUiEvent
+            EventManager.Publish(new CloseUiEvent
             {
                 LayerType = ui.Layer,
                 LayerCount = layerStack[ui.Layer].Count

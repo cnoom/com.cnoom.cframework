@@ -8,6 +8,5 @@ namespace CnoomFrameWork.Base.Events
         public int Priority;
         public bool Once;
         public WeakReference<object> Target;
-        public bool IsAsync;
     }
 }

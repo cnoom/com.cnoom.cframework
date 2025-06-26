@@ -30,7 +30,7 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         public static void Subscribe<T>(Func<T, Task> handler, int priority = 0, bool once = false)
         {
-            AddHandler(typeof(T), handler, priority, once, isAsync: true);
+            AddHandler(typeof(T), handler, priority, once);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         public static void Subscribe<T>(Action<T> handler, int priority = 0, bool once = false)
         {
-            AddHandler(typeof(T), handler, priority, once, isAsync: false);
+            AddHandler(typeof(T), handler, priority, once);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace CnoomFrameWork.Base.Events
             }
         }
 
-        private static void AddHandler(Type type, Delegate handler, int priority, bool once, bool isAsync)
+        private static void AddHandler(Type type, Delegate handler, int priority, bool once)
         {
             lock (Lock)
             {
@@ -68,7 +68,6 @@ namespace CnoomFrameWork.Base.Events
                     Handler = handler,
                     Priority = priority,
                     Once = once,
-                    IsAsync = isAsync,
                     Target = new WeakReference<object>(handler.Target)
                 });
                 list.Sort((a, b) => b.Priority.CompareTo(a.Priority));
@@ -119,7 +118,7 @@ namespace CnoomFrameWork.Base.Events
         /// <summary>
         /// 同步或异步发布事件给所有订阅者。
         /// </summary>
-        public static async Task PublishAsync<T>(T e)
+        public static void Publish<T>(T e)
         {
             List<HandlerInfo> snapshot;
             lock (Lock)
@@ -137,12 +136,11 @@ namespace CnoomFrameWork.Base.Events
                     toRemove.Add(h);
                     continue;
                 }
+
                 if (!ShouldInvokeHandler(e, h.Handler)) continue;
                 try
                 {
-                    if (h.IsAsync && h.Handler is Func<T, Task> asyncHandler)
-                        await asyncHandler(e).ConfigureAwait(false);
-                    else if (h.Handler is Action<T> syncHandler)
+                    if (h.Handler is Action<T> syncHandler)
                         syncHandler(e);
 
                     if (h.Once)
@@ -227,6 +225,7 @@ namespace CnoomFrameWork.Base.Events
                     toRemove.Add(h);
                     continue;
                 }
+
                 if (!ShouldInvokeRefHandler(e, h.Handler)) continue;
                 try
                 {
@@ -300,17 +299,16 @@ namespace CnoomFrameWork.Base.Events
                     var type = attr.EventType;
                     try
                     {
-                        Delegate del = attr.IsAsync
-                            ? Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(type, typeof(Task)), subscriber,
-                                m)
-                            : Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
+                        Delegate del = Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
 
-                        AddHandler(type, del, attr.Priority, attr.Once, attr.IsAsync);
+                        AddHandler(type, del, attr.Priority, attr.Once);
                         canSkip = true;
                     }
                     catch (System.Exception ex)
                     {
-                        App.Log.Log($"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
+                        App.Log.Log(
+                            $"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}",
+                            ELogType.Error);
                     }
                 }
 
@@ -335,7 +333,9 @@ namespace CnoomFrameWork.Base.Events
                     }
                     catch (System.Exception ex)
                     {
-                        App.Log.Log($"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}", ELogType.Error);
+                        App.Log.Log(
+                            $"[EventManager] Register Failed to bind ref method[{m.Name}]: {ex.Message}\n{ex.StackTrace}",
+                            ELogType.Error);
                     }
                 }
             }
@@ -356,6 +356,7 @@ namespace CnoomFrameWork.Base.Events
                         {
                             return ReferenceEquals(target, subscriber);
                         }
+
                         return true;
                     });
                 }
@@ -371,6 +372,7 @@ namespace CnoomFrameWork.Base.Events
                         {
                             return ReferenceEquals(target, subscriber);
                         }
+
                         return true;
                     });
                 }

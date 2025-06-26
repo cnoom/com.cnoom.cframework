@@ -43,7 +43,7 @@ namespace CnoomFrameWork.Modules.UiModule
                 layerStack[layer] = new Stack<BaseUi>();
             }
 
-            EventManager.PublishAsync(this);
+            EventManager.Publish(this);
         }
 
         // 从缓存池获取界面

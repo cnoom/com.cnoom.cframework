@@ -11,14 +11,12 @@ namespace CnoomFrameWork.Base.Events
         public Type EventType { get; }
         public int Priority { get; }
         public bool Once { get; }
-        public bool IsAsync { get; }
 
         public EventSubscriberAttribute(Type eventType, int priority = 0, bool once = false, bool isAsync = false)
         {
             EventType = eventType;
             Priority = priority;
             Once = once;
-            IsAsync = isAsync;
         }
     }
 }
