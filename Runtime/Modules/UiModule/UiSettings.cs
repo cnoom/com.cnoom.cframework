@@ -9,18 +9,21 @@ namespace CnoomFrameWork.Modules.UiModule
     {
         public const string FileName = "UiSettings";
         public Canvas canvas;
-        public List<BaseUi> panels = new List<BaseUi>();
-        public T GetPanel<T>() where T : BaseUi
+        public List<UiBase> panels = new();
+
+        public T GetUi<T>() where T : UiBase
         {
-            if(panels == null)
+            if (panels == null)
             {
-                throw new System.Exception("panels is null");
+                throw new System.Exception("ui list is null");
             }
+
             foreach (T panel in panels.OfType<T>())
             {
                 return panel;
             }
-            throw new System.Exception("panel not found");
+
+            throw new System.Exception("ui not found");
         }
     }
 }

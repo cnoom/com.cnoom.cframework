@@ -1,33 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using CnoomFrameWork.Modules.UiModule;
 using UnityEngine;
 
-namespace CnoomFrameWork.Modules.UiModule.UiPart
+namespace Modules.UiModule
 {
-    public class AnimationUi : BaseUi
+    public class UiAnimation : MonoBehaviour
     {
-        // 新增动画控制组件
+        public bool hasOpenAnimation = true;
+        public bool hasCloseAnimation = true;
+        
         private Coroutine _currentAnimation;
-        /// <summary>
-        ///     需要动画的子对象列表
-        /// </summary>
         protected List<CanvasGroup> Animations;
-
-
-        public override void OnGenerate()
-        {
-            base.OnGenerate();
-            InitAnimationPart();
-        }
-
-        /// <summary>
-        /// 动画播放前
-        /// </summary>
-        /// <param name="param"></param>
-        public virtual void OnBeforePlay(object param = null) { }
-
-        protected virtual void InitAnimationPart()
+        
+        public virtual void InitAnimationPart()
         {
             Animations = new List<CanvasGroup>();
             // 为需要动画的子对象初始化CanvasGroup（跳过标记忽略的）
@@ -44,16 +31,22 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
                 }
             }
         }
-
+        /// <summary>
+        /// 打开ui动画
+        /// </summary>
+        /// <returns></returns>
         public virtual IEnumerator PlayEnterAnimation()
         {
-            // 默认动画：渐显+缩放
             yield return StartCoroutine(CombineAnimations(
                 FadeAnimation(0, 1, 0.2f),
                 ScaleAnimation(Vector3.one * 0.8f, Vector3.one, 0.2f)
             ));
         }
-
+        
+        /// <summary>
+        /// 关闭ui动画
+        /// </summary>
+        /// <returns></returns>
         public virtual IEnumerator PlayExitAnimation()
         {
             // 默认动画：渐隐+缩小
@@ -62,8 +55,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
                 ScaleAnimation(Vector3.one, Vector3.one * 0.8f, 0.15f)
             ));
         }
-
-        // 动画工具方法 --------------------------------------------------
+        
         protected IEnumerator FadeAnimation(float from, float to, float duration)
         {
             foreach (CanvasGroup cg in Animations) cg.alpha = from;
@@ -75,6 +67,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
                 {
                     cg.alpha = Mathf.Lerp(from, to, timer / duration);
                 }
+
                 timer += Time.deltaTime;
                 yield return null;
             }
@@ -97,6 +90,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
                 {
                     t.localScale = Vector3.Lerp(from, to, timer / duration);
                 }
+
                 timer += Time.deltaTime;
                 yield return null;
             }
@@ -122,16 +116,6 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
             foreach (Coroutine coroutine in running)
             {
                 yield return coroutine;
-            }
-        }
-
-        // 强制停止动画
-        public void StopAllPanelAnimations()
-        {
-            if(_currentAnimation != null)
-            {
-                StopCoroutine(_currentAnimation);
-                _currentAnimation = null;
             }
         }
     }

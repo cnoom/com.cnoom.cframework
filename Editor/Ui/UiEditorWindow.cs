@@ -49,14 +49,14 @@ namespace FrameWork.Editor.Ui
                         foreach (Object draggedObject in DragAndDrop.objectReferences)
                         {
                             if(draggedObject is not GameObject prefab) continue;
-                            BaseUi baseUi = prefab.GetComponent<BaseUi>();
-                            if(!baseUi)
+                            UiBase uiBase = prefab.GetComponent<UiBase>();
+                            if(!uiBase)
                             {
-                                Debug.LogError($"[{nameof(UiEditorWindow)}] {prefab.name} 没有{nameof(BaseUi)}组件]",this);
+                                Debug.LogError($"[{nameof(UiEditorWindow)}] {prefab.name} 没有{nameof(UiBase)}组件]",this);
                                 continue;
                             }
-                            TryAddPrefabToAddressable(baseUi);
-                            TryAddConfigs(baseUi);
+                            TryAddPrefabToAddressable(uiBase);
+                            TryAddConfigs(uiBase);
                         }
                     }
                     currentEvent.Use();
@@ -64,13 +64,13 @@ namespace FrameWork.Editor.Ui
             }
         }
 
-        private void TryAddPrefabToAddressable(BaseUi prefab)
+        private void TryAddPrefabToAddressable(UiBase prefab)
         {
             GameObject prefabGameObject = prefab.gameObject;
             ToAddressable(prefabGameObject);
         }
 
-        private void TryAddConfigs(BaseUi prefab)
+        private void TryAddConfigs(UiBase prefab)
         {
             UiSettings uiSettings = GetUiPanels();
             if(uiSettings.panels.Contains(prefab))
