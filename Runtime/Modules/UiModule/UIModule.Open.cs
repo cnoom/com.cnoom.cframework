@@ -21,9 +21,9 @@ namespace CnoomFrameWork.Modules.UiModule
 
             // 从缓存池获取或创建新实例
             T panel = CreateUi<T>();
-            EUiLayer layer = panel.uiConfig.layer;
+            string layer = panel.uiConfig.layer;
             panel.gameObject.SetActive(true);
-            Transform panelParent = _canvasTransform.Find(layer.ToString());
+            Transform panelParent = _canvasTransform.Find(layer);
             panel.transform.SetParent(panelParent);
 
             // 加入管理

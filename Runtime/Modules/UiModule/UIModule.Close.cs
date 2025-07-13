@@ -10,16 +10,16 @@ namespace CnoomFrameWork.Modules.UiModule
     public partial class UIModule
     {
         // 关闭顶层界面
-        public void CloseTop(EUiLayer layer)
+        public void CloseTop(string layer)
         {
-            if(_layerStack[layer].Count == 0) return;
+            if (_layerStack[layer].Count == 0) return;
 
             UiBase ui = _layerStack[layer].Pop();
 
             // 调用生命周期
             ui.OnExit();
             ui.gameObject.SetActive(false);
-            
+
             RemoveUi(ui);
         }
 
@@ -33,17 +33,18 @@ namespace CnoomFrameWork.Modules.UiModule
         /// </summary>
         private void CloseUi(UiBase ui)
         {
-            if(ui == null) return;
+            if (ui == null) return;
 
             // 处理栈结构
             RemoveInStack(ui);
 
             // 生命周期调用
-            if(ui.uiAnimation && ui.uiAnimation.hasCloseAnimation)
+            if (ui.uiAnimation && ui.uiAnimation.hasCloseAnimation)
             {
                 App.StartCoroutine(CloseWithAnimation(ui));
                 return;
             }
+
             ui.OnExit();
             FinalizeClose(ui);
         }
@@ -74,13 +75,13 @@ namespace CnoomFrameWork.Modules.UiModule
 
         private void FinalizeClose(UiBase ui)
         {
-            EUiLayer layer = ui.uiConfig.layer;
+            string layer = ui.uiConfig.layer;
             // 回收处理
             RemoveUi(ui);
 
             // 刷新层级
             RefreshUiDepths();
-            
+
             // 触发关闭ui事件
             EventManager.Publish(new CloseUiEvent
             {
@@ -89,7 +90,7 @@ namespace CnoomFrameWork.Modules.UiModule
             });
 
             // 恢复栈顶界面
-            if(_layerStack[layer].Count > 0)
+            if (_layerStack[layer].Count > 0)
             {
                 UiBase newTop = _layerStack[layer].Peek();
                 SetPanelInteractable(newTop, true);
@@ -99,13 +100,13 @@ namespace CnoomFrameWork.Modules.UiModule
         private void SetPanelInteractable(UiBase ui, bool state)
         {
             CanvasGroup canvasGroup = ui.GetComponent<CanvasGroup>();
-            if(canvasGroup)
+            if (canvasGroup)
             {
                 canvasGroup.interactable = state;
                 canvasGroup.blocksRaycasts = state;
             }
         }
-        
+
         /// <summary>
         ///     关闭界面事件
         /// </summary>
@@ -114,7 +115,8 @@ namespace CnoomFrameWork.Modules.UiModule
             /// <summary>
             ///     关闭的界面层级
             /// </summary>
-            public EUiLayer  LayerType;
+            public string LayerType;
+
             /// <summary>
             /// 该层级剩余的界面数量
             /// </summary>

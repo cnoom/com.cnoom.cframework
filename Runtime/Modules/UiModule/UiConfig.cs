@@ -6,7 +6,7 @@ namespace CnoomFrameWork.Modules.UiModule
     public class UiConfig
     {
         public string uiName;
-        public EUiLayer layer;
+        public string layer;
         public bool allowMultiple;
     }
 }

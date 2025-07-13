@@ -14,7 +14,7 @@ namespace CnoomFrameWork.Modules.UiModule
     public partial class UIModule : Module
     {
         // 使用栈管理界面层级
-        private readonly Dictionary<EUiLayer, Stack<UiBase>> _layerStack = new();
+        private readonly Dictionary<string, Stack<UiBase>> _layerStack = new();
 
         private Transform _canvasTransform;
         private UiSettings _uiSettings;
@@ -26,7 +26,7 @@ namespace CnoomFrameWork.Modules.UiModule
             _uiSettings = AssetsService.LoadAsset<UiSettings>(UiSettings.FileName);
             _canvasTransform = Object.Instantiate(_uiSettings.canvas, App.transform).transform;
 
-            foreach (EUiLayer layer in Enum.GetValues(typeof(EUiLayer)))
+            foreach (string layer in _uiSettings.uiLayers)
             {
                 GameObject go = new GameObject(layer.ToString());
                 go.transform.SetParent(_canvasTransform);
@@ -54,7 +54,7 @@ namespace CnoomFrameWork.Modules.UiModule
         /// 刷新层级深度的方法
         private void RefreshUiDepths()
         {
-            foreach (EUiLayer layer in _layerStack.Keys)
+            foreach (string layer in _layerStack.Keys)
             {
                 Transform layerTransform = _canvasTransform.Find(layer.ToString());
                 layerTransform.DetachChildren();
@@ -65,7 +65,7 @@ namespace CnoomFrameWork.Modules.UiModule
             }
         }
 
-        private bool HasUi(EUiLayer uiLayer, string gameObjectName, out UiBase ui)
+        private bool HasUi(string uiLayer, string gameObjectName, out UiBase ui)
         {
             foreach (var uiBase in _layerStack[uiLayer])
             {

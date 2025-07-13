@@ -10,6 +10,7 @@ namespace CnoomFrameWork.Modules.UiModule
         public const string FileName = "UiSettings";
         public Canvas canvas;
         public List<UiBase> panels = new();
+        public List<string> uiLayers = new();
 
         public T GetUi<T>() where T : UiBase
         {

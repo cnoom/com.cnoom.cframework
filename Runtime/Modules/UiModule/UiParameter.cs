@@ -17,7 +17,25 @@ namespace CnoomFrameWork.Modules.UiModule
             {
                 return (T)_parameter[key];
             }
+
             return default;
+        }
+
+        public bool HasParameter(string key)
+        {
+            return _parameter.ContainsKey(key);
+        }
+
+        public bool TryGetParameter<T>(string key, out T value)
+        {
+            if (_parameter.ContainsKey(key))
+            {
+                value = (T)_parameter[key];
+                return true;
+            }
+
+            value = default;
+            return false;
         }
     }
 }
