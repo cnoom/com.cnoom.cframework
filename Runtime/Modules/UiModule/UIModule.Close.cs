@@ -104,8 +104,6 @@ namespace CnoomFrameWork.Modules.UiModule
         /// </summary>
         public struct CloseUiEvent
         {
-            
-            
             /// <summary>
             ///     关闭的界面层级
             /// </summary>

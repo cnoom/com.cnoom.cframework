@@ -28,7 +28,7 @@ namespace CnoomFrameWork.Modules.UiModule
 
             foreach (string layer in _uiSettings.uiLayers)
             {
-                GameObject go = new GameObject(layer.ToString());
+                GameObject go = new GameObject(layer);
                 go.transform.SetParent(_canvasTransform);
                 _layerStack[layer] = new Stack<UiBase>();
             }
