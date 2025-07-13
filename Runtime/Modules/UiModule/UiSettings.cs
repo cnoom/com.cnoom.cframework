@@ -12,18 +12,21 @@ namespace CnoomFrameWork.Modules.UiModule
         public List<UiBase> panels = new();
         public List<string> uiLayers = new();
 
-        public T GetUi<T>() where T : UiBase
+        public UiBase GetUi(string uiName)
         {
             if (panels == null)
             {
                 throw new System.Exception("ui list is null");
             }
 
-            foreach (T panel in panels.OfType<T>())
+            foreach (UiBase panel in panels)
             {
-                return panel;
+                if (panel.uiConfig.uiName == uiName)
+                {
+                    return panel;
+                }
             }
-
+            
             throw new System.Exception("ui not found");
         }
     }

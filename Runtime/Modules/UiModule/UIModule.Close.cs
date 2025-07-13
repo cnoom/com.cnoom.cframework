@@ -4,18 +4,18 @@ using System.Linq;
 using CnoomFrameWork.Base.Events;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace CnoomFrameWork.Modules.UiModule
 {
     public partial class UIModule
     {
-        // 关闭顶层界面
-        public void CloseTopUi(string layer)
+        [EventSubscriber(typeof(CloseLayerTopCommand)),Preserve]
+        private void OnCloseUiTopLayer(CloseLayerTopCommand command)
         {
-            if (_layerStack[layer].Count == 0) return;
-
-            UiBase ui = _layerStack[layer].Pop();
-            Closing(ui);
+            if (_layerStack[command.Layer].Count <= 0) return;
+            UiBase ui = _layerStack[command.Layer].Peek();
+            CloseUi(ui);
         }
 
         /// <summary>
@@ -97,22 +97,6 @@ namespace CnoomFrameWork.Modules.UiModule
                 canvasGroup.interactable = state;
                 canvasGroup.blocksRaycasts = state;
             }
-        }
-
-        /// <summary>
-        ///     关闭界面事件
-        /// </summary>
-        public struct CloseUiEvent
-        {
-            /// <summary>
-            ///     关闭的界面层级
-            /// </summary>
-            public string LayerType;
-
-            /// <summary>
-            /// 该层级剩余的界面数量
-            /// </summary>
-            public int LayerCount;
         }
     }
 }

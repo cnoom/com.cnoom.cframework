@@ -36,12 +36,11 @@ namespace CnoomFrameWork.Modules.UiModule
             EventManager.Publish(this);
         }
 
-        private T CreateUi<T>() where T : UiBase
+        private UiBase CreateUi(string uiName)
         {
-            GameObject prefab = _uiSettings.GetUi<T>().gameObject;
+            GameObject prefab = _uiSettings.GetUi(uiName).gameObject;
             GameObject instance = Object.Instantiate(prefab, _canvasTransform);
-            T ui = instance.GetComponent<T>();
-            ui.CloseAction = ()=> CloseUi(ui);
+            UiBase ui = instance.GetComponent<UiBase>();
             ui.Generate();
             return ui;
         }
@@ -57,7 +56,7 @@ namespace CnoomFrameWork.Modules.UiModule
         {
             foreach (string layer in _layerStack.Keys)
             {
-                Transform layerTransform = _canvasTransform.Find(layer.ToString());
+                Transform layerTransform = _canvasTransform.Find(layer);
                 layerTransform.DetachChildren();
                 foreach (UiBase basePanel in _layerStack[layer].Reverse())
                 {
@@ -77,6 +76,53 @@ namespace CnoomFrameWork.Modules.UiModule
 
             ui = null;
             return false;
+        }
+
+        /// <summary>
+        ///     关闭界面事件
+        /// </summary>
+        public struct CloseUiEvent
+        {
+            /// <summary>
+            ///     关闭的界面层级
+            /// </summary>
+            public string LayerType;
+
+            /// <summary>
+            /// 该层级剩余的界面数量
+            /// </summary>
+            public int LayerCount;
+
+            public CloseUiEvent(string layerType, int layerCount)
+            {
+                LayerType = layerType;
+                LayerCount = layerCount;
+            }
+        }
+
+        /// <summary>
+        /// 关闭某层最上方ui命令
+        /// </summary>
+        public struct CloseLayerTopCommand
+        {
+            public string Layer;
+
+            public CloseLayerTopCommand(string layer)
+            {
+                Layer = layer;
+            }
+        }
+
+        public struct OpenUiCommand
+        {
+            public string UiName;
+            public UiParameter Parameters;
+
+            public OpenUiCommand(string uiName, UiParameter parameters)
+            {
+                UiName = uiName;
+                Parameters = parameters;
+            }
         }
     }
 }

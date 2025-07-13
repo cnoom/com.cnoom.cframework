@@ -1,5 +1,6 @@
 ﻿using System;
 using CnoomFrameWork.Base.Container;
+using CnoomFrameWork.Base.Events;
 using Modules.UiModule;
 using UnityEngine;
 
@@ -9,9 +10,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
     {
         public UiConfig uiConfig;
 
-        public UiAnimation uiAnimation;
-
-        internal Action CloseAction;
+        [HideInInspector] public UiAnimation uiAnimation;
 
         // 生命周期方法
         private void Awake()
@@ -34,9 +33,13 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
             OnGenerate();
         }
 
-        public void CloseSelf()
+        public void CloseLayerTop(string layerName = null)
         {
-            CloseAction?.Invoke();
+            if (string.IsNullOrEmpty(layerName))
+            {
+                layerName = uiConfig.layer;
+            }
+            EventManager.Publish(new UIModule.CloseLayerTopCommand(layerName));
         }
 
         public virtual void OnGenerate()
