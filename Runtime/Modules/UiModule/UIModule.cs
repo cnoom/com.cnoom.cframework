@@ -48,6 +48,7 @@ namespace CnoomFrameWork.Modules.UiModule
 
         private void RemoveUi(UiBase ui)
         {
+            ui.OnExit();
             Object.Destroy(ui.gameObject);
         }
 

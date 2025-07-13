@@ -10,22 +10,12 @@ namespace CnoomFrameWork.Modules.UiModule
     public partial class UIModule
     {
         // 关闭顶层界面
-        public void CloseTop(string layer)
+        public void CloseTopUi(string layer)
         {
             if (_layerStack[layer].Count == 0) return;
 
             UiBase ui = _layerStack[layer].Pop();
-
-            // 调用生命周期
-            ui.OnExit();
-            ui.gameObject.SetActive(false);
-
-            RemoveUi(ui);
-        }
-
-        public void Close(UiBase ui)
-        {
-            CloseUi(ui);
+            Closing(ui);
         }
 
         /// <summary>
@@ -34,11 +24,13 @@ namespace CnoomFrameWork.Modules.UiModule
         private void CloseUi(UiBase ui)
         {
             if (ui == null) return;
-
             // 处理栈结构
             RemoveInStack(ui);
+            Closing(ui);
+        }
 
-            // 生命周期调用
+        private void Closing(UiBase ui)
+        {
             if (ui.uiAnimation && ui.uiAnimation.hasCloseAnimation)
             {
                 App.StartCoroutine(CloseWithAnimation(ui));
@@ -112,6 +104,8 @@ namespace CnoomFrameWork.Modules.UiModule
         /// </summary>
         public struct CloseUiEvent
         {
+            
+            
             /// <summary>
             ///     关闭的界面层级
             /// </summary>
