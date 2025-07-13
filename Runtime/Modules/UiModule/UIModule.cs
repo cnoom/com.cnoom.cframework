@@ -41,6 +41,7 @@ namespace CnoomFrameWork.Modules.UiModule
             GameObject prefab = _uiSettings.GetUi<T>().gameObject;
             GameObject instance = Object.Instantiate(prefab, _canvasTransform);
             T ui = instance.GetComponent<T>();
+            ui.CloseAction = ()=> CloseUi(ui);
             ui.Generate();
             return ui;
         }

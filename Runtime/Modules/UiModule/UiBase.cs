@@ -1,4 +1,5 @@
-﻿using CnoomFrameWork.Base.Container;
+﻿using System;
+using CnoomFrameWork.Base.Container;
 using Modules.UiModule;
 using UnityEngine;
 
@@ -7,7 +8,11 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
     public class UiBase : MonoBehaviour
     {
         public UiConfig uiConfig;
+
         public UiAnimation uiAnimation;
+
+        internal Action CloseAction;
+
         // 生命周期方法
         private void Awake()
         {
@@ -25,8 +30,13 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
                 uiAnimation = animation;
                 uiAnimation.InitAnimationPart();
             }
-            OnGenerate();
 
+            OnGenerate();
+        }
+
+        public void CloseSelf()
+        {
+            CloseAction?.Invoke();
         }
 
         public virtual void OnGenerate()
