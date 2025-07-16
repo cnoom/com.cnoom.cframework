@@ -117,7 +117,14 @@ namespace CnoomFrameWork.Modules.UiModule
             public UiParameter Parameters;
             public string ObjectName;
 
-            public OpenUiCommand(string uiName, UiParameter parameters, string objectName = null)
+            public OpenUiCommand(string uiName, UiParameter parameters = null, string objectName = null)
+            {
+                UiName = uiName;
+                Parameters = parameters;
+                ObjectName = objectName;
+            }
+
+            public OpenUiCommand(string uiName, string objectName = null, UiParameter parameters = null)
             {
                 UiName = uiName;
                 Parameters = parameters;
@@ -131,11 +138,12 @@ namespace CnoomFrameWork.Modules.UiModule
             /// 打开的ui
             /// </summary>
             public UiBase UiBase;
+
             /// <summary>
             /// 打开的ui层ui数量
             /// </summary>
             public int LayerCount;
-            
+
             public OpenUiEvent(UiBase uiBase, int layerCount)
             {
                 UiBase = uiBase;
