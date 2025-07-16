@@ -9,7 +9,6 @@ namespace CnoomFrameWork.Singleton
     /// <typeparam name="T"></typeparam>
     public abstract class MonoSingleton<T> : MonoBehaviour, ISingleton where T : MonoSingleton<T>
     {
-
         #region Unity Messages
 
         /// <summary>
@@ -17,7 +16,7 @@ namespace CnoomFrameWork.Singleton
         /// </summary>
         protected virtual void Awake()
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = this as T;
 
@@ -26,20 +25,16 @@ namespace CnoomFrameWork.Singleton
             }
             else
             {
-
                 // Destory duplicates
-                if(Application.isPlaying)
-                {
+                if (Application.isPlaying)
                     Destroy(gameObject);
-                }
                 else
-                {
                     DestroyImmediate(gameObject);
-                }
             }
         }
 
         #endregion
+
         #region Fields
 
         /// <summary>
@@ -64,21 +59,22 @@ namespace CnoomFrameWork.Singleton
         {
             get
             {
-                if(instance == null)
+                if (instance == null)
                 {
-                    #if UNITY_6000
+#if UNITY_6000
                     instance = FindAnyObjectByType<T>();
-                    #else
+#else
                     instance = FindObjectOfType<T>();
-                    #endif
-                    if(instance == null)
+#endif
+                    if (instance == null)
                     {
-                        GameObject obj = new GameObject();
+                        var obj = new GameObject();
                         obj.name = typeof(T).Name;
                         instance = obj.AddComponent<T>();
                         instance.OnMonoSingletonCreated();
                     }
                 }
+
                 return instance;
             }
         }
@@ -97,17 +93,14 @@ namespace CnoomFrameWork.Singleton
         /// </summary>
         protected virtual void OnMonoSingletonCreated()
         {
-
         }
 
         protected virtual void OnInitializing()
         {
-
         }
 
         protected virtual void OnInitialized()
         {
-
         }
 
         #endregion
@@ -116,10 +109,7 @@ namespace CnoomFrameWork.Singleton
 
         public virtual void InitializeSingleton()
         {
-            if(initializationStatus != SingletonInitializationStatus.None)
-            {
-                return;
-            }
+            if (initializationStatus != SingletonInitializationStatus.None) return;
 
             initializationStatus = SingletonInitializationStatus.Initializing;
             OnInitializing();
@@ -127,7 +117,9 @@ namespace CnoomFrameWork.Singleton
             OnInitialized();
         }
 
-        public virtual void ClearSingleton() { }
+        public virtual void ClearSingleton()
+        {
+        }
 
         public static void CreateInstance()
         {
@@ -137,10 +129,7 @@ namespace CnoomFrameWork.Singleton
 
         public static void DestroyInstance()
         {
-            if(instance == null)
-            {
-                return;
-            }
+            if (instance == null) return;
 
             instance.ClearSingleton();
             instance = default;

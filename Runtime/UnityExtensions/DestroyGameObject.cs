@@ -7,14 +7,14 @@ namespace CnoomFrameWork.Core.UnityExtensions
     {
         private Action _action;
 
-        public void SetAction(Action action)
-        {
-            _action = action;
-        }
-
         private void OnDestroy()
         {
             _action?.Invoke();
+        }
+
+        public void SetAction(Action action)
+        {
+            _action = action;
         }
     }
 }

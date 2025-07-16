@@ -15,7 +15,7 @@ namespace CnoomFrameWork.Base.Log
     public static class LogExtension
     {
         /// <summary>
-        /// 使用发送者信息记录日志
+        ///     使用发送者信息记录日志
         /// </summary>
         /// <param name="sender">日志发送者对象</param>
         /// <param name="message">日志内容</param>
@@ -42,8 +42,8 @@ namespace CnoomFrameWork.Base.Log
         public static void LogWithSenderAndColor(this ILog log, string sender, string message, Color senderColor,
             Color messageColor, ELogType logType = ELogType.Log, Object context = null)
         {
-            string senderString = ColorText(sender, senderColor);
-            string messageString = ColorText(message, messageColor);
+            var senderString = ColorText(sender, senderColor);
+            var messageString = ColorText(message, messageColor);
             log.Log(CombineMessage(senderString, messageString), logType, context);
         }
 
@@ -54,7 +54,7 @@ namespace CnoomFrameWork.Base.Log
 
         internal static string ColorText(string message, Color color)
         {
-            string colorStr = ColorUtility.ToHtmlStringRGB(color);
+            var colorStr = ColorUtility.ToHtmlStringRGB(color);
             return $"<color=#{colorStr}>{message}</color>";
         }
     }

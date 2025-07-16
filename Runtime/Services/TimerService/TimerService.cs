@@ -9,21 +9,30 @@ namespace CnoomFrameWork.Services.TimerService
 {
     public class TimerService : IService
     {
-        private GameObject _updateGameObject;
         private readonly TimerCollections<FrameTimer> _frameTimers = new();
         private readonly TimerCollections<SecondsTimer> _secondsTimers = new();
+        private GameObject _updateGameObject;
 
-        void Update()
+        public void Initialize()
         {
-            foreach (FrameTimer timer in _frameTimers.Timers)
-            {
-                timer.Update(Time.frameCount);
-            }
+            _updateGameObject = new GameObject("TimerService");
+            _updateGameObject.AddComponent<UpdateGameObject>().SetAction(Update);
+            Object.DontDestroyOnLoad(_updateGameObject);
+        }
 
-            foreach (SecondsTimer timer in _secondsTimers.Timers)
-            {
-                timer.Update(Time.deltaTime);
-            }
+        public void Dispose()
+        {
+            Object.Destroy(_updateGameObject);
+            _updateGameObject = null;
+            _secondsTimers.Dispose();
+            _frameTimers.Dispose();
+        }
+
+        private void Update()
+        {
+            foreach (var timer in _frameTimers.Timers) timer.Update(Time.frameCount);
+
+            foreach (var timer in _secondsTimers.Timers) timer.Update(Time.deltaTime);
 
             _frameTimers.RemoveCompleted();
             _secondsTimers.RemoveCompleted();
@@ -34,7 +43,7 @@ namespace CnoomFrameWork.Services.TimerService
 
         public SecondsTimer AddSecondsTimer(float delay, Action callback, bool loop = false)
         {
-            SecondsTimer t = _secondsTimers.Pool.Count > 0 ? _secondsTimers.Pool.Pop() : new SecondsTimer();
+            var t = _secondsTimers.Pool.Count > 0 ? _secondsTimers.Pool.Pop() : new SecondsTimer();
             t.Init(delay, callback, loop, this);
             _secondsTimers.AddToWait(t);
             return t;
@@ -42,7 +51,7 @@ namespace CnoomFrameWork.Services.TimerService
 
         public FrameTimer AddFrameTimer(int delay, Action callback, bool loop = false)
         {
-            FrameTimer t = _frameTimers.Pool.Count > 0 ? _frameTimers.Pool.Pop() : new FrameTimer();
+            var t = _frameTimers.Pool.Count > 0 ? _frameTimers.Pool.Pop() : new FrameTimer();
             t.Init(delay, callback, loop, this);
             _frameTimers.AddToWait(t);
             return t;
@@ -60,29 +69,21 @@ namespace CnoomFrameWork.Services.TimerService
             if (t is SecondsTimer secondsTimer) _secondsTimers.Pool.Push(secondsTimer);
         }
 
-        public void Initialize()
-        {
-            _updateGameObject = new GameObject("TimerService");
-            _updateGameObject.AddComponent<UpdateGameObject>().SetAction(Update);
-            Object.DontDestroyOnLoad(_updateGameObject);
-        }
-
-        public void Dispose()
-        {
-            Object.Destroy(_updateGameObject);
-            _updateGameObject = null;
-            _secondsTimers.Dispose();
-            _frameTimers.Dispose();
-        }
-
         private class TimerCollections<TTimer> : IDisposable where TTimer : ITimer
         {
             private readonly Queue<TTimer> _waitQueue = new();
             public readonly Stack<TTimer> Pool = new();
             public readonly List<TTimer> Timers = new();
 
+            public void Dispose()
+            {
+                _waitQueue.Clear();
+                Pool.Clear();
+                Timers.Clear();
+            }
+
             /// <summary>
-            /// 添加计时器，会在更新时添加到Timers中。
+            ///     添加计时器，会在更新时添加到Timers中。
             /// </summary>
             /// <param name="timer"></param>
             public void AddToWait(TTimer timer)
@@ -91,7 +92,7 @@ namespace CnoomFrameWork.Services.TimerService
             }
 
             /// <summary>
-            /// 移除所有已完成的计时器。
+            ///     移除所有已完成的计时器。
             /// </summary>
             public void RemoveCompleted()
             {
@@ -99,21 +100,11 @@ namespace CnoomFrameWork.Services.TimerService
             }
 
             /// <summary>
-            /// 更新计时器，将_waitQueue中的计时器添加到Timers中。
+            ///     更新计时器，将_waitQueue中的计时器添加到Timers中。
             /// </summary>
             public void UpdateToAdd()
             {
-                while (_waitQueue.Count > 0)
-                {
-                    Timers.Add(_waitQueue.Dequeue());
-                }
-            }
-
-            public void Dispose()
-            {
-                _waitQueue.Clear();
-                Pool.Clear();
-                Timers.Clear();
+                while (_waitQueue.Count > 0) Timers.Add(_waitQueue.Dequeue());
             }
         }
     }

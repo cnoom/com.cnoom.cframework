@@ -7,7 +7,8 @@ namespace CnoomFrameWork.Modules.AddressableModule
 {
     public partial class AssetsService
     {
-        [Inject, Preserve] private ILog Log { get; set; }
+        [Inject] [Preserve] private ILog Log { get; set; }
+
         private void LogError(string message)
         {
             Log.LogWithSenderAndColor(nameof(AssetsService), message, Color.red, ELogType.Error);

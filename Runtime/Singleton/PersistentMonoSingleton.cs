@@ -12,22 +12,18 @@ namespace CnoomFrameWork.Singleton
         /// <summary>
         ///     if this is true, this singleton will auto detach if it finds itself parented on awake
         /// </summary>
-        [FormerlySerializedAs("UnparentOnAwake"), Tooltip("if this is true, this singleton will auto detach if it finds itself parented on awake"), SerializeField]
+        [FormerlySerializedAs("UnparentOnAwake")]
+        [Tooltip("if this is true, this singleton will auto detach if it finds itself parented on awake")]
+        [SerializeField]
         private bool unparentOnAwake = true;
 
         #region Protected Methods
 
         protected override void OnInitializing()
         {
-            if(unparentOnAwake)
-            {
-                transform.SetParent(null);
-            }
+            if (unparentOnAwake) transform.SetParent(null);
             base.OnInitializing();
-            if(Application.isPlaying)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
+            if (Application.isPlaying) DontDestroyOnLoad(gameObject);
         }
 
         #endregion

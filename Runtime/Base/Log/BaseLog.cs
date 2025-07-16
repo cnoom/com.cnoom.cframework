@@ -4,11 +4,6 @@ namespace CnoomFrameWork.Base.Log
 {
     public class BaseLog : ILog
     {
-        public bool EnableTest { get; set; } = true;
-        public bool EnableLog { get; set; }  = true;
-        public bool EnableWarning { get; set; } = true;
-        public bool EnableError { get; set; } = true;
-
         internal BaseLog()
         {
             if (!Application.isEditor)
@@ -18,6 +13,11 @@ namespace CnoomFrameWork.Base.Log
                 EnableLog = false;
             }
         }
+
+        public bool EnableTest { get; set; } = true;
+        public bool EnableLog { get; set; } = true;
+        public bool EnableWarning { get; set; } = true;
+        public bool EnableError { get; set; } = true;
 
         public void Log(string message, ELogType logType = ELogType.Log, Object context = null)
         {

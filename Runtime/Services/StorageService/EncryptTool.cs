@@ -22,18 +22,18 @@ namespace CnoomFrameWork.Services.StorageService
         /// </summary>
         public string Encrypt(string encryptStr)
         {
-            using (Aes aes = Aes.Create())
+            using (var aes = Aes.Create())
             {
                 aes.Key = _key;
                 aes.IV = _iv;
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
 
-                ICryptoTransform encryptor = aes.CreateEncryptor();
-                byte[] plainBytes = Encoding.UTF8.GetBytes(encryptStr);
+                var encryptor = aes.CreateEncryptor();
+                var plainBytes = Encoding.UTF8.GetBytes(encryptStr);
 
-                using (MemoryStream ms = new MemoryStream())
-                using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                using (var ms = new MemoryStream())
+                using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                 {
                     cs.Write(plainBytes, 0, plainBytes.Length);
                     cs.FlushFinalBlock();
@@ -47,18 +47,18 @@ namespace CnoomFrameWork.Services.StorageService
         /// </summary>
         public string Decrypt(string decryptStr)
         {
-            using (Aes aes = Aes.Create())
+            using (var aes = Aes.Create())
             {
                 aes.Key = _key;
                 aes.IV = _iv;
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
 
-                ICryptoTransform decryptor = aes.CreateDecryptor();
-                byte[] cipherBytes = Convert.FromBase64String(decryptStr);
+                var decryptor = aes.CreateDecryptor();
+                var cipherBytes = Convert.FromBase64String(decryptStr);
 
-                using (MemoryStream ms = new MemoryStream())
-                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
+                using (var ms = new MemoryStream())
+                using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
                 {
                     cs.Write(cipherBytes, 0, cipherBytes.Length);
                     cs.FlushFinalBlock();

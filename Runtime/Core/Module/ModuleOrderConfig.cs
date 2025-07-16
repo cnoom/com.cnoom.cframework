@@ -10,7 +10,6 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class ModuleOrderConfig : IocRegisterConfig
     {
-
         public ModuleOrderConfig()
         {
             Register<UIModule>(960);

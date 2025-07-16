@@ -12,10 +12,10 @@ namespace FrameWork.Editor.Addressable
         /// </summary>
         public static string SimplifyPath(string originalPath)
         {
-            string fileName = Path.GetFileNameWithoutExtension(originalPath);
+            var fileName = Path.GetFileNameWithoutExtension(originalPath);
 
             // 步骤1：清理文件名
-            string cleanedName = NamingValidator.SanitizeVariableName(fileName);
+            var cleanedName = NamingValidator.SanitizeVariableName(fileName);
 
             return cleanedName;
         }

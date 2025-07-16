@@ -14,7 +14,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
         {
             onClick.AddListener(OnClick);
         }
-        
+
 
         private void OnClick()
         {

@@ -1,7 +1,4 @@
-﻿using System.IO;
-using FrameWork.Editor;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEditor;
 
 namespace Editor.Base
 {
@@ -12,8 +9,8 @@ namespace Editor.Base
         [MenuItem("FrameWork/脚本生成/自动注册游戏对象脚本(Start)")]
         private static void CreateGameObjectRegisterOnStart()
         {
-            string fileName = "GameObjectRegisterOnStart";
-            string scriptContent = $@"using CnoomFrameWork.Base.Container;
+            var fileName = "GameObjectRegisterOnStart";
+            var scriptContent = $@"using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Core;
 using CnoomFrameWork.Core.UnityExtensions;
 using UnityEngine;
@@ -29,12 +26,12 @@ public class {fileName} : MonoBehaviour
             CodeCreator.CreateScript(fileName, scriptContent);
         }
 
-        
+
         [MenuItem("FrameWork/脚本生成/自动注册游戏对象脚本(Trigger)")]
         private static void CreateGameObjectRegisterOnTrigger()
         {
-            string fileName = "GameObjectRegisterOnTrigger";
-            string scriptContent = $@"using CnoomFrameWork.Base.Events;
+            var fileName = "GameObjectRegisterOnTrigger";
+            var scriptContent = $@"using CnoomFrameWork.Base.Events;
 using CnoomFrameWork.Core.UnityExtensions;
 using UnityEngine;
 using UnityEngine.Scripting;

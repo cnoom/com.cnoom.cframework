@@ -10,16 +10,17 @@ public class GameObjectRegisterOnTrigger : MonoBehaviour
         EventManager.Register(this);
     }
 
-    [EventSubscriber(typeof(UnityContainer)),Preserve]
+    private void OnDestroy()
+    {
+        EventManager.Unregister(this);
+    }
+
+    [EventSubscriber(typeof(UnityContainer))]
+    [Preserve]
     private void OnTrigger(UnityContainer unityContainer)
     {
         if (unityContainer.SceneName != gameObject.scene.name) return;
         unityContainer.AddGameObject(gameObject.name, gameObject);
-        EventManager.Unregister(this);
-    }
-
-    private void OnDestroy()
-    {
         EventManager.Unregister(this);
     }
 }

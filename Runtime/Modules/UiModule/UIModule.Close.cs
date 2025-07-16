@@ -10,11 +10,12 @@ namespace CnoomFrameWork.Modules.UiModule
 {
     public partial class UIModule
     {
-        [EventSubscriber(typeof(CloseLayerTopCommand)),Preserve]
+        [EventSubscriber(typeof(CloseLayerTopCommand))]
+        [Preserve]
         private void OnCloseUiTopLayer(CloseLayerTopCommand command)
         {
             if (_layerStack[command.Layer].Count <= 0) return;
-            UiBase ui = _layerStack[command.Layer].Peek();
+            var ui = _layerStack[command.Layer].Peek();
             CloseUi(ui);
         }
 
@@ -47,7 +48,7 @@ namespace CnoomFrameWork.Modules.UiModule
         /// <param name="ui"></param>
         private void RemoveInStack(UiBase ui)
         {
-            List<UiBase> panelList = new List<UiBase>(_layerStack[ui.uiConfig.layer]);
+            var panelList = new List<UiBase>(_layerStack[ui.uiConfig.layer]);
             panelList.Remove(ui);
             _layerStack[ui.uiConfig.layer] = new Stack<UiBase>(panelList.Reverse<UiBase>());
         }
@@ -67,7 +68,7 @@ namespace CnoomFrameWork.Modules.UiModule
 
         private void FinalizeClose(UiBase ui)
         {
-            string layer = ui.uiConfig.layer;
+            var layer = ui.uiConfig.layer;
             // 回收处理
             RemoveUi(ui);
 
@@ -84,14 +85,14 @@ namespace CnoomFrameWork.Modules.UiModule
             // 恢复栈顶界面
             if (_layerStack[layer].Count > 0)
             {
-                UiBase newTop = _layerStack[layer].Peek();
+                var newTop = _layerStack[layer].Peek();
                 SetPanelInteractable(newTop, true);
             }
         }
 
         private void SetPanelInteractable(UiBase ui, bool state)
         {
-            CanvasGroup canvasGroup = ui.GetComponent<CanvasGroup>();
+            var canvasGroup = ui.GetComponent<CanvasGroup>();
             if (canvasGroup)
             {
                 canvasGroup.interactable = state;

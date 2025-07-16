@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 
 namespace FrameWork.Editor.Addressable
@@ -14,20 +13,20 @@ namespace FrameWork.Editor.Addressable
     /// </summary>
     public class AddressableCodeGenerator
     {
-
         private const string ClassName = "AssetsPaths";
         private const string LabelClassName = "AssetsLabels";
+
         public static void GenerateAddressableClass()
         {
-            Dictionary<string, string> addressables = GetAllAddressableAssets();
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            DirectoryNode root = new DirectoryNode();
+            var addressables = GetAllAddressableAssets();
+            var dic = new Dictionary<string, string>();
+            var root = new DirectoryNode();
 
             // 构建目录树
-            foreach (KeyValuePair<string, string> entry in addressables)
+            foreach (var entry in addressables)
             {
                 // 检查是否为目录，如果是则跳过
-                if(Directory.Exists(entry.Value)) continue;
+                if (Directory.Exists(entry.Value)) continue;
                 BuildDirectoryTree(root, entry.Key, entry.Value, dic);
             }
 
@@ -35,7 +34,7 @@ namespace FrameWork.Editor.Addressable
             FlattenDirectoryTree(root);
 
             // 生成代码
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.AppendLine("// Auto-generated Addressable Hierarchy");
             sb.AppendLine("// WARNING: Do not modify manually");
             sb.AppendLine($"public static class {ClassName}");
@@ -50,24 +49,26 @@ namespace FrameWork.Editor.Addressable
         }
 
         // 递归构建目录树
-        private static void BuildDirectoryTree(DirectoryNode node, string key, string value, Dictionary<string, string> dic)
+        private static void BuildDirectoryTree(DirectoryNode node, string key, string value,
+            Dictionary<string, string> dic)
         {
-            string[] pathSegments = value.Split('/');
-            if(pathSegments.Length == 0) return;
+            var pathSegments = value.Split('/');
+            if (pathSegments.Length == 0) return;
 
-            for(var i = 0; i < pathSegments.Length - 1; i++)
+            for (var i = 0; i < pathSegments.Length - 1; i++)
             {
-                string segment = NamingValidator.SanitizeVariableName(pathSegments[i]);
-                if(!node.Children.TryGetValue(segment, out DirectoryNode childNode))
+                var segment = NamingValidator.SanitizeVariableName(pathSegments[i]);
+                if (!node.Children.TryGetValue(segment, out var childNode))
                 {
                     childNode = new DirectoryNode();
                     node.Children[segment] = childNode;
                 }
+
                 node = childNode;
             }
 
             // 处理最终文件名
-            string fileName = NamingValidator.SanitizeVariableName(key);
+            var fileName = NamingValidator.SanitizeVariableName(key);
             node.Values[fileName] = key;
             dic.Add(key, value);
         }
@@ -77,31 +78,23 @@ namespace FrameWork.Editor.Addressable
         {
             while (node.Children.Count == 1 && node.Values.Count == 0)
             {
-                DirectoryNode singleChild = node.Children.First().Value;
+                var singleChild = node.Children.First().Value;
                 node.Children.Clear();
-                foreach ((string key, DirectoryNode value) in singleChild.Children)
-                {
-                    node.Children[key] = value;
-                }
-                foreach ((string key, string value) in singleChild.Values)
-                {
-                    node.Values[key] = value;
-                }
+                foreach (var (key, value) in singleChild.Children) node.Children[key] = value;
+                foreach (var (key, value) in singleChild.Values) node.Values[key] = value;
             }
 
-            foreach (DirectoryNode child in node.Children.Values)
-            {
-                FlattenDirectoryTree(child);
-            }
+            foreach (var child in node.Children.Values) FlattenDirectoryTree(child);
         }
 
         // 递归生成嵌套类
-        private static void GenerateNestedClasses(StringBuilder sb, DirectoryNode node, int indentLevel, Dictionary<string, string> dic)
+        private static void GenerateNestedClasses(StringBuilder sb, DirectoryNode node, int indentLevel,
+            Dictionary<string, string> dic)
         {
             var indent = new string(' ', indentLevel * 4);
 
             // 先生成子类
-            foreach (KeyValuePair<string, DirectoryNode> child in node.Children)
+            foreach (var child in node.Children)
             {
                 sb.AppendLine($"{indent}public class {child.Key}");
                 sb.AppendLine($"{indent}{{");
@@ -110,85 +103,84 @@ namespace FrameWork.Editor.Addressable
             }
 
             // 生成当前层的常量
-            foreach (KeyValuePair<string, string> value in node.Values)
+            foreach (var value in node.Values)
             {
-                string path = dic[value.Value];
+                var path = dic[value.Value];
                 sb.AppendLine($"{indent}/// <summary>");
                 sb.AppendLine($"{indent}/// {path}");
                 sb.AppendLine($"{indent}/// </summary>");
-                sb.AppendLine($"{indent}public const string {Path.GetFileNameWithoutExtension(path)} = \"{value.Value}\";");
+                sb.AppendLine(
+                    $"{indent}public const string {Path.GetFileNameWithoutExtension(path)} = \"{value.Value}\";");
             }
         }
 
         public static void GenerateLabelClass()
         {
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            if(!settings)
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            if (!settings)
             {
                 Debug.LogError("Addressable Asset Settings not found.");
                 return;
             }
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.AppendLine("// Auto-generated Addressable Labels");
             sb.AppendLine($"public static class {LabelClassName}");
             sb.AppendLine("{");
 
             // 获取所有标签
-            List<string> labels = settings.GetLabels();
-            foreach (string label in labels)
+            var labels = settings.GetLabels();
+            foreach (var label in labels)
             {
-                string varName = NamingValidator.SanitizeVariableName(label);
+                var varName = NamingValidator.SanitizeVariableName(label);
                 sb.AppendLine($"    public const string {varName} = \"{label}\";");
             }
 
             sb.AppendLine("}");
 
             // 写入文件
-            string filePath = Path.Combine(FrameWorkConfig.ScriptPath, $"{LabelClassName}.cs");
+            var filePath = Path.Combine(FrameWorkConfig.ScriptPath, $"{LabelClassName}.cs");
             File.WriteAllText(filePath, sb.ToString());
             AssetDatabase.Refresh();
         }
 
         private static Dictionary<string, string> GetAllAddressableAssets()
         {
-            Dictionary<string, string> addressablePaths = new Dictionary<string, string>();
+            var addressablePaths = new Dictionary<string, string>();
 
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            if(!settings)
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            if (!settings)
             {
                 Debug.LogError("Addressable Asset Settings not found.");
                 return addressablePaths;
             }
 
             // 遍历所有可寻址资源
-            foreach (AddressableAssetGroup group in settings.groups)
+            foreach (var group in settings.groups)
             {
-                if(!group || group.ReadOnly)
+                if (!group || group.ReadOnly)
                     continue;
 
-                foreach (AddressableAssetEntry entry in group.entries)
+                foreach (var entry in group.entries)
                 {
-                    if(entry == null)
+                    if (entry == null)
                         continue;
 
-                    string assetPath = entry.AssetPath;
-                    string addressablePath = entry.address;
+                    var assetPath = entry.AssetPath;
+                    var addressablePath = entry.address;
 
-                    if(!addressablePaths.ContainsKey(addressablePath))
-                    {
-                        addressablePaths[addressablePath] = assetPath;
-                    }
+                    if (!addressablePaths.ContainsKey(addressablePath)) addressablePaths[addressablePath] = assetPath;
                 }
             }
 
             return addressablePaths;
         }
+
         // 定义树节点类用于构建目录结构
         private class DirectoryNode
         {
-            public readonly Dictionary<string, DirectoryNode> Children = new Dictionary<string, DirectoryNode>();
-            public readonly Dictionary<string, string> Values = new Dictionary<string, string>();
+            public readonly Dictionary<string, DirectoryNode> Children = new();
+            public readonly Dictionary<string, string> Values = new();
         }
     }
 }

@@ -6,15 +6,26 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace CnoomFrameWork.Modules.AddressableModule
 {
-
     public partial class AssetsService : AService
     {
         private readonly App app = App.Instance;
+
         // 资源追踪数据结构
-        private readonly Dictionary<string, AsyncOperationHandle> assetHandles = new Dictionary<string, AsyncOperationHandle>();
-        private readonly Dictionary<GameObject, string> instanceMap = new Dictionary<GameObject, string>();
-        private readonly Dictionary<string, AsyncOperationHandle> loadingHandles = new Dictionary<string, AsyncOperationHandle>();
-        private readonly Dictionary<string, int> referenceCount = new Dictionary<string, int>();
+        private readonly Dictionary<string, AsyncOperationHandle> assetHandles = new();
+        private readonly Dictionary<GameObject, string> instanceMap = new();
+        private readonly Dictionary<string, AsyncOperationHandle> loadingHandles = new();
+        private readonly Dictionary<string, int> referenceCount = new();
+
+        public override void Dispose()
+        {
+            foreach (var asyncOperationHandle in assetHandles) asyncOperationHandle.Value.Release();
+            assetHandles.Clear();
+            foreach (var gameObject in instanceMap.Keys) GameObject.Destroy(gameObject);
+            instanceMap.Clear();
+            foreach (var asyncOperationHandle in loadingHandles) asyncOperationHandle.Value.Release();
+            loadingHandles.Clear();
+            referenceCount.Clear();
+        }
 
         #region 内部辅助组件
 
@@ -41,7 +52,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         private void TrackHandle(string key, AsyncOperationHandle handle)
         {
             // 资源已加载的情况
-            if(!assetHandles.TryAdd(key, handle))
+            if (!assetHandles.TryAdd(key, handle))
             {
                 referenceCount[key]++;
                 return;
@@ -53,16 +64,11 @@ namespace CnoomFrameWork.Modules.AddressableModule
             // 自动释放监听
             handle.Completed += op =>
             {
-                if(op.Status == AsyncOperationStatus.Succeeded)
-                {
-                    return;
-                }
+                if (op.Status == AsyncOperationStatus.Succeeded) return;
                 assetHandles.Remove(key);
                 referenceCount.Remove(key);
             };
         }
-
-
 
 
         // 实例化对象追踪
@@ -71,29 +77,10 @@ namespace CnoomFrameWork.Modules.AddressableModule
             instanceMap[instance] = key;
 
             // 自动释放监听
-            InstanceReleaseTracker tracker = instance.AddComponent<InstanceReleaseTracker>();
+            var tracker = instance.AddComponent<InstanceReleaseTracker>();
             tracker.Init(() => ReleaseInstance(instance));
         }
 
         #endregion
-        public override void Dispose()
-        {
-            foreach (var asyncOperationHandle in assetHandles)
-            {
-                asyncOperationHandle.Value.Release();
-            }
-            assetHandles.Clear();
-            foreach (var gameObject in instanceMap.Keys)
-            {
-                GameObject.Destroy(gameObject);
-            }
-            instanceMap.Clear();
-            foreach (var asyncOperationHandle in loadingHandles)
-            {
-                asyncOperationHandle.Value.Release();
-            }
-            loadingHandles.Clear();
-            referenceCount.Clear();
-        }
     }
 }

@@ -4,7 +4,7 @@ namespace CnoomFrameWork.Modules.UiModule
 {
     public class UiParameter
     {
-        private Dictionary<string, object> _parameter = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _parameter = new();
 
         public void SetParameter(string key, object value)
         {
@@ -13,10 +13,7 @@ namespace CnoomFrameWork.Modules.UiModule
 
         public T GetParameter<T>(string key)
         {
-            if (_parameter.ContainsKey(key))
-            {
-                return (T)_parameter[key];
-            }
+            if (_parameter.ContainsKey(key)) return (T)_parameter[key];
 
             return default;
         }

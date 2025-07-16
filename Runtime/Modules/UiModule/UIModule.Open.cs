@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using CnoomFrameWork.Base.Events;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine.Scripting;
-using Transform = UnityEngine.Transform;
 
 namespace CnoomFrameWork.Modules.UiModule
 {
     public partial class UIModule
     {
-        [EventSubscriber(typeof(OpenUiCommand)), Preserve]
+        [EventSubscriber(typeof(OpenUiCommand))]
+        [Preserve]
         private void OnOpenCommand(OpenUiCommand command)
         {
             // 已存在检查
             var uiPrefab = _uiSettings.GetUi(command.UiName);
-            string layer = uiPrefab.uiConfig.layer;
+            var layer = uiPrefab.uiConfig.layer;
             if (!uiPrefab.uiConfig.allowMultiple &&
-                HasUi(uiPrefab.uiConfig.layer, uiPrefab.gameObject.name, out UiBase ui))
+                HasUi(uiPrefab.uiConfig.layer, uiPrefab.gameObject.name, out var ui))
             {
                 RemoveInStack(ui);
             }
@@ -24,7 +23,7 @@ namespace CnoomFrameWork.Modules.UiModule
             {
                 ui = CreateUi(command.UiName);
                 ui.gameObject.SetActive(true);
-                Transform panelParent = _canvasTransform.Find(layer);
+                var panelParent = _canvasTransform.Find(layer);
                 ui.transform.SetParent(panelParent);
             }
 
@@ -44,10 +43,7 @@ namespace CnoomFrameWork.Modules.UiModule
             SetPanelInteractable(ui, false);
 
             ui.OnEnter(param);
-            if (ui.uiAnimation && ui.uiAnimation.hasOpenAnimation)
-            {
-                yield return ui.uiAnimation.PlayEnterAnimation();
-            }
+            if (ui.uiAnimation && ui.uiAnimation.hasOpenAnimation) yield return ui.uiAnimation.PlayEnterAnimation();
 
             // 启用交互
             SetPanelInteractable(ui, true);

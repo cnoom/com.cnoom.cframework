@@ -7,6 +7,7 @@ namespace CnoomFrameWork.Core
     {
         protected App App;
         [Inject] public ILog Log { set; get; }
+
         public void Initialize()
         {
             App = App.Instance;
@@ -17,6 +18,8 @@ namespace CnoomFrameWork.Core
         {
         }
 
-        protected virtual void OnInitialize() { }
+        protected virtual void OnInitialize()
+        {
+        }
     }
 }

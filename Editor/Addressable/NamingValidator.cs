@@ -10,7 +10,7 @@ namespace FrameWork.Editor.Addressable
     public static class NamingValidator
     {
         // C# 关键字列表（部分示例）
-        private static readonly HashSet<string> _csharpKeywords = new HashSet<string>
+        private static readonly HashSet<string> _csharpKeywords = new()
         {
             // Unity 特有关键字
             "Material",
@@ -49,29 +49,20 @@ namespace FrameWork.Editor.Addressable
         /// </summary>
         public static string SanitizeVariableName(string input)
         {
-            if(string.IsNullOrEmpty(input)) return "INVALID_NAME";
+            if (string.IsNullOrEmpty(input)) return "INVALID_NAME";
 
             // 第一步：基础清理
-            StringBuilder cleanedName = new StringBuilder();
-            foreach (char c in input)
-            {
-                cleanedName.Append(char.IsLetterOrDigit(c) ? c : '_');
-            }
+            var cleanedName = new StringBuilder();
+            foreach (var c in input) cleanedName.Append(char.IsLetterOrDigit(c) ? c : '_');
 
             // 第二步：处理特殊开头
             var sanitized = cleanedName.ToString();
 
             // 处理数字开头
-            if(char.IsDigit(sanitized[0]))
-            {
-                sanitized = "_" + sanitized;
-            }
+            if (char.IsDigit(sanitized[0])) sanitized = "_" + sanitized;
 
             // 第三步：处理保留关键字
-            if(_csharpKeywords.Contains(sanitized.ToLower()))
-            {
-                sanitized = "@" + sanitized;
-            }
+            if (_csharpKeywords.Contains(sanitized.ToLower())) sanitized = "@" + sanitized;
 
             // 第四步：去除连续下划线
             sanitized = Regex.Replace(sanitized, @"_+", "_");

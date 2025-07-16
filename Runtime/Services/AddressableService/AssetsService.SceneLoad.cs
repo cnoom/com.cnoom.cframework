@@ -14,21 +14,24 @@ namespace CnoomFrameWork.Modules.AddressableModule
         /// <summary>
         ///     异步加载场景
         /// </summary>
-        public void LoadScene(string sceneKey, LoadSceneMode loadMode, Action<SceneInstance> onLoaded, Action<string> onError = null)
+        public void LoadScene(string sceneKey, LoadSceneMode loadMode, Action<SceneInstance> onLoaded,
+            Action<string> onError = null)
         {
             app.StartCoroutine(LoadSceneCoroutine(sceneKey, loadMode, onLoaded, onError));
         }
 
-        public IEnumerator LoadSceneCoroutine(string sceneKey, LoadSceneMode loadMode, Action<SceneInstance> onLoaded, Action<string> onError = null)
+        public IEnumerator LoadSceneCoroutine(string sceneKey, LoadSceneMode loadMode, Action<SceneInstance> onLoaded,
+            Action<string> onError = null)
         {
-            AsyncOperationHandle<SceneInstance> operation = Addressables.LoadSceneAsync(sceneKey, loadMode);
+            var operation = Addressables.LoadSceneAsync(sceneKey, loadMode);
             yield return operation;
 
-            if(operation.Status != AsyncOperationStatus.Succeeded)
+            if (operation.Status != AsyncOperationStatus.Succeeded)
             {
                 onError?.Invoke($"Failed to load scene: {sceneKey}");
                 yield break;
             }
+
             onLoaded?.Invoke(operation.Result);
         }
     }

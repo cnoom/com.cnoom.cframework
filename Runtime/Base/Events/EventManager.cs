@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Core;
 using Object = UnityEngine.Object;
 
@@ -12,7 +11,7 @@ namespace CnoomFrameWork.Base.Events
     public class EventManager
     {
         /// <summary>
-        /// ref 结构体事件处理器委托。
+        ///     ref 结构体事件处理器委托。
         /// </summary>
         public delegate void RefEventHandler<T>(ref T e) where T : struct;
 
@@ -26,7 +25,7 @@ namespace CnoomFrameWork.Base.Events
         private static readonly object RefLock = new();
 
         /// <summary>
-        /// 注册异步普通事件处理器。
+        ///     注册异步普通事件处理器。
         /// </summary>
         public static void Subscribe<T>(Func<T, Task> handler, int priority = 0, bool once = false)
         {
@@ -34,7 +33,7 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 注册同步普通事件处理器。
+        ///     注册同步普通事件处理器。
         /// </summary>
         public static void Subscribe<T>(Action<T> handler, int priority = 0, bool once = false)
         {
@@ -42,17 +41,14 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 取消注册普通事件处理器。
+        ///     取消注册普通事件处理器。
         /// </summary>
         public static void Unsubscribe<T>(Action<T> handler)
         {
             var type = typeof(T);
             lock (Lock)
             {
-                if (Handlers.TryGetValue(type, out var list))
-                {
-                    list.RemoveAll(h => h.Handler == (Delegate)handler);
-                }
+                if (Handlers.TryGetValue(type, out var list)) list.RemoveAll(h => h.Handler == (Delegate)handler);
             }
         }
 
@@ -75,30 +71,25 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 检查事件是否应被特定处理器接收（基于过滤器判断）。
+        ///     检查事件是否应被特定处理器接收（基于过滤器判断）。
         /// </summary>
         private static bool ShouldInvokeHandler<T>(T e, Delegate handler)
         {
             if (Filters.TryGetValue(typeof(T), out var filterList))
-            {
-                foreach (Func<T, Delegate, bool> filter in filterList.Cast<Func<T, Delegate, bool>>())
-                {
-                    if (!filter(e, handler)) return false;
-                }
-            }
+                foreach (var filter in filterList.Cast<Func<T, Delegate, bool>>())
+                    if (!filter(e, handler))
+                        return false;
 
             return true;
         }
 
         /// <summary>
-        /// 检查结构体事件是否应被特定处理器接收（基于过滤器判断）。
+        ///     检查结构体事件是否应被特定处理器接收（基于过滤器判断）。
         /// </summary>
         private static bool ShouldInvokeRefHandler<T>(T e, Delegate handler) where T : struct
         {
             if (RefFilters.TryGetValue(typeof(T), out var filterList))
-            {
-                foreach (Delegate filterObject in filterList)
-                {
+                foreach (var filterObject in filterList)
                     // 确保过滤器是正确的类型
                     if (filterObject is Func<T, Delegate, bool> filter)
                     {
@@ -109,14 +100,12 @@ namespace CnoomFrameWork.Base.Events
                         throw new InvalidOperationException(
                             $"过滤器类型不匹配: {filterObject.GetType()} 不是 Func<{typeof(T)}, Delegate, bool>");
                     }
-                }
-            }
 
             return true;
         }
 
         /// <summary>
-        /// 同步发布事件给所有订阅者。
+        ///     同步发布事件给所有订阅者。
         /// </summary>
         public static void Publish<T>(T e)
         {
@@ -131,7 +120,7 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var h in snapshot)
             {
-                if (!h.Target.TryGetTarget(out object t) || t is Object o && !o)
+                if (!h.Target.TryGetTarget(out var t) || (t is Object o && !o))
                 {
                     toRemove.Add(h);
                     continue;
@@ -155,7 +144,7 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 注册结构体事件处理器（ref 传参）。
+        ///     注册结构体事件处理器（ref 传参）。
         /// </summary>
         public static void SubscribeRef<T>(RefEventHandler<T> handler, int priority = 0, bool once = false)
             where T : struct
@@ -178,22 +167,19 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 取消注册结构体事件处理器。
+        ///     取消注册结构体事件处理器。
         /// </summary>
         public static void UnSubscribeRef<T>(RefEventHandler<T> handler) where T : struct
         {
             var type = typeof(T);
             lock (RefLock)
             {
-                if (RefHandlers.TryGetValue(type, out var list))
-                {
-                    list.RemoveAll(h => h.Handler == (Delegate)handler);
-                }
+                if (RefHandlers.TryGetValue(type, out var list)) list.RemoveAll(h => h.Handler == (Delegate)handler);
             }
         }
 
         /// <summary>
-        /// 同步触发结构体事件，允许处理器修改结构体内容。
+        ///     同步触发结构体事件，允许处理器修改结构体内容。
         /// </summary>
         public static void RefPublish<T>(ref T e) where T : struct
         {
@@ -209,7 +195,7 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var h in snapshot)
             {
-                if (!h.Target.TryGetTarget(out object t) || t is Object o && !o)
+                if (!h.Target.TryGetTarget(out var t) || (t is Object o && !o))
                 {
                     toRemove.Add(h);
                     continue;
@@ -226,13 +212,13 @@ namespace CnoomFrameWork.Base.Events
             lock (RefLock)
             {
                 if (!RefHandlers.TryGetValue(type, out var list)) return;
-                foreach (RefHandlerInfo r in toRemove)
+                foreach (var r in toRemove)
                     list.Remove(r);
             }
         }
 
         /// <summary>
-        /// 添加普通事件过滤器。每个处理器会独立判断是否继续传播。
+        ///     添加普通事件过滤器。每个处理器会独立判断是否继续传播。
         /// </summary>
         public static void AddFilter<T>(Func<T, Delegate, bool> filter)
         {
@@ -246,7 +232,7 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 添加结构体事件过滤器。每个处理器会独立判断是否继续传播。
+        ///     添加结构体事件过滤器。每个处理器会独立判断是否继续传播。
         /// </summary>
         public static void AddRefFilter<T>(Func<T, Delegate, bool> filter) where T : struct
         {
@@ -260,7 +246,7 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 扫描对象中带有特性的方法并自动注册为事件处理器。
+        ///     扫描对象中带有特性的方法并自动注册为事件处理器。
         /// </summary>
         public static void Register(object subscriber)
         {
@@ -269,11 +255,11 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var m in methods)
             {
-                bool canSkip = false;
+                var canSkip = false;
                 foreach (var attr in m.GetCustomAttributes<EventSubscriberAttribute>())
                 {
                     var type = attr.EventType;
-                    Delegate del = Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
+                    var del = Delegate.CreateDelegate(typeof(Action<>).MakeGenericType(type), subscriber, m);
 
                     AddHandler(type, del, attr.Priority, attr.Once);
                     canSkip = true;
@@ -300,40 +286,30 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 从事件系统中注销某个对象的所有事件处理器。
+        ///     从事件系统中注销某个对象的所有事件处理器。
         /// </summary>
         public static void Unregister(object subscriber)
         {
             lock (Lock)
             {
                 foreach (var list in Handlers.Values)
-                {
                     list.RemoveAll(h =>
                     {
-                        if (h.Target.TryGetTarget(out var target))
-                        {
-                            return ReferenceEquals(target, subscriber);
-                        }
+                        if (h.Target.TryGetTarget(out var target)) return ReferenceEquals(target, subscriber);
 
                         return true;
                     });
-                }
             }
 
             lock (RefLock)
             {
                 foreach (var list in RefHandlers.Values)
-                {
                     list.RemoveAll(h =>
                     {
-                        if (h.Target.TryGetTarget(out var target))
-                        {
-                            return ReferenceEquals(target, subscriber);
-                        }
+                        if (h.Target.TryGetTarget(out var target)) return ReferenceEquals(target, subscriber);
 
                         return true;
                     });
-                }
             }
         }
     }

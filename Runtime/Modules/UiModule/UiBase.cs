@@ -1,5 +1,4 @@
-﻿using System;
-using CnoomFrameWork.Base.Container;
+﻿using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Base.Events;
 using Modules.UiModule;
 using UnityEngine;
@@ -35,10 +34,7 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
 
         public void CloseLayerTop(string layerName = null)
         {
-            if (string.IsNullOrEmpty(layerName))
-            {
-                layerName = uiConfig.layer;
-            }
+            if (string.IsNullOrEmpty(layerName)) layerName = uiConfig.layer;
             EventManager.Publish(new UIModule.CloseLayerTopCommand(layerName));
         }
 

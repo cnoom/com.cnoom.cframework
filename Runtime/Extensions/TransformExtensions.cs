@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 namespace CnoomFrameWork.Extensions
 {
     public static class TransformExtensions
     {
-
         #region 重置操作
 
         public static Transform ResetLocalPosition(this Transform transform)
@@ -27,14 +25,17 @@ namespace CnoomFrameWork.Extensions
         {
             return transform.localPosition;
         }
+
         public static float LocalPositionX(this Transform transform)
         {
             return transform.localPosition.x;
         }
+
         public static float LocalPositionY(this Transform transform)
         {
             return transform.localPosition.y;
         }
+
         public static float LocalPositionZ(this Transform transform)
         {
             return transform.localPosition.z;
@@ -84,14 +85,17 @@ namespace CnoomFrameWork.Extensions
         {
             return transform.position;
         }
+
         public static float PositionX(this Transform transform)
         {
             return transform.position.x;
         }
+
         public static float PositionY(this Transform transform)
         {
             return transform.position.y;
         }
+
         public static float PositionZ(this Transform transform)
         {
             return transform.position.z;
@@ -141,14 +145,17 @@ namespace CnoomFrameWork.Extensions
         {
             return transform.localScale;
         }
+
         public static float LocalScaleX(this Transform transform)
         {
             return transform.localScale.x;
         }
+
         public static float LocalScaleY(this Transform transform)
         {
             return transform.localScale.y;
         }
+
         public static float LocalScaleZ(this Transform transform)
         {
             return transform.localScale.z;
@@ -177,17 +184,20 @@ namespace CnoomFrameWork.Extensions
 
         public static Transform SetLocalEulerAnglesX(this Transform transform, float x)
         {
-            return transform.SetLocalEulerAngles(new Vector3(x, transform.localEulerAngles.y, transform.localEulerAngles.z));
+            return transform.SetLocalEulerAngles(new Vector3(x, transform.localEulerAngles.y,
+                transform.localEulerAngles.z));
         }
 
         public static Transform SetLocalEulerAnglesY(this Transform transform, float y)
         {
-            return transform.SetLocalEulerAngles(new Vector3(transform.localEulerAngles.x, y, transform.localEulerAngles.z));
+            return transform.SetLocalEulerAngles(new Vector3(transform.localEulerAngles.x, y,
+                transform.localEulerAngles.z));
         }
 
         public static Transform SetLocalEulerAnglesZ(this Transform transform, float z)
         {
-            return transform.SetLocalEulerAngles(new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, z));
+            return transform.SetLocalEulerAngles(new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y,
+                z));
         }
 
         private static Transform SetLocalEulerAngles(this Transform transform, Vector3 angles)
@@ -205,47 +215,43 @@ namespace CnoomFrameWork.Extensions
         {
             foreach (Transform child in parent)
             {
-                if(child.name == name) return child;
-                Transform result = child.FindChildRecursive(name);
-                if(result) return result;
+                if (child.name == name) return child;
+                var result = child.FindChildRecursive(name);
+                if (result) return result;
             }
+
             return null;
         }
 
         // 删除所有子对象
         public static Transform DestroyAllChildren(this Transform parent)
         {
-            for(int i = parent.childCount - 1; i >= 0; i--)
+            for (var i = parent.childCount - 1; i >= 0; i--)
             {
-                Transform child = parent.GetChild(i);
-                #if UNITY_EDITOR
-                if(!Application.isPlaying)
+                var child = parent.GetChild(i);
+#if UNITY_EDITOR
+                if (!Application.isPlaying)
                     Object.DestroyImmediate(child.gameObject);
                 else
-                    #endif
+#endif
                     Object.Destroy(child.gameObject);
             }
+
             return parent;
         }
 
         // 批量设置子对象激活状态
         public static Transform SetChildrenActive(this Transform parent, bool active)
         {
-            foreach (Transform child in parent)
-            {
-                child.gameObject.SetActive(active);
-            }
+            foreach (Transform child in parent) child.gameObject.SetActive(active);
             return parent;
         }
 
         // 获取所有子对象的Transform
         public static Transform[] GetAllChildren(this Transform parent)
         {
-            Transform[] children = new Transform[parent.childCount];
-            for(var i = 0; i < parent.childCount; i++)
-            {
-                children[i] = parent.GetChild(i);
-            }
+            var children = new Transform[parent.childCount];
+            for (var i = 0; i < parent.childCount; i++) children[i] = parent.GetChild(i);
             return children;
         }
 
@@ -268,57 +274,47 @@ namespace CnoomFrameWork.Extensions
         }
 
         // 获取子对象组件（仅子对象，不包含自己）
-        public static T GetComponentInChildrenOnly<T>(this Transform parent, bool includeInactive = false) where T : Component
+        public static T GetComponentInChildrenOnly<T>(this Transform parent, bool includeInactive = false)
+            where T : Component
         {
             foreach (Transform child in parent)
             {
-                T component = child.GetComponentInChildren<T>(includeInactive);
-                if(component != null) return component;
+                var component = child.GetComponentInChildren<T>(includeInactive);
+                if (component != null) return component;
             }
+
             return null;
         }
 
         // 按名称排序子对象（自然排序）
         public static Transform SortChildrenByName(this Transform parent)
         {
-            List<Transform> children = parent.GetAllChildren().OrderBy(t => t.name).ToList();
-            for(var i = 0; i < children.Count; i++)
-            {
-                children[i].SetSiblingIndex(i);
-            }
+            var children = parent.GetAllChildren().OrderBy(t => t.name).ToList();
+            for (var i = 0; i < children.Count; i++) children[i].SetSiblingIndex(i);
             return parent;
         }
 
         // 按X坐标排序子对象
         public static Transform SortChildrenByPositionX(this Transform parent)
         {
-            List<Transform> children = parent.GetAllChildren().OrderBy(t => t.position.x).ToList();
-            for(var i = 0; i < children.Count; i++)
-            {
-                children[i].SetSiblingIndex(i);
-            }
+            var children = parent.GetAllChildren().OrderBy(t => t.position.x).ToList();
+            for (var i = 0; i < children.Count; i++) children[i].SetSiblingIndex(i);
             return parent;
         }
 
         // 按Y坐标排序子对象
         public static Transform SortChildrenByPositionY(this Transform parent)
         {
-            List<Transform> children = parent.GetAllChildren().OrderBy(t => t.position.y).ToList();
-            for(var i = 0; i < children.Count; i++)
-            {
-                children[i].SetSiblingIndex(i);
-            }
+            var children = parent.GetAllChildren().OrderBy(t => t.position.y).ToList();
+            for (var i = 0; i < children.Count; i++) children[i].SetSiblingIndex(i);
             return parent;
         }
 
         // 按Z坐标排序子对象
         public static Transform SortChildrenByPositionZ(this Transform parent)
         {
-            List<Transform> children = parent.GetAllChildren().OrderBy(t => t.position.z).ToList();
-            for(var i = 0; i < children.Count; i++)
-            {
-                children[i].SetSiblingIndex(i);
-            }
+            var children = parent.GetAllChildren().OrderBy(t => t.position.z).ToList();
+            for (var i = 0; i < children.Count; i++) children[i].SetSiblingIndex(i);
             return parent;
         }
 

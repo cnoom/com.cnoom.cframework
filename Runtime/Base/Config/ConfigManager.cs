@@ -9,24 +9,22 @@ namespace CnoomFrameWork.Base.Config
     /// </summary>
     public class ConfigManager : Singleton<ConfigManager>
     {
-        public Dictionary<Type, IConfig> Configs { get; } = new Dictionary<Type, IConfig>();
+        public Dictionary<Type, IConfig> Configs { get; } = new();
 
         public T GetConfig<T>() where T : class, IConfig, new()
         {
-            if(!Configs.ContainsKey(typeof(T)))
-            {
-                return new T();
-            }
+            if (!Configs.ContainsKey(typeof(T))) return new T();
             return (T)Configs[typeof(T)];
         }
 
         public void RegisterConfig(IConfig config)
         {
-            if(Configs.ContainsKey(config.GetType()))
+            if (Configs.ContainsKey(config.GetType()))
             {
                 Configs[config.GetType()] = config;
                 return;
             }
+
             Configs.Add(config.GetType(), config);
         }
     }

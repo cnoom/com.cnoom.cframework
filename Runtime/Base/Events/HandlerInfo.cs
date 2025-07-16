@@ -5,8 +5,8 @@ namespace CnoomFrameWork.Base.Events
     internal class HandlerInfo
     {
         public Delegate Handler;
-        public int Priority;
         public bool Once;
+        public int Priority;
         public WeakReference<object> Target;
     }
 }

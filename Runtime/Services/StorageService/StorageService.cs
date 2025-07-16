@@ -56,30 +56,23 @@ namespace CnoomFrameWork.Services.StorageService
         public void ClearSection(string section)
         {
             var prefix = $"{section}.";
-            List<string> keyToMove = new List<string>();
-            foreach (string key in storageData.dataDict.Keys)
-            {
+            var keyToMove = new List<string>();
+            foreach (var key in storageData.dataDict.Keys)
                 if (key.StartsWith(prefix))
-                {
                     keyToMove.Add(key);
-                }
-            }
 
-            foreach (string key in keyToMove)
-            {
-                storageData.dataDict.Remove(key);
-            }
+            foreach (var key in keyToMove) storageData.dataDict.Remove(key);
 
             MakeDirty();
         }
 
         private void InitEncryptTool()
         {
-            StorageConfig config = ConfigManager.Instance.GetConfig<StorageConfig>();
+            var config = ConfigManager.Instance.GetConfig<StorageConfig>();
             if (PlayerPrefs.HasKey(EncryptKey) && PlayerPrefs.HasKey(EncryptIv))
             {
-                byte[] key = Convert.FromBase64String(PlayerPrefs.GetString(EncryptKey));
-                byte[] iv = Convert.FromBase64String(PlayerPrefs.GetString(EncryptIv));
+                var key = Convert.FromBase64String(PlayerPrefs.GetString(EncryptKey));
+                var iv = Convert.FromBase64String(PlayerPrefs.GetString(EncryptIv));
                 if (key.Length == config.Key.Length && iv.Length == config.Iv.Length)
                 {
                     encryptTool = new EncryptTool(key, iv);
@@ -110,7 +103,7 @@ namespace CnoomFrameWork.Services.StorageService
         {
             try
             {
-                string json = JsonConvert.SerializeObject(storageData);
+                var json = JsonConvert.SerializeObject(storageData);
                 json = encryptTool.Encrypt(json);
                 File.WriteAllText(storagePath, json);
             }
@@ -128,7 +121,7 @@ namespace CnoomFrameWork.Services.StorageService
             {
                 if (File.Exists(storagePath))
                 {
-                    string json = File.ReadAllText(storagePath);
+                    var json = File.ReadAllText(storagePath);
                     json = encryptTool.Decrypt(json);
                     storageData = JsonConvert.DeserializeObject<StorageData>(json);
                     if (storageData == null) throw new System.Exception("Invalid JSON format");
@@ -149,7 +142,7 @@ namespace CnoomFrameWork.Services.StorageService
         [Serializable]
         private class StorageData
         {
-            public Dictionary<string, string> dataDict = new Dictionary<string, string>();
+            public Dictionary<string, string> dataDict = new();
 
             public void Save(string key, object value)
             {
@@ -161,7 +154,7 @@ namespace CnoomFrameWork.Services.StorageService
 
             public T Load<T>(string key, T defaultValue)
             {
-                if (!dataDict.TryGetValue(key, out string json)) return defaultValue;
+                if (!dataDict.TryGetValue(key, out var json)) return defaultValue;
                 try
                 {
                     return JsonConvert.DeserializeObject<T>(json);

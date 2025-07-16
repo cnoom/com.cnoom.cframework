@@ -13,7 +13,6 @@
     /// <typeparam name="T"></typeparam>
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>, new()
     {
-
         #region Fields
 
         /// <summary>
@@ -38,18 +37,16 @@
         {
             get
             {
-                if(instance == null)
-                {
+                if (instance == null)
                     //ensure that only one thread can execute
                     lock (typeof(T))
                     {
-                        if(instance == null)
+                        if (instance == null)
                         {
                             instance = new T();
                             instance.InitializeSingleton();
                         }
                     }
-                }
 
                 return instance;
             }
@@ -66,12 +63,10 @@
 
         protected virtual void OnInitializing()
         {
-
         }
 
         protected virtual void OnInitialized()
         {
-
         }
 
         #endregion
@@ -80,10 +75,7 @@
 
         public virtual void InitializeSingleton()
         {
-            if(initializationStatus != SingletonInitializationStatus.None)
-            {
-                return;
-            }
+            if (initializationStatus != SingletonInitializationStatus.None) return;
 
             initializationStatus = SingletonInitializationStatus.Initializing;
             OnInitializing();
@@ -91,7 +83,9 @@
             OnInitialized();
         }
 
-        public virtual void ClearSingleton() { }
+        public virtual void ClearSingleton()
+        {
+        }
 
         public static void CreateInstance()
         {
@@ -101,10 +95,7 @@
 
         public static void DestroyInstance()
         {
-            if(instance == null)
-            {
-                return;
-            }
+            if (instance == null) return;
 
             instance.ClearSingleton();
             instance = default;
@@ -112,5 +103,4 @@
 
         #endregion
     }
-
 }

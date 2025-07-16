@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
 
@@ -14,19 +13,12 @@ namespace CnoomFrameWork.Modules.UiModule
 
         public UiBase GetUi(string uiName)
         {
-            if (panels == null)
-            {
-                throw new System.Exception("ui list is null");
-            }
+            if (panels == null) throw new System.Exception("ui list is null");
 
-            foreach (UiBase panel in panels)
-            {
+            foreach (var panel in panels)
                 if (panel.uiConfig.uiName == uiName)
-                {
                     return panel;
-                }
-            }
-            
+
             throw new System.Exception("ui not found");
         }
     }

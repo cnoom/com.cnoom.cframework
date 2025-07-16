@@ -4,20 +4,22 @@ namespace CnoomFrameWork.Extensions
 {
     public static class Vector2Extensions
     {
-
         //============== 分量操作 ==============//
         public static Vector2 WithX(this Vector2 v, float x)
         {
             return new Vector2(x, v.y);
         }
+
         public static Vector2 WithY(this Vector2 v, float y)
         {
             return new Vector2(v.x, y);
         }
+
         public static Vector2 AddX(this Vector2 v, float x)
         {
             return new Vector2(v.x + x, v.y);
         }
+
         public static Vector2 AddY(this Vector2 v, float y)
         {
             return new Vector2(v.x, v.y + y);
@@ -28,6 +30,7 @@ namespace CnoomFrameWork.Extensions
         {
             return new Vector2(-v.x, v.y);
         }
+
         public static Vector2 FlipY(this Vector2 v)
         {
             return new Vector2(v.x, -v.y);
@@ -38,6 +41,7 @@ namespace CnoomFrameWork.Extensions
         {
             return (a + b) / 2f;
         }
+
         public static float AngleTo(this Vector2 from, Vector2 to)
         {
             return Vector2.Angle(from, to);
@@ -48,6 +52,7 @@ namespace CnoomFrameWork.Extensions
         {
             return v == Vector2.zero;
         }
+
         public static bool IsApproximate(this Vector2 a, Vector2 b, float epsilon = 0.001f)
         {
             return (a - b).sqrMagnitude < epsilon * epsilon;

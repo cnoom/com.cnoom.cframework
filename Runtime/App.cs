@@ -1,7 +1,7 @@
 using CnoomFrameWork.Base.Config;
+using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Singleton;
-using CnoomFrameWork.Base.Container;
 
 namespace CnoomFrameWork.Core
 {
@@ -11,7 +11,10 @@ namespace CnoomFrameWork.Core
     /// </summary>
     public class App : PersistentMonoSingleton<App>
     {
-        private App() { }
+        private App()
+        {
+        }
+
         public ModuleManager ModuleManager { get; private set; }
         public ServiceLocator ServiceLocator { get; private set; }
         public ILog Log { get; private set; }
@@ -23,11 +26,11 @@ namespace CnoomFrameWork.Core
         protected override void OnInitialized()
         {
             RootContainer = new RootContainer();
-            
-            ConfigManager configManager = ConfigManager.Instance;
+
+            var configManager = ConfigManager.Instance;
 
             Log = configManager.GetConfig<LogConfig>().Log;
-            RootContainer.BindSingleton<ILog,ILog>(Log);
+            RootContainer.BindSingleton<ILog, ILog>(Log);
 
             ServiceLocator = new ServiceLocator(RootContainer);
             ServiceLocator.AutoRegister();

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Base.Events;
@@ -25,10 +24,10 @@ namespace CnoomFrameWork.Modules.UiModule
         {
             _uiSettings = AssetsService.LoadAsset<UiSettings>(UiSettings.FileName);
             _canvasTransform = Object.Instantiate(_uiSettings.canvas, App.transform).transform;
-            
-            foreach (string layer in _uiSettings.uiLayers)
+
+            foreach (var layer in _uiSettings.uiLayers)
             {
-                GameObject go = new GameObject(layer);
+                var go = new GameObject(layer);
                 go.transform.SetParent(_canvasTransform);
                 _layerStack[layer] = new Stack<UiBase>();
             }
@@ -38,9 +37,9 @@ namespace CnoomFrameWork.Modules.UiModule
 
         private UiBase CreateUi(string uiName)
         {
-            GameObject prefab = _uiSettings.GetUi(uiName).gameObject;
-            GameObject instance = Object.Instantiate(prefab, _canvasTransform);
-            UiBase ui = instance.GetComponent<UiBase>();
+            var prefab = _uiSettings.GetUi(uiName).gameObject;
+            var instance = Object.Instantiate(prefab, _canvasTransform);
+            var ui = instance.GetComponent<UiBase>();
             ui.Generate();
             return ui;
         }
@@ -54,14 +53,11 @@ namespace CnoomFrameWork.Modules.UiModule
         /// 刷新层级深度的方法
         private void RefreshUiDepths()
         {
-            foreach (string layer in _layerStack.Keys)
+            foreach (var layer in _layerStack.Keys)
             {
-                Transform layerTransform = _canvasTransform.Find(layer);
+                var layerTransform = _canvasTransform.Find(layer);
                 layerTransform.DetachChildren();
-                foreach (UiBase basePanel in _layerStack[layer].Reverse())
-                {
-                    basePanel.transform.SetParent(layerTransform);
-                }
+                foreach (var basePanel in _layerStack[layer].Reverse()) basePanel.transform.SetParent(layerTransform);
             }
         }
 
@@ -89,7 +85,7 @@ namespace CnoomFrameWork.Modules.UiModule
             public string LayerType;
 
             /// <summary>
-            /// 该层级剩余的界面数量
+            ///     该层级剩余的界面数量
             /// </summary>
             public int LayerCount;
 
@@ -101,7 +97,7 @@ namespace CnoomFrameWork.Modules.UiModule
         }
 
         /// <summary>
-        /// 关闭某层最上方ui命令
+        ///     关闭某层最上方ui命令
         /// </summary>
         public struct CloseLayerTopCommand
         {

@@ -41,7 +41,7 @@ namespace FrameWork.Editor
         {
             get
             {
-                string path = DataPathAbsolute + "/Scripts";
+                var path = DataPathAbsolute + "/Scripts";
                 TryCreateFolder("Assets/" + DataFolderName, "Scripts");
                 return path;
             }
@@ -49,10 +49,7 @@ namespace FrameWork.Editor
 
         private static void TryCreateFolder(string path, string folderName)
         {
-            if(!AssetDatabase.IsValidFolder(path + "/" + folderName))
-            {
-                AssetDatabase.CreateFolder(path, folderName);
-            }
+            if (!AssetDatabase.IsValidFolder(path + "/" + folderName)) AssetDatabase.CreateFolder(path, folderName);
         }
     }
 }

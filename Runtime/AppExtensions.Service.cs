@@ -4,10 +4,10 @@ using CnoomFrameWork.Services.TimerService;
 
 namespace CnoomFrameWork.Core
 {
-    public static partial class AppExtensions
+    public static class AppExtensions
     {
         /// <summary>
-        /// 获取资源服务
+        ///     获取资源服务
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
@@ -17,7 +17,7 @@ namespace CnoomFrameWork.Core
         }
 
         /// <summary>
-        /// 获取存储服务
+        ///     获取存储服务
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
@@ -27,7 +27,7 @@ namespace CnoomFrameWork.Core
         }
 
         /// <summary>
-        /// 获取定时器服务
+        ///     获取定时器服务
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
@@ -37,10 +37,10 @@ namespace CnoomFrameWork.Core
         }
 
         /// <summary>
-        /// 获取服务
+        ///     获取服务
         /// </summary>
         /// <returns></returns>
-        public static TService GetService<TService>(this App app) where TService : class,IService
+        public static TService GetService<TService>(this App app) where TService : class, IService
         {
             return app.ServiceLocator.GetService<TService>();
         }

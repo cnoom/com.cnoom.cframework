@@ -1,12 +1,9 @@
 ﻿// 文件：AssetsSystem.cs
 
 using System.Collections;
-using System.Collections.Generic;
-using CnoomFrameWork.Base.Log;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace CnoomFrameWork.Modules.AddressableModule
@@ -26,7 +23,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         /// </summary>
         public void ReleaseInstance(GameObject instance)
         {
-            if(instanceMap.TryGetValue(instance, out string key))
+            if (instanceMap.TryGetValue(instance, out var key))
             {
                 Addressables.ReleaseInstance(instance);
                 instanceMap.Remove(instance);
@@ -50,18 +47,16 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
         private IEnumerator ReleaseOfLabelCoroutine(string label)
         {
-            AsyncOperationHandle<IList<IResourceLocation>> locationHandle = Addressables.LoadResourceLocationsAsync(label);
+            var locationHandle = Addressables.LoadResourceLocationsAsync(label);
             yield return locationHandle;
 
-            if(locationHandle.Status != AsyncOperationStatus.Succeeded)
+            if (locationHandle.Status != AsyncOperationStatus.Succeeded)
             {
                 LogError("按标签释放资产失败: " + label);
                 yield break;
             }
-            foreach (IResourceLocation location in locationHandle.Result)
-            {
-                ReleaseAsset(location.PrimaryKey);
-            }
+
+            foreach (var location in locationHandle.Result) ReleaseAsset(location.PrimaryKey);
         }
 
         /// <summary>
@@ -69,16 +64,12 @@ namespace CnoomFrameWork.Modules.AddressableModule
         /// </summary>
         public void ReleaseAsset<T>(string key)
         {
-            if(assetHandles.TryGetValue(key, out AsyncOperationHandle handle))
+            if (assetHandles.TryGetValue(key, out var handle))
             {
-                if(handle.Result is T)
-                {
+                if (handle.Result is T)
                     ReleaseAsset(key);
-                }
                 else
-                {
                     LogError($"释放时类型不匹配 {key}");
-                }
             }
         }
 
@@ -87,7 +78,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         /// </summary>
         public void ForceRelease(string key)
         {
-            if(assetHandles.TryGetValue(key, out AsyncOperationHandle handle))
+            if (assetHandles.TryGetValue(key, out var handle))
             {
                 Addressables.Release(handle);
                 assetHandles.Remove(key);
@@ -101,16 +92,17 @@ namespace CnoomFrameWork.Modules.AddressableModule
         /// </summary>
         public void ReleaseAsset(string key)
         {
-            if(!referenceCount.TryGetValue(key, out int count))
+            if (!referenceCount.TryGetValue(key, out var count))
             {
                 LogWarning($"尝试释放未追踪的资产: {key}");
                 return;
             }
+
             count--;
             referenceCount[key] = count;
 
-            if(count > 0) return;
-            if(!assetHandles.TryGetValue(key, out AsyncOperationHandle handle)) return;
+            if (count > 0) return;
+            if (!assetHandles.TryGetValue(key, out var handle)) return;
             Addressables.Release(handle);
             assetHandles.Remove(key);
             referenceCount.Remove(key);
@@ -121,7 +113,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         /// </summary>
         public void ReleaseAll()
         {
-            foreach (AsyncOperationHandle handle in assetHandles.Values)
+            foreach (var handle in assetHandles.Values)
                 Addressables.Release(handle);
 
             assetHandles.Clear();

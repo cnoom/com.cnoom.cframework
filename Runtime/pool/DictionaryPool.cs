@@ -11,9 +11,9 @@ namespace pool
     /// <typeparam name="T"></typeparam>
     public class DictionaryPool<T> where T : Object
     {
-        private readonly Dictionary<int, string> indexToKey = new Dictionary<int, string>();
-        private readonly Dictionary<string, int> keyToIndex = new Dictionary<string, int>();
-        private readonly List<ObjectPool<T>> pools = new List<ObjectPool<T>>();
+        private readonly Dictionary<int, string> indexToKey = new();
+        private readonly Dictionary<string, int> keyToIndex = new();
+        private readonly List<ObjectPool<T>> pools = new();
 
         public bool ContainsKey(string key)
         {
@@ -29,41 +29,32 @@ namespace pool
 
         public T Get(string key)
         {
-            if(!keyToIndex.ContainsKey(key))
-            {
-                throw new NullReferenceException("poolDict not contain key:" + key);
-            }
+            if (!keyToIndex.ContainsKey(key)) throw new NullReferenceException("poolDict not contain key:" + key);
             return pools[keyToIndex[key]].Get();
         }
 
         public void Release(string key, T obj)
         {
-            if(!keyToIndex.ContainsKey(key))
-            {
-                throw new NullReferenceException("poolDict not contain key:" + key);
-            }
+            if (!keyToIndex.ContainsKey(key)) throw new NullReferenceException("poolDict not contain key:" + key);
             pools[keyToIndex[key]].Release(obj);
         }
 
         public void RemovePool(string key)
         {
-            int index = keyToIndex[key];
+            var index = keyToIndex[key];
             keyToIndex.Remove(key);
             indexToKey.Remove(index);
             pools.RemoveAt(index);
-            for(int i = index; i < pools.Count; i++)
+            for (var i = index; i < pools.Count; i++)
             {
-                string k = indexToKey[i + 1];
+                var k = indexToKey[i + 1];
                 keyToIndex[k] = i;
             }
         }
 
         public void ClearAll()
         {
-            foreach (ObjectPool<T> pool in pools)
-            {
-                pool.Clear();
-            }
+            foreach (var pool in pools) pool.Clear();
         }
     }
 }

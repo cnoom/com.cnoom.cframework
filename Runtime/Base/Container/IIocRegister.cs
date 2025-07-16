@@ -24,19 +24,17 @@ namespace CnoomFrameWork.Base.Container
 
         public object Register(BaseContainer container)
         {
-            TInstance instance = InstanceFactory.CreateInstance<TInstance>(container);
+            var instance = InstanceFactory.CreateInstance<TInstance>(container);
             container.BindSingleton<TInterface, TInstance>(instance);
             return instance;
         }
     }
-    
-    
+
 
     public class IocRegisterConfig : IConfig
     {
+        private readonly List<IIocRegister> registers = new();
         public List<IIocRegister> Registers => registers.OrderByDescending(r => r.Order).ToList();
-        
-        private List<IIocRegister> registers = new List<IIocRegister>();
 
         public void Register<TInterface, TRegister>(int order = 0) where TRegister : TInterface
         {
