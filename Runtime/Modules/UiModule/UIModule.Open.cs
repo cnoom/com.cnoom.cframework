@@ -14,14 +14,13 @@ namespace CnoomFrameWork.Modules.UiModule
             // 已存在检查
             var uiPrefab = _uiSettings.GetUi(command.UiName);
             var layer = uiPrefab.uiConfig.layer;
-            if (!uiPrefab.uiConfig.allowMultiple &&
-                HasUi(uiPrefab.uiConfig.layer, uiPrefab.gameObject.name, out var ui))
+            if (!uiPrefab.uiConfig.allowMultiple && HasUi(uiPrefab.uiConfig, out var ui))
             {
                 RemoveInStack(ui);
             }
             else
             {
-                ui = CreateUi(command.UiName);
+                ui = CreateUi(command.UiName, command.ObjectName);
                 ui.gameObject.SetActive(true);
                 var panelParent = _canvasTransform.Find(layer);
                 ui.transform.SetParent(panelParent);
@@ -43,6 +42,7 @@ namespace CnoomFrameWork.Modules.UiModule
             SetPanelInteractable(ui, false);
 
             ui.OnEnter(param);
+            EventManager.Publish(new OpenUiEvent(ui, _layerStack[ui.uiConfig.layer].Count));
             if (ui.uiAnimation && ui.uiAnimation.hasOpenAnimation) yield return ui.uiAnimation.PlayEnterAnimation();
 
             // 启用交互

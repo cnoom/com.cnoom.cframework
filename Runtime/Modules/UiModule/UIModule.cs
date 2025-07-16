@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Base.Events;
@@ -35,10 +36,11 @@ namespace CnoomFrameWork.Modules.UiModule
             EventManager.Publish(this);
         }
 
-        private UiBase CreateUi(string uiName)
+        private UiBase CreateUi(string uiName, string objectName)
         {
-            var prefab = _uiSettings.GetUi(uiName).gameObject;
-            var instance = Object.Instantiate(prefab, _canvasTransform);
+            GameObject prefab = _uiSettings.GetUi(uiName).gameObject;
+            GameObject instance = Object.Instantiate(prefab, _canvasTransform);
+            if (!string.IsNullOrEmpty(objectName)) instance.name = objectName;
             var ui = instance.GetComponent<UiBase>();
             ui.Generate();
             return ui;
@@ -61,11 +63,11 @@ namespace CnoomFrameWork.Modules.UiModule
             }
         }
 
-        private bool HasUi(string uiLayer, string gameObjectName, out UiBase ui)
+        private bool HasUi(UiConfig uiConfig, out UiBase ui)
         {
-            foreach (var uiBase in _layerStack[uiLayer])
+            foreach (var uiBase in _layerStack[uiConfig.layer])
             {
-                if (uiBase.gameObject.name != gameObjectName) continue;
+                if (uiBase.uiConfig.uiName != uiConfig.uiName) continue;
                 ui = uiBase;
                 return true;
             }
@@ -113,11 +115,31 @@ namespace CnoomFrameWork.Modules.UiModule
         {
             public string UiName;
             public UiParameter Parameters;
+            public string ObjectName;
 
-            public OpenUiCommand(string uiName, UiParameter parameters)
+            public OpenUiCommand(string uiName, UiParameter parameters, string objectName = null)
             {
                 UiName = uiName;
                 Parameters = parameters;
+                ObjectName = objectName;
+            }
+        }
+
+        public struct OpenUiEvent
+        {
+            /// <summary>
+            /// 打开的ui
+            /// </summary>
+            public UiBase UiBase;
+            /// <summary>
+            /// 打开的ui层ui数量
+            /// </summary>
+            public int LayerCount;
+            
+            public OpenUiEvent(UiBase uiBase, int layerCount)
+            {
+                UiBase = uiBase;
+                LayerCount = layerCount;
             }
         }
     }
