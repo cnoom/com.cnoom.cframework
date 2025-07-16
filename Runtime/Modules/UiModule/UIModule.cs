@@ -25,7 +25,7 @@ namespace CnoomFrameWork.Modules.UiModule
         {
             _uiSettings = AssetsService.LoadAsset<UiSettings>(UiSettings.FileName);
             _canvasTransform = Object.Instantiate(_uiSettings.canvas, App.transform).transform;
-
+            
             foreach (string layer in _uiSettings.uiLayers)
             {
                 GameObject go = new GameObject(layer);

@@ -116,7 +116,7 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        /// 同步或异步发布事件给所有订阅者。
+        /// 同步发布事件给所有订阅者。
         /// </summary>
         public static void Publish<T>(T e)
         {
