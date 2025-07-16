@@ -117,6 +117,13 @@ namespace CnoomFrameWork.Modules.UiModule
             public UiParameter Parameters;
             public string ObjectName;
 
+            public OpenUiCommand(string uiName)
+            {
+                UiName = uiName;
+                Parameters = null;
+                ObjectName = null;
+            }
+
             public OpenUiCommand(string uiName, UiParameter parameters = null, string objectName = null)
             {
                 UiName = uiName;
