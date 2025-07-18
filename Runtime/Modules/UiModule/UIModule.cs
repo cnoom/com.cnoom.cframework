@@ -38,12 +38,13 @@ namespace CnoomFrameWork.Modules.UiModule
 
         private UiBase CreateUi(string uiName, string objectName)
         {
-            GameObject prefab = _uiSettings.GetUi(App.Log,uiName).gameObject;
+            GameObject prefab = _uiSettings.GetUi(App.Log, uiName).gameObject;
             if (prefab == null) return null;
             GameObject instance = Object.Instantiate(prefab, _canvasTransform);
             if (!string.IsNullOrEmpty(objectName)) instance.name = objectName;
             var ui = instance.GetComponent<UiBase>();
-            Injector.Inject(ui);
+            Injector.Inject(this);
+            EventManager.Register(this);
             ui.Generate();
             return ui;
         }
@@ -51,6 +52,7 @@ namespace CnoomFrameWork.Modules.UiModule
         private void RemoveUi(UiBase ui)
         {
             ui.OnExit();
+            EventManager.Unregister(ui);
             Object.Destroy(ui.gameObject);
         }
 
