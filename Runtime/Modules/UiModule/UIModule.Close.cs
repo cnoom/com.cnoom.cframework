@@ -38,7 +38,6 @@ namespace CnoomFrameWork.Modules.UiModule
                 return;
             }
 
-            ui.OnExit();
             FinalizeClose(ui);
         }
 
@@ -62,7 +61,6 @@ namespace CnoomFrameWork.Modules.UiModule
             yield return ui.uiAnimation.PlayExitAnimation();
 
             // 确保没有被立即关闭
-            ui.OnExit();
             FinalizeClose(ui);
         }
 
