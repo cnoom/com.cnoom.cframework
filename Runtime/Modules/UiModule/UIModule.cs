@@ -161,5 +161,12 @@ namespace CnoomFrameWork.Modules.UiModule
                 LayerCount = layerCount;
             }
         }
+        
+        /// <summary>
+        /// 清理所有ui,不触发ui移除事件
+        /// </summary>
+        public struct ClearUiCommand
+        {
+        }
     }
 }

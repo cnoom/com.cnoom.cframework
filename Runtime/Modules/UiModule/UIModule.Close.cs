@@ -10,8 +10,21 @@ namespace CnoomFrameWork.Modules.UiModule
 {
     public partial class UIModule
     {
-        [EventSubscriber(typeof(CloseLayerTopCommand))]
-        [Preserve]
+        [EventSubscriber(typeof(ClearUiCommand)), Preserve]
+        private void OnClearUi(ClearUiCommand command)
+        {
+            foreach (string stackKey in _layerStack.Keys)
+            {
+                foreach (UiBase uiBase in _layerStack[stackKey])
+                {
+                    RemoveUi(uiBase);
+                }
+            }
+
+            _layerStack.Clear();
+        }
+
+        [EventSubscriber(typeof(CloseLayerTopCommand)), Preserve]
         private void OnCloseUiTopLayer(CloseLayerTopCommand command)
         {
             if (_layerStack[command.Layer].Count <= 0) return;
@@ -67,7 +80,7 @@ namespace CnoomFrameWork.Modules.UiModule
         private void FinalizeClose(UiBase ui)
         {
             var layer = ui.uiConfig.layer;
-            // 回收处理
+
             RemoveUi(ui);
 
             // 刷新层级
