@@ -12,7 +12,12 @@ namespace CnoomFrameWork.Modules.UiModule
         private void OnOpenCommand(OpenUiCommand command)
         {
             // 已存在检查
-            var uiPrefab = _uiSettings.GetUi(command.UiName);
+            var uiPrefab = _uiSettings.GetUi(App.Log, command.UiName);
+            if (uiPrefab == null)
+            {
+                return;
+            }
+
             var layer = uiPrefab.uiConfig.layer;
             if (!uiPrefab.uiConfig.allowMultiple && HasUi(uiPrefab.uiConfig, out var ui))
             {
@@ -21,6 +26,7 @@ namespace CnoomFrameWork.Modules.UiModule
             else
             {
                 ui = CreateUi(command.UiName, command.ObjectName);
+                if (ui == null) return;
                 ui.gameObject.SetActive(true);
                 var panelParent = _canvasTransform.Find(layer);
                 ui.transform.SetParent(panelParent);

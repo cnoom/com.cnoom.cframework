@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using CnoomFrameWork.Base.Log;
+using CnoomFrameWork.Core;
 using CnoomFrameWork.Modules.UiModule.UiPart;
 using UnityEngine;
 
@@ -11,15 +13,15 @@ namespace CnoomFrameWork.Modules.UiModule
         public List<UiBase> panels = new();
         public List<string> uiLayers = new();
 
-        public UiBase GetUi(string uiName)
+        public UiBase GetUi(ILog log, string uiName)
         {
             if (panels == null) throw new System.Exception("ui list is null");
 
             foreach (var panel in panels)
                 if (panel.uiConfig.uiName == uiName)
                     return panel;
-
-            throw new System.Exception("ui not found");
+            log.LogWithSender(nameof(UiSettings), $"ui not found [{uiName}]", ELogType.Error);
+            return null;
         }
     }
 }
