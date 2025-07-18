@@ -43,8 +43,8 @@ namespace CnoomFrameWork.Modules.UiModule
             GameObject instance = Object.Instantiate(prefab, _canvasTransform);
             if (!string.IsNullOrEmpty(objectName)) instance.name = objectName;
             var ui = instance.GetComponent<UiBase>();
-            Injector.Inject(this);
-            EventManager.Register(this);
+            Injector.Inject(ui);
+            EventManager.Register(ui);
             ui.Generate();
             return ui;
         }
