@@ -2,7 +2,7 @@
 
 namespace CnoomFrameWork.Base.Events
 {
-    internal class HandlerInfo
+    public class HandlerInfo
     {
         public Delegate Handler;
         public bool Once;
