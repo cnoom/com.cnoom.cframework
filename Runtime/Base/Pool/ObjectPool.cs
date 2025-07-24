@@ -24,7 +24,7 @@ namespace CnoomFrameWork.Core.Base.Pool
             Action<T> onGet = null,
             Action<T> onRelease = null,
             Action<T> onDestroy = null,
-            int maxSize = 999)
+            int maxSize = 11)
         {
             _createFunc = createFunc ?? throw new ArgumentNullException(nameof(createFunc));
             _onGet = onGet;
@@ -33,7 +33,7 @@ namespace CnoomFrameWork.Core.Base.Pool
             _maxSize = maxSize > 0
                 ? maxSize
                 : throw new ArgumentException("Max size must be greater than 0", nameof(maxSize));
-            _pool = new Queue<T>(Math.Min(16, maxSize));
+            _pool = new Queue<T>(maxSize);
         }
 
         #endregion

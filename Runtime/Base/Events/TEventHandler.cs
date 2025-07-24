@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CnoomFrameWork.Core.Base.Pool;
 
 namespace CnoomFrameWork.Base.Events
 {
@@ -9,8 +10,32 @@ namespace CnoomFrameWork.Base.Events
     {
         protected readonly Dictionary<Type, List<HandlerInfo>> Handlers = new();
         protected readonly Dictionary<Type, List<Delegate>> Filters = new();
-        protected readonly Dictionary<Type, MethodInfo[]> MethodInfos = new();
+        protected readonly ObjectPool<List<HandlerInfo>> HandlerListPool;
+        private readonly Dictionary<Type, MethodInfo[]> _methodInfos = new();
         protected readonly object Lock = new();
+
+        protected TEventHandler()
+        {
+            HandlerListPool = new ObjectPool<List<HandlerInfo>>(
+                () => new List<HandlerInfo>(),
+                null,
+                list => { list.Clear(); });
+        }
+        
+        public void TryRemoveHandle(Type type,List<HandlerInfo> toRemove)
+        {
+            if (toRemove.Count > 0)
+            {
+                lock (Lock)
+                {
+                    if (!Handlers.TryGetValue(type, out var list)) return;
+                    foreach (var r in toRemove)
+                        list.Remove(r);
+                }
+            }
+
+            HandlerListPool.Release(toRemove);
+        }
 
         /// <summary>
         ///     注册处理器。
@@ -63,13 +88,13 @@ namespace CnoomFrameWork.Base.Events
         protected MethodInfo[] GetMethodInfo(object subscriber)
         {
             var type = subscriber.GetType();
-            if (MethodInfos.TryGetValue(type, out MethodInfo[] methodInfos))
+            if (_methodInfos.TryGetValue(type, out MethodInfo[] methodInfos))
             {
                 return methodInfos;
             }
 
             methodInfos = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            MethodInfos.Add(type, methodInfos);
+            _methodInfos.Add(type, methodInfos);
             return methodInfos;
         }
 

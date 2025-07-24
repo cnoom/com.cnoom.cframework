@@ -8,7 +8,6 @@ namespace CnoomFrameWork.Base.Events
 {
     public class EventHandler : TEventHandler
     {
-      
         /// <summary>
         ///     注册同步普通事件处理器。
         /// </summary>
@@ -30,20 +29,20 @@ namespace CnoomFrameWork.Base.Events
         }
 
 
-
         /// <summary>
         ///     同步发布事件给所有订阅者。
         /// </summary>
         public void Publish<T>(T e)
         {
+            Type type = typeof(T);
             List<HandlerInfo> snapshot;
             lock (Lock)
             {
-                if (!Handlers.TryGetValue(typeof(T), out var list)) return;
-                snapshot = new List<HandlerInfo>(list);
+                if (!Handlers.TryGetValue(type, out var list)) return;
+                snapshot = HandlerListPool.Get();
             }
 
-            HashSet<HandlerInfo> toRemove = new();
+            List<HandlerInfo> toRemove = HandlerListPool.Get();
 
             foreach (var h in snapshot)
             {
@@ -61,15 +60,10 @@ namespace CnoomFrameWork.Base.Events
                     toRemove.Add(h);
             }
 
-            if (toRemove.Count <= 0) return;
-            lock (Lock)
-            {
-                if (!Handlers.TryGetValue(typeof(T), out var list)) return;
-                foreach (var r in toRemove)
-                    list.Remove(r);
-            }
+            TryRemoveHandle(type, toRemove);
+            HandlerListPool.Release(snapshot);
         }
-        
+
         /// <summary>
         ///     添加普通事件过滤器。每个处理器会独立判断是否继续传播。
         /// </summary>

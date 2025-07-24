@@ -43,10 +43,10 @@ namespace CnoomFrameWork.Base.Events
             lock (Lock)
             {
                 if (!Handlers.TryGetValue(type, out var list)) return;
-                snapshot = new List<HandlerInfo>(list);
+                snapshot = HandlerListPool.Get();
             }
 
-            HashSet<HandlerInfo> toRemove = new();
+            List<HandlerInfo> toRemove = HandlerListPool.Get();
 
             foreach (var h in snapshot)
             {
@@ -63,13 +63,8 @@ namespace CnoomFrameWork.Base.Events
                     toRemove.Add(h);
             }
 
-            if (toRemove.Count <= 0) return;
-            lock (Lock)
-            {
-                if (!Handlers.TryGetValue(type, out var list)) return;
-                foreach (var r in toRemove)
-                    list.Remove(r);
-            }
+            TryRemoveHandle(type, toRemove);
+            HandlerListPool.Release(snapshot);
         }
 
         public override void Register(object subscriber)
