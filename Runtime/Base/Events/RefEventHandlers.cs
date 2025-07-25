@@ -44,6 +44,7 @@ namespace CnoomFrameWork.Base.Events
             {
                 if (!Handlers.TryGetValue(type, out var list)) return;
                 snapshot = HandlerListPool.Get();
+                snapshot.AddRange(list);
             }
 
             List<HandlerInfo> toRemove = HandlerListPool.Get();
