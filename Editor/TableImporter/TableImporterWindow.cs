@@ -19,7 +19,7 @@ namespace FrameWork.Editor.TableImporter
 
             GUILayout.BeginHorizontal();
             tablePath = EditorGUILayout.TextField("表格目录路径", tablePath);
-            if (GUILayout.Button("选择表格"))
+            if (GUILayout.Button("选择表格目录"))
             {
                 OnClickTableButton();
             }
@@ -27,7 +27,7 @@ namespace FrameWork.Editor.TableImporter
 
             GUILayout.BeginHorizontal();
             classOutputPath = EditorGUILayout.TextField("类输出路径", classOutputPath);
-            if (GUILayout.Button("选择类输出路径"))
+            if (GUILayout.Button("选择类输出目录"))
             {
                 OnClickClassButton();
             }
@@ -35,7 +35,7 @@ namespace FrameWork.Editor.TableImporter
 
             GUILayout.BeginHorizontal();
             jsonOutputPath = EditorGUILayout.TextField("JSON输出路径", jsonOutputPath);
-            if (GUILayout.Button("选择JSON输出路径"))
+            if (GUILayout.Button("选择JSON输出目录"))
             {
                 OnClickJsonButton();
             }
@@ -49,8 +49,7 @@ namespace FrameWork.Editor.TableImporter
 
         void OnClickTableButton()
         {
-            string[] filters = new string[] { "Excel Files", "xlsx,csv", "All Files", "*" };
-            tablePath = EditorUtility.OpenFilePanelWithFilters("选择文件", Application.dataPath, filters);
+            tablePath = EditorUtility.OpenFolderPanel("选择文件", Application.dataPath, tablePath);
         }
 
         void OnClickClassButton()
