@@ -16,6 +16,7 @@ namespace FrameWork.Editor.TableImporter
                     case "string": return value;
                     case "bool": return bool.Parse(value);
                     case "List<int>": return new List<int>(Array.ConvertAll(value.Split(';'), int.Parse));
+                    case "List<string>": return new List<string>(value.Split(';'));
                     default: return null;
                 }
             }
