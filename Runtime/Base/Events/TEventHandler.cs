@@ -59,20 +59,6 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        ///     添加事件过滤器。每个处理器会独立判断是否继续传播。
-        /// </summary>
-        public void AddFilter<T>(Func<T, Delegate, bool> filter) where T : struct
-        {
-            var type = typeof(T);
-            lock (Lock)
-            {
-                if (!Filters.TryGetValue(type, out var list))
-                    list = Filters[type] = new List<Delegate>();
-                list.Add(filter);
-            }
-        }
-
-        /// <summary>
         ///     检查事件是否应被特定处理器接收（基于过滤器判断）。
         /// </summary>
         protected bool ShouldInvokeHandler<T>(T e, Delegate handler)
