@@ -49,7 +49,7 @@ namespace FrameWork.Editor.TableImporter
 
         void OnClickTableButton()
         {
-            tablePath = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, tablePath);
+            tablePath = EditorUtility.OpenFilePanel("选择文件", Application.dataPath, tablePath);
         }
 
         void OnClickClassButton()
