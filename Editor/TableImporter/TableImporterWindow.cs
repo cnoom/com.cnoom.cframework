@@ -19,7 +19,7 @@ namespace FrameWork.Editor.TableImporter
 
             GUILayout.BeginHorizontal();
             tablePath = EditorGUILayout.TextField("表格目录路径", tablePath);
-            if (GUILayout.Button("选择表格目录"))
+            if (GUILayout.Button("选择表格"))
             {
                 OnClickTableButton();
             }
@@ -49,7 +49,8 @@ namespace FrameWork.Editor.TableImporter
 
         void OnClickTableButton()
         {
-            tablePath = EditorUtility.OpenFilePanel("选择文件", Application.dataPath, tablePath);
+            string[] filters = new string[] { "Excel Files", "xlsx,csv", "All Files", "*" };
+            tablePath = EditorUtility.OpenFilePanelWithFilters("选择文件", Application.dataPath, filters);
         }
 
         void OnClickClassButton()
