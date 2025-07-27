@@ -7,6 +7,16 @@ namespace FrameWork.Editor.TableImporter
 {
     public class ExcelReader
     {
+        
+        public static string GetFirstSheetName(string filePath)
+        {
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                IWorkbook workbook = new XSSFWorkbook(fs);
+                return workbook.GetSheetName(0);
+            }
+        }
+        
         public static TableData Read(string filePath)
         {
             var data = new TableData

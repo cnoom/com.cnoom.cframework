@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,9 +7,18 @@ namespace FrameWork.Editor.TableImporter
 {
     public class TableImporterWindow : EditorWindow
     {
-        private static string _tablePath = "Assets/Tables";
-        private static string _classOutputPath = "Assets/Scripts/Generated/Tables";
-        private static string _jsonOutputPath = "Assets/StreamingAssets/Tables";
+        private string _tablePath = "Assets/Tables";
+        private string _classOutputPath = "Assets/Scripts/Generated/Tables";
+        private string _jsonOutputPath = "Assets/StreamingAssets/Tables";
+        private string _className = "";
+
+        private void OnEnable()
+        {
+            _tablePath = PlayerPrefs.GetString(nameof(_tablePath), "Assets");
+            _classOutputPath = PlayerPrefs.GetString(nameof(_classOutputPath), "Assets");
+            _jsonOutputPath = PlayerPrefs.GetString(nameof(_jsonOutputPath), "Assets");
+            InitClassName();
+        }
 
         [MenuItem("FrameWork/表格导入工具")]
         static void OpenWindow() => GetWindow<TableImporterWindow>("表格导入工具");
@@ -22,6 +32,7 @@ namespace FrameWork.Editor.TableImporter
             if (GUILayout.Button("选择表格路径"))
             {
                 OnClickTableButton();
+                InitClassName();
             }
 
             GUILayout.EndHorizontal();
@@ -44,50 +55,92 @@ namespace FrameWork.Editor.TableImporter
 
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("开始导入"))
+            GUILayout.Label("类名(默认使用csv文件名/xlxs文件的第一个表名;也可以自己设置)");
+            GUILayout.BeginHorizontal();
+            _className = EditorGUILayout.TextField("类名", _className, GUILayout.ExpandWidth(true));
+            GUILayout.EndHorizontal();
+
+            if (GUILayout.Button("生成表类"))
             {
-                ImportTable();
+                GenerateClass();
+            }
+
+            if (GUILayout.Button("生成JSON"))
+            {
+                GenerateJson();
             }
         }
 
         void OnClickTableButton()
         {
-            string[] filters = new string[] { "Excel Files", "xlsx,csv", "All Files", "*" };
+            string[] filters = { "Excel Files", "xlsx,csv", "All Files", "*" };
             _tablePath = EditorUtility.OpenFilePanelWithFilters("选择文件", Application.dataPath, filters);
+            PlayerPrefs.SetString(nameof(_tablePath), _tablePath);
+        }
+
+        void InitClassName()
+        {
+            if (Path.GetExtension(_tablePath) == ".csv")
+            {
+                _className = Path.GetFileNameWithoutExtension(_tablePath);
+            }
+            else if (Path.GetExtension(_tablePath) == ".xlsx")
+            {
+                _className = ExcelReader.GetFirstSheetName(_tablePath);
+            }
         }
 
         void OnClickClassButton()
         {
             _classOutputPath = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, _classOutputPath);
+            PlayerPrefs.SetString(nameof(_classOutputPath), _classOutputPath);
         }
 
         void OnClickJsonButton()
         {
             _jsonOutputPath = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, _jsonOutputPath);
+            PlayerPrefs.SetString(nameof(_jsonOutputPath), _jsonOutputPath);
         }
 
-        void ImportTable()
+        void GenerateClass()
         {
-            //判断文件类型
+            TableData tableData = null;
             if (Path.GetExtension(_tablePath) == ".csv")
             {
-                ProcessTable(CsvReader.Read);
+                tableData = CsvReader.Read(_tablePath);
             }
             else if (Path.GetExtension(_tablePath) == ".xlsx")
             {
-                ProcessTable(ExcelReader.Read);
+                tableData = ExcelReader.Read(_tablePath);
             }
 
-            AssetDatabase.Refresh();
-            Debug.Log("表格导入完成");
-        }
+            if (tableData == null)
+            {
+                Debug.LogError("读取表格失败!请检查表格格式是否正确");
+                return;
+            }
 
-        void ProcessTable(System.Func<string, TableData> reader)
+            TableToClassGenerator.Generate(_className, tableData.headers, tableData.types, _classOutputPath);
+        }
+        
+        void GenerateJson()
         {
-            var table = reader(_tablePath);
-            var className = Path.GetFileNameWithoutExtension(_tablePath);
-            TableToClassGenerator.Generate(className, table.headers, table.types, _classOutputPath);
-            TableToJsonExporter.Export(className, table.headers, table.types, table.rows, _jsonOutputPath);
+            TableData tableData = null;
+            if (Path.GetExtension(_tablePath) == ".csv")
+            {
+                tableData = CsvReader.Read(_tablePath);
+            }
+            else if (Path.GetExtension(_tablePath) == ".xlsx")
+            {
+                tableData = ExcelReader.Read(_tablePath);
+            }
+
+            if (tableData == null)
+            {
+                Debug.LogError("读取表格失败!请检查表格格式是否正确");
+                return;
+            }
+            TableToJsonExporter.Export(_className, tableData.headers, tableData.types, tableData.rows, _jsonOutputPath);
         }
     }
 }
