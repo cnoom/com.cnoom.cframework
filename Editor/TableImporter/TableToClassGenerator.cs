@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UnityEditor;
 
 namespace FrameWork.Editor.TableImporter
 {
@@ -20,6 +21,7 @@ namespace FrameWork.Editor.TableImporter
             sb.AppendLine("}");
             Directory.CreateDirectory(outputPath);
             File.WriteAllText(Path.Combine(outputPath, className + ".cs"), sb.ToString());
+            AssetDatabase.Refresh();
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using UnityEditor;
+using UnityEngine;
 
 namespace FrameWork.Editor.TableImporter
 {
@@ -32,6 +34,8 @@ namespace FrameWork.Editor.TableImporter
             Directory.CreateDirectory(outputPath);
             var json = JsonConvert.SerializeObject(list, Formatting.Indented);
             File.WriteAllText(Path.Combine(outputPath, className + ".json"), json);
+            AssetDatabase.Refresh();
+            Debug.Log($"导出 {className} 到 {outputPath}");
         }
     }
 }
