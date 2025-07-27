@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -13,7 +14,7 @@ namespace FrameWork.Editor.TableImporter
             var type = CompileHelper.GetCompiledType(className);
             if (type == null) return;
 
-            var list = (IList<object>)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
+            IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
 
             foreach (var row in rows)
             {
