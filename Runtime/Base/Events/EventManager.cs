@@ -43,6 +43,7 @@ namespace CnoomFrameWork.Base.Events
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SubscribeCallback<T, TResult>(CallbackEventHandler.CallbackEvent<T, TResult> handler,
             int priority = 0, bool once = false)
+            where T : struct
         {
             CallbackHandler.Subscribe(handler, priority, once);
         }
@@ -52,6 +53,7 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void UnsubscribeCallback<T, TResult>(CallbackEventHandler.CallbackEvent<T, TResult> handler)
+            where T : struct
         {
             CallbackHandler.Unsubscribe(handler);
         }
@@ -61,6 +63,7 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PublishCallback<T, TResult>(T e, Action<TResult> callback)
+            where T : struct
         {
             CallbackHandler.Publish(e, callback);
         }
