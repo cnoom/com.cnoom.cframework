@@ -13,7 +13,7 @@ namespace CnoomFrameWork.Base.Events
     public class CallbackEventHandler : TEventHandler
     {
         // 回调事件处理器委托定义
-        public delegate void CallbackEvent<in T, out TResult>(T e, Action<TResult> callback) where T : struct;
+        public delegate void CallbackEvent<in T, out TResult>(T e, Action<TResult> callback);
 
         // 错误处理委托定义
         public delegate void ErrorHandler<TResult>(Exception exception, Action<TResult> callback);
@@ -26,7 +26,6 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Subscribe<T, TResult>(CallbackEvent<T, TResult> handler, int priority = 0, bool once = false)
-            where T : struct
         {
             var type = typeof(CallbackEvent<T, TResult>);
             AddHandler(type, handler, priority, once);
@@ -37,7 +36,6 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Unsubscribe<T, TResult>(CallbackEvent<T, TResult> handler)
-            where T : struct
         {
             var type = typeof(CallbackEvent<T, TResult>);
             lock (WriteLock)
@@ -52,7 +50,6 @@ namespace CnoomFrameWork.Base.Events
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Publish<T, TResult>(T e, Action<TResult> callback)
-            where T : struct
         {
             var type = typeof(CallbackEvent<T, TResult>);
             List<HandlerInfo> snapshot;
@@ -174,7 +171,8 @@ namespace CnoomFrameWork.Base.Events
 
             foreach (var m in methods)
             {
-                foreach (var attr in m.GetCustomAttributes<CallbackEventSubscriberAttribute>())
+                foreach (CallbackEventSubscriberAttribute attr in m
+                             .GetCustomAttributes<CallbackEventSubscriberAttribute>())
                 {
                     var parameters = m.GetParameters();
                     if (parameters.Length != 2 ||
