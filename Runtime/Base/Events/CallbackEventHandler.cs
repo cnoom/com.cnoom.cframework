@@ -176,20 +176,48 @@ namespace CnoomFrameWork.Base.Events
                 {
                     var parameters = m.GetParameters();
                     if (parameters.Length != 2 ||
-                        parameters[1].ParameterType.GetGenericTypeDefinition() != typeof(Action<>))
+                        !typeof(Delegate).IsAssignableFrom(parameters[1].ParameterType) &&
+                        !parameters[1].ParameterType.IsGenericType)
                     {
-                        Debug.LogError($"回调事件订阅方法 {m.Name} 参数格式错误，应为 (T e, Action<TResult> callback)");
+                        LogManager.Error(nameof(CallbackEventHandler),
+                            $"回调事件订阅方法 {m.Name} 参数格式错误，应为 (T e, Action<TResult> callback)");
                         continue;
                     }
 
                     var eventType = parameters[0].ParameterType;
-                    var resultType = parameters[1].ParameterType.GetGenericArguments()[0];
+                    Type resultType;
 
-                    var wrapperType = typeof(CallbackEvent<,>).MakeGenericType(eventType, resultType);
-                    var delegateType = typeof(CallbackEvent<,>).MakeGenericType(eventType, resultType);
-                    var del = GetOrCreateDelegate(delegateType, subscriber, m);
+                    // 处理 Action<T> 类型的回调参数
+                    if (parameters[1].ParameterType.IsGenericType &&
+                        parameters[1].ParameterType.GetGenericTypeDefinition() == typeof(Action<>))
+                    {
+                        resultType = parameters[1].ParameterType.GetGenericArguments()[0];
+                    }
+                    else
+                    {
+                        LogManager.Error(nameof(CallbackEventHandler),
+                            $"回调事件订阅方法 {m.Name} 的回调参数类型不支持，必须是 Action<T> 类型");
 
-                    AddHandler(wrapperType, del, attr.Priority, attr.Once);
+                        continue;
+                    }
+
+                    try
+                    {
+                        var delegateType = typeof(CallbackEvent<,>).MakeGenericType(eventType, resultType);
+                        var del = Delegate.CreateDelegate(delegateType, subscriber, m, false);
+
+                        if (del == null)
+                        {
+                            LogManager.Error(nameof(CallbackEventHandler), $"无法为方法 {m.Name} 创建委托，方法签名与委托类型不匹配");
+                            continue;
+                        }
+
+                        AddHandler(delegateType, del, attr.Priority, attr.Once);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        LogManager.Error(nameof(CallbackEventHandler), $"为方法 {m.Name} 创建委托失败: {ex.Message}");
+                    }
                 }
             }
         }
