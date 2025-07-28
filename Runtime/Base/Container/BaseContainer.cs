@@ -117,22 +117,22 @@ namespace CnoomFrameWork.Base.Container
         /// </summary>
         public virtual object Resolve(Type type)
         {
-            lock (LockObject)
+            // 首先检查当前容器的单例字典（读取操作不需要完全锁定）
+            if (Singletons.TryGetValue(type, out var instance)) 
+                return instance;
+
+            // 然后检查当前容器的工厂方法字典
+            Func<BaseContainer, object> factory = null;
+            if (Factories.TryGetValue(type, out factory))
             {
-                // 首先检查当前容器的单例字典
-                if (Singletons.TryGetValue(type, out var instance)) return instance;
-
-                // 然后检查当前容器的工厂方法字典
-                if (Factories.TryGetValue(type, out var factory))
-                {
-                    var newInstance = factory(this);
-                    Inject(newInstance);
-                    return newInstance;
-                }
-
-                // 未找到注册项，返回null
-                return null;
+                // 只在创建新实例时加锁，减少锁的范围
+                var newInstance = factory(this);
+                Injector.Inject(newInstance);
+                return newInstance;
             }
+
+            // 未找到注册项，返回null
+            return null;
         }
 
         /// <summary>

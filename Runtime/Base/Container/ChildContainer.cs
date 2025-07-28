@@ -16,20 +16,25 @@ namespace CnoomFrameWork.Base.Container
         /// </summary>
         public override object Resolve(Type type)
         {
-            lock (LockObject)
+            // 首先检查当前容器的单例字典（读取操作不需要完全锁定）
+            if (Singletons.TryGetValue(type, out var instance)) 
+                return instance;
+
+            // 然后检查当前容器的工厂方法字典
+            Func<BaseContainer, object> factory = null;
+            if (Factories.TryGetValue(type, out factory))
             {
-                // 首先检查当前容器的单例字典
-                if (Singletons.TryGetValue(type, out var instance)) return instance;
-
-                // 然后检查当前容器的工厂方法字典
-                if (Factories.TryGetValue(type, out var factory)) return factory(this);
-
-                // 如果有父容器，递归查找
-                if (_parent != null) return _parent.Resolve(type);
-
-                // 未找到注册项，抛出异常
-                throw new InvalidOperationException($"类型 {type.FullName} 未在容器中注册");
+                var newInstance = factory(this);
+                Injector.Inject(newInstance);
+                return newInstance;
             }
+
+            // 如果有父容器，递归查找
+            if (_parent != null) 
+                return _parent.Resolve(type);
+
+            // 未找到注册项，抛出异常
+            throw new InvalidOperationException($"类型 {type.FullName} 未在容器中注册");
         }
     }
 }

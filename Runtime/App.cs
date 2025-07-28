@@ -15,10 +15,11 @@ namespace CnoomFrameWork.Core
         {
         }
 
+
         public ModuleManager ModuleManager { get; private set; }
         public ServiceLocator ServiceLocator { get; private set; }
-        public ILog Log { get; private set; }
         public RootContainer RootContainer { get; private set; }
+        public ILog Log { get; private set; }
 
         /// <summary>
         ///     单例初始化时调用，完成核心系统注册
