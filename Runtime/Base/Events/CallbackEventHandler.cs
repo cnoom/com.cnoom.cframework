@@ -13,7 +13,7 @@ namespace CnoomFrameWork.Base.Events
     public class CallbackEventHandler : TEventHandler
     {
         // 回调事件处理器委托定义
-        public delegate void CallbackEvent<in T, out TResult>(T e, Action<TResult> callback);
+        public delegate void CallbackEvent<T, TResult>(T e, Action<TResult> callback);
 
         // 错误处理委托定义
         public delegate void ErrorHandler<TResult>(Exception exception, Action<TResult> callback);
