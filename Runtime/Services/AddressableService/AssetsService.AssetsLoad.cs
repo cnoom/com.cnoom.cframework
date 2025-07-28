@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using CnoomFrameWork.Exception;
+using CnoomFrameWork.Base;
+using CnoomFrameWork.Base.Log;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
@@ -15,7 +16,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         {
             if (string.IsNullOrEmpty(key))
             {
-                LogError("资源键无效!");
+                LogManager.Error(nameof(AssetsService), "资源键无效!");
                 return default;
             }
 
@@ -26,7 +27,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
                 if (locationHandle.Status != AsyncOperationStatus.Succeeded || locationHandle.Result.Count <= 0)
                 {
-                    LogError($"加载失败: 无法找到地址键 {key}");
+                    LogManager.Error(nameof(AssetsService), $"加载失败: 无法找到地址键 {key}");
                     return default;
                 }
 
@@ -43,9 +44,9 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
                 return result;
             }
-            catch (CnoomFrameWorkException e)
+            catch (ResourceException e)
             {
-                LogError($"加载失败: {e.Message}");
+                LogManager.Error(nameof(AssetsService), $"加载失败: {e.Message}");
                 return default;
             }
         }
@@ -57,7 +58,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         {
             if (string.IsNullOrEmpty(key))
             {
-                LogError("资源键无效!");
+                LogManager.Error(nameof(AssetsService), "资源键无效!");
                 return;
             }
 
@@ -96,7 +97,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
             }
             else
             {
-                LogError($"加载失败: {key} [{operation.OperationException}]");
+                LogManager.Error(nameof(AssetsService), $"加载失败: {key} [{operation.OperationException}]");
                 Addressables.Release(operation); // 新增释放操作
             }
         }
@@ -108,7 +109,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         {
             if (!reference.RuntimeKeyIsValid())
             {
-                LogError("无效的AssetReference");
+                LogManager.Error(nameof(AssetsService), "无效的AssetReference");
                 return;
             }
 
@@ -132,7 +133,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
             if (operation.Status != AsyncOperationStatus.Succeeded)
             {
-                LogError($"加载失败: {reference.AssetGUID} [{operation.OperationException}]");
+                LogManager.Error(nameof(AssetsService), $"加载失败: {reference.AssetGUID} [{operation.OperationException}]");
                 yield break;
             }
 
@@ -176,7 +177,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
                 if (operation.Status != AsyncOperationStatus.Succeeded)
                 {
-                    LogError($"加载失败: {location.PrimaryKey} [{operation.OperationException}]");
+                    LogManager.Error(nameof(AssetsService),$"加载失败: {location.PrimaryKey} [{operation.OperationException}]");
                     continue;
                 }
 
@@ -203,7 +204,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         {
             if (locationHandle.Status != AsyncOperationStatus.Succeeded || locationHandle.Result.Count <= 0)
             {
-                LogError($"加载失败: 无法找到地址键 {key}");
+                LogManager.Error(nameof(AssetsService), $"加载失败: 无法找到地址键 {key}");
                 return;
             }
 

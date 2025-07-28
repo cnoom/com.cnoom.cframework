@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Base.Events;
@@ -38,7 +37,7 @@ namespace CnoomFrameWork.Modules.UiModule
 
         private UiBase CreateUi(string uiName, string objectName)
         {
-            GameObject prefab = _uiSettings.GetUi(App.Log, uiName).gameObject;
+            GameObject prefab = _uiSettings.GetUi(uiName).gameObject;
             if (prefab == null) return null;
             GameObject instance = Object.Instantiate(prefab, _canvasTransform);
             if (!string.IsNullOrEmpty(objectName)) instance.name = objectName;

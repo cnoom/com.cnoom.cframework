@@ -1,6 +1,6 @@
+using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Base.Config;
 using CnoomFrameWork.Base.Container;
-using CnoomFrameWork.Base.Log;
 using CnoomFrameWork.Singleton;
 
 namespace CnoomFrameWork.Core
@@ -19,7 +19,6 @@ namespace CnoomFrameWork.Core
         public ModuleManager ModuleManager { get; private set; }
         public ServiceLocator ServiceLocator { get; private set; }
         public RootContainer RootContainer { get; private set; }
-        public ILog Log { get; private set; }
 
         /// <summary>
         ///     单例初始化时调用，完成核心系统注册
@@ -30,8 +29,8 @@ namespace CnoomFrameWork.Core
 
             var configManager = ConfigManager.Instance;
 
-            Log = configManager.GetConfig<LogConfig>().Log;
-            RootContainer.BindSingleton<ILog, ILog>(Log);
+            LogManager.Initialize(configManager.GetConfig<LogConfig>());
+            
 
             ServiceLocator = new ServiceLocator(RootContainer);
             ServiceLocator.AutoRegister();

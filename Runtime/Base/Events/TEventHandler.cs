@@ -109,7 +109,7 @@ namespace CnoomFrameWork.Base.Events
                 };
                 
                 // 优化：仅在必要时排序
-                if (list.Count == 0 || priority <= list[list.Count - 1].Priority)
+                if (list.Count == 0 || priority <= list[^1].Priority)
                 {
                     // 如果优先级最低，直接添加到末尾
                     list.Add(info);

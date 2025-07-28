@@ -12,7 +12,7 @@ namespace CnoomFrameWork.Modules.UiModule
         private void OnOpenCommand(OpenUiCommand command)
         {
             // 已存在检查
-            var uiPrefab = _uiSettings.GetUi(App.Log, command.UiName);
+            var uiPrefab = _uiSettings.GetUi(command.UiName);
             if (uiPrefab == null)
             {
                 return;

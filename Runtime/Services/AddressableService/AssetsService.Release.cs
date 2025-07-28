@@ -1,6 +1,7 @@
 ﻿// 文件：AssetsSystem.cs
 
 using System.Collections;
+using CnoomFrameWork.Base.Log;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -31,7 +32,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
             }
             else
             {
-                LogError("尝试释放未追踪的实例对象");
+                LogManager.Error(nameof(AssetsService), "尝试释放未追踪的实例对象");
                 Object.Destroy(instance);
             }
         }
@@ -52,7 +53,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
 
             if (locationHandle.Status != AsyncOperationStatus.Succeeded)
             {
-                LogError("按标签释放资产失败: " + label);
+                LogManager.Error(nameof(AssetsService), "按标签释放资产失败: " + label);
                 yield break;
             }
 
@@ -69,7 +70,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
                 if (handle.Result is T)
                     ReleaseAsset(key);
                 else
-                    LogError($"释放时类型不匹配 {key}");
+                    LogManager.Error(nameof(AssetsService), $"释放时类型不匹配 {key}");
             }
         }
 
@@ -83,7 +84,8 @@ namespace CnoomFrameWork.Modules.AddressableModule
                 Addressables.Release(handle);
                 assetHandles.Remove(key);
                 referenceCount.Remove(key);
-                LogWarning($"强制释放: {key}");
+
+                LogManager.Warn(nameof(AssetsService), $"强制释放: {key}");
             }
         }
 
@@ -94,7 +96,7 @@ namespace CnoomFrameWork.Modules.AddressableModule
         {
             if (!referenceCount.TryGetValue(key, out var count))
             {
-                LogWarning($"尝试释放未追踪的资产: {key}");
+                LogManager.Warn(nameof(AssetsService), $"尝试释放未追踪的资产: {key}");
                 return;
             }
 
