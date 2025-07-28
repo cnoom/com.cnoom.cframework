@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CnoomFrameWork.Base.Log;
 using UnityEngine;
 
 namespace CnoomFrameWork.Base.Events
@@ -13,7 +14,7 @@ namespace CnoomFrameWork.Base.Events
     {
         // 回调事件处理器委托定义
         public delegate void CallbackEvent<in T, out TResult>(T e, Action<TResult> callback) where T : struct;
-        
+
         // 错误处理委托定义
         public delegate void ErrorHandler<TResult>(Exception exception, Action<TResult> callback);
 
@@ -27,7 +28,7 @@ namespace CnoomFrameWork.Base.Events
         public void Subscribe<T, TResult>(CallbackEvent<T, TResult> handler, int priority = 0, bool once = false)
             where T : struct
         {
-            var type = typeof(CallbackEventWrapper);
+            var type = typeof(CallbackEvent<T, TResult>);
             AddHandler(type, handler, priority, once);
         }
 
@@ -38,7 +39,7 @@ namespace CnoomFrameWork.Base.Events
         public void Unsubscribe<T, TResult>(CallbackEvent<T, TResult> handler)
             where T : struct
         {
-            var type = typeof(CallbackEventWrapper);
+            var type = typeof(CallbackEvent<T, TResult>);
             lock (WriteLock)
             {
                 if (Handlers.TryGetValue(type, out var list))
@@ -53,8 +54,7 @@ namespace CnoomFrameWork.Base.Events
         public void Publish<T, TResult>(T e, Action<TResult> callback)
             where T : struct
         {
-
-            var type = typeof(CallbackEventWrapper);
+            var type = typeof(CallbackEvent<T, TResult>);
             List<HandlerInfo> snapshot;
 
             // 减少锁的范围，只在读取时加锁
@@ -73,6 +73,11 @@ namespace CnoomFrameWork.Base.Events
 
             List<HandlerInfo> toRemove = null;
             bool hasHandler = false;
+
+            if (snapshot.Count > 1)
+            {
+                LogManager.Warn(nameof(CallbackEventHandler), "存在多个回调事件处理器，仅调用第一个匹配的处理器");
+            }
 
             // 遍历处理器并调用
             for (int i = 0; i < snapshot.Count; i++)
@@ -182,18 +187,13 @@ namespace CnoomFrameWork.Base.Events
                     var eventType = parameters[0].ParameterType;
                     var resultType = parameters[1].ParameterType.GetGenericArguments()[0];
 
-                    var wrapperType = typeof(CallbackEventWrapper).MakeGenericType(eventType, resultType);
+                    var wrapperType = typeof(CallbackEvent<,>).MakeGenericType(eventType, resultType);
                     var delegateType = typeof(CallbackEvent<,>).MakeGenericType(eventType, resultType);
                     var del = GetOrCreateDelegate(delegateType, subscriber, m);
 
                     AddHandler(wrapperType, del, attr.Priority, attr.Once);
                 }
             }
-        }
-
-        // 事件包装类，用于区分不同的事件类型和结果类型
-        private class CallbackEventWrapper
-        {
         }
     }
 }
