@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEngine;
 
-namespace FrameWork.Editor.Ui
+namespace cnoom.Editor.Ui
 {
     public class UiEditorWindow : EditorWindow
     {
@@ -15,7 +15,7 @@ namespace FrameWork.Editor.Ui
             UpdatePrefabDropArea();
         }
 
-        [MenuItem("FrameWork/ui管理")]
+        [MenuItem("cnoom/cframework/ui管理")]
         public static void ShowWindow()
         {
             GetWindow<UiEditorWindow>("Ui管理");

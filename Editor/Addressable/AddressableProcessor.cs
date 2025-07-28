@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 
-namespace FrameWork.Editor.Addressable
+namespace cnoom.Editor.Addressable
 {
     public class AddressableProcessor
     {

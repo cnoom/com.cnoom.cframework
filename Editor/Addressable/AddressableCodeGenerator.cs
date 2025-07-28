@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEngine;
 
-namespace FrameWork.Editor.Addressable
+namespace cnoom.Editor.Addressable
 {
     /// <summary>
     ///     生成Addressable资源的代码

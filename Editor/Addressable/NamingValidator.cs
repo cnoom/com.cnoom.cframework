@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace FrameWork.Editor.Addressable
+namespace cnoom.Editor.Addressable
 {
     /// <summary>
     ///     命名验证器

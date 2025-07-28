@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace FrameWork.Editor
+namespace cnoom.Editor
 {
     public static class FrameWorkConfig
     {

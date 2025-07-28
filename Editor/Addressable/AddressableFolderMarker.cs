@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace FrameWork.Editor.Addressable
+namespace cnoom.Editor.Addressable
 {
     /// <summary>
     ///     用于标记可寻址文件夹的脚本

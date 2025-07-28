@@ -3,7 +3,7 @@ using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 
-namespace FrameWork.Editor
+namespace cnoom.Editor
 {
     public class PackageUpdater
     {
@@ -12,7 +12,7 @@ namespace FrameWork.Editor
         private static ListRequest listRequest;
         private static int progressId;
 
-        [MenuItem("FrameWork/更新框架包")]
+        [MenuItem("cnoom/cframework/更新框架包")]
         public static void UpdatePackage()
         {
             if (!EditorUtility.DisplayDialog("确认更新", $"确定要更新{PackageName}吗？", "更新", "取消"))

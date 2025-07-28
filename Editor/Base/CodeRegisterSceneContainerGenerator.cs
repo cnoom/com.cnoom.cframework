@@ -3,13 +3,13 @@ using Editor.Base;
 using UnityEditor;
 using UnityEngine;
 
-namespace FrameWork.Editor.Base
+namespace cnoom.Editor.Base
 {
     public static class CodeRegisterSceneContainerGenerator
     {
         public const string FileName = "RegisterSceneContainer";
 
-        [MenuItem("FrameWork/脚本生成/生成场景容器脚本")]
+        [MenuItem("cnoom/cframework/脚本生成/生成场景容器脚本")]
         private static void CreateSceneContainer()
         {
             // 如果文件已存在，则提示用户

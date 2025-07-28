@@ -6,7 +6,7 @@ namespace Editor.Base
     {
         public const string FileName = "GameObjectRegisterOnStart";
 
-        [MenuItem("FrameWork/脚本生成/自动注册游戏对象脚本(Start)")]
+        [MenuItem("cnoom/cframework/脚本生成/自动注册游戏对象脚本(Start)")]
         private static void CreateGameObjectRegisterOnStart()
         {
             var fileName = "GameObjectRegisterOnStart";
@@ -27,7 +27,7 @@ public class {fileName} : MonoBehaviour
         }
 
 
-        [MenuItem("FrameWork/脚本生成/自动注册游戏对象脚本(Trigger)")]
+        [MenuItem("cnoom/cframework/脚本生成/自动注册游戏对象脚本(Trigger)")]
         private static void CreateGameObjectRegisterOnTrigger()
         {
             var fileName = "GameObjectRegisterOnTrigger";

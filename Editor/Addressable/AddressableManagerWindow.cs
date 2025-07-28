@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace FrameWork.Editor.Addressable
+namespace cnoom.Editor.Addressable
 {
     /// <summary>
     ///     资源管理器
@@ -41,7 +41,7 @@ namespace FrameWork.Editor.Addressable
             }
         }
 
-        [MenuItem("FrameWork/资源管理器")]
+        [MenuItem("cnoom/cframework/资源管理器")]
         public static void ShowWindow()
         {
             GetWindow<AddressableManagerWindow>("资源管理器");

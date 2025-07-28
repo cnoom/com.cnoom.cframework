@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace FrameWork.Editor.Addressable
+namespace cnoom.Editor.Addressable
 {
     /// <summary>
     ///     地址简化器
