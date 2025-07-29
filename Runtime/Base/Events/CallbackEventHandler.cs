@@ -193,7 +193,7 @@ namespace CnoomFrameWork.Base.Events
 
                     var wrapperType = typeof(CallbackEvent<,>).MakeGenericType(eventType, resultType);
                     var delegateType = typeof(CallbackEvent<,>).MakeGenericType(eventType, resultType);
-                    var del = GetOrCreateDelegate(delegateType, subscriber, m);
+                    var del = CreateDelegate(delegateType, subscriber, m);
 
                     AddHandler(wrapperType, del, attr.Priority, attr.Once);
                 }

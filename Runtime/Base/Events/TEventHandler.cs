@@ -23,7 +23,6 @@ namespace CnoomFrameWork.Base.Events
 
         // 缓存反射信息以提高性能
         private readonly Dictionary<Type, MethodInfo[]> _methodInfos = new();
-        private readonly Dictionary<Type, Dictionary<MethodInfo, Delegate>> _delegateCache = new();
 
         // 读写锁分离，提高并发性能
         protected readonly object ReadLock = new();
@@ -195,36 +194,12 @@ namespace CnoomFrameWork.Base.Events
         }
 
         /// <summary>
-        ///     获取或创建委托，使用缓存提高性能
+        ///     创建委托
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected Delegate GetOrCreateDelegate(Type delegateType, object target, MethodInfo method)
+        protected Delegate CreateDelegate(Type delegateType, object target, MethodInfo method)
         {
-            var targetType = target.GetType();
-
-            lock (ReadLock)
-            {
-                if (_delegateCache.TryGetValue(targetType, out var methodCache) &&
-                    methodCache.TryGetValue(method, out var cachedDelegate))
-                {
-                    return cachedDelegate;
-                }
-            }
-
-            var newDelegate = Delegate.CreateDelegate(delegateType, target, method);
-
-            lock (WriteLock)
-            {
-                if (!_delegateCache.TryGetValue(targetType, out var methodCache))
-                {
-                    methodCache = new Dictionary<MethodInfo, Delegate>();
-                    _delegateCache[targetType] = methodCache;
-                }
-
-                methodCache[method] = newDelegate;
-            }
-
-            return newDelegate;
+            return Delegate.CreateDelegate(delegateType, target, method);
         }
 
         /// <summary>
@@ -245,13 +220,6 @@ namespace CnoomFrameWork.Base.Events
                         if (h.Target.TryGetTarget(out var target)) return ReferenceEquals(target, subscriber);
                         return true;
                     });
-
-                // 清除委托缓存
-                var type = subscriber.GetType();
-                if (_delegateCache.ContainsKey(type))
-                {
-                    _delegateCache.Remove(type);
-                }
             }
         }
 

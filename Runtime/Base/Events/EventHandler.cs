@@ -176,7 +176,7 @@ namespace CnoomFrameWork.Base.Events
                 {
                     var type = attr.EventType;
                     var delegateType = typeof(Action<>).MakeGenericType(type);
-                    var del = GetOrCreateDelegate(delegateType, subscriber, m);
+                    var del = CreateDelegate(delegateType, subscriber, m);
 
                     AddHandler(type, del, attr.Priority, attr.Once);
                 }

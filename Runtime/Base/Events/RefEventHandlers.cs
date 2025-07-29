@@ -127,7 +127,7 @@ namespace CnoomFrameWork.Base.Events
                 {
                     var type = attr.EventType;
                     var handlerType = typeof(RefEvent<>).MakeGenericType(type);
-                    var del = GetOrCreateDelegate(handlerType, subscriber, m);
+                    var del = CreateDelegate(handlerType, subscriber, m);
                     AddHandler(type, del, attr.Priority, attr.Once);
                 }
             }
