@@ -76,7 +76,11 @@ namespace CnoomFrameWork.Base.Events
 
             if (snapshot.Count > 1)
             {
-                LogManager.Warn(nameof(CallbackEventHandler), "存在多个回调事件处理器，仅调用第一个匹配的处理器");
+                LogManager.Warn(nameof(CallbackEventHandler), $"存在多个回调事件处理器，仅调用第一个匹配的处理器，当前匹配处理器数量：{snapshot.Count},具体处理器如下：");
+                foreach (var h in snapshot)
+                {
+                    LogManager.Warn(nameof(CallbackEventHandler), $"处理器：{h.Handler}，优先级：{h.Priority}，一次性：{h.Once}");
+                }
             }
 
             // 遍历处理器并调用
