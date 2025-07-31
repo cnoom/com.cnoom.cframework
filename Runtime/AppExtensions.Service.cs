@@ -1,6 +1,5 @@
 ﻿using CnoomFrameWork.Modules.AddressableModule;
 using CnoomFrameWork.Services.StorageService;
-using CnoomFrameWork.Services.TimerService;
 
 namespace CnoomFrameWork.Core
 {
@@ -24,16 +23,6 @@ namespace CnoomFrameWork.Core
         public static IStorageService GetStorageService(this App app)
         {
             return app.ServiceLocator.GetService<IStorageService>();
-        }
-
-        /// <summary>
-        ///     获取定时器服务
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
-        public static TimerService GetTimerService(this App app)
-        {
-            return app.ServiceLocator.GetService<TimerService>();
         }
 
         /// <summary>

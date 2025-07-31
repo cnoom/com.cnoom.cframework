@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CnoomFrameWork.Services.TimerService
+namespace CnoomFrameWork.Base.Timer
 {
     public class SecondsTimer : ISecondsTimer
     {

@@ -2,28 +2,19 @@
 using System.Collections.Generic;
 using CnoomFrameWork.Core;
 using CnoomFrameWork.Core.UnityExtensions;
+using CnoomFrameWork.Singleton;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace CnoomFrameWork.Services.TimerService
+namespace CnoomFrameWork.Base.Timer
 {
-    public class TimerService : IService
+    public class TimerService : PersistentMonoSingleton<TimerService>
     {
         private readonly TimerCollections<FrameTimer> _frameTimers = new();
         private readonly TimerCollections<SecondsTimer> _secondsTimers = new();
-        private GameObject _updateGameObject;
 
-        public void Initialize()
+        private void OnDestroy()
         {
-            _updateGameObject = new GameObject("TimerService");
-            _updateGameObject.AddComponent<UpdateGameObject>().SetAction(Update);
-            Object.DontDestroyOnLoad(_updateGameObject);
-        }
-
-        public void Dispose()
-        {
-            Object.Destroy(_updateGameObject);
-            _updateGameObject = null;
             _secondsTimers.Dispose();
             _frameTimers.Dispose();
         }

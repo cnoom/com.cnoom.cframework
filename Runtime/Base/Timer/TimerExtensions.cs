@@ -1,7 +1,7 @@
 ﻿using CnoomFrameWork.Core.UnityExtensions;
 using UnityEngine;
 
-namespace CnoomFrameWork.Services.TimerService
+namespace CnoomFrameWork.Base.Timer
 {
     public static class TimerExtensions
     {
