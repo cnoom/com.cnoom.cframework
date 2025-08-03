@@ -21,7 +21,10 @@ namespace CnoomFrameWork.Modules.UiModule
                 }
             }
 
-            _layerStack.Clear();
+            foreach (var key in _layerStack.Keys)
+            {
+                _layerStack[key].Clear();
+            }
         }
 
         [EventSubscriber(typeof(CloseLayerTopCommand)), Preserve]
