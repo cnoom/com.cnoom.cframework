@@ -13,7 +13,7 @@ namespace CnoomFrameWork.Modules.UiModule
     public partial class UIModule : Module
     {
         // 使用栈管理界面层级
-        private readonly Dictionary<string, Stack<UiBase>> _layerStack = new();
+        private readonly Dictionary<string, LinkedList<UiBase>> _layerLinkedList = new();
 
         private Transform _canvasTransform;
         private UiSettings _uiSettings;
@@ -29,7 +29,7 @@ namespace CnoomFrameWork.Modules.UiModule
             {
                 var go = new GameObject(layer);
                 go.transform.SetParent(_canvasTransform);
-                _layerStack[layer] = new Stack<UiBase>();
+                _layerLinkedList[layer] = new LinkedList<UiBase>();
             }
 
             EventManager.Publish(this);
@@ -58,17 +58,18 @@ namespace CnoomFrameWork.Modules.UiModule
         /// 刷新层级深度的方法
         private void RefreshUiDepths()
         {
-            foreach (var layer in _layerStack.Keys)
+            foreach (var layer in _layerLinkedList.Keys)
             {
                 var layerTransform = _canvasTransform.Find(layer);
                 layerTransform.DetachChildren();
-                foreach (var basePanel in _layerStack[layer].Reverse()) basePanel.transform.SetParent(layerTransform);
+                foreach (var basePanel in _layerLinkedList[layer].Reverse())
+                    basePanel.transform.SetParent(layerTransform);
             }
         }
 
         private bool HasUi(UiConfig uiConfig, out UiBase ui)
         {
-            foreach (var uiBase in _layerStack[uiConfig.layer])
+            foreach (var uiBase in _layerLinkedList[uiConfig.layer])
             {
                 if (uiBase.uiConfig.uiName != uiConfig.uiName) continue;
                 ui = uiBase;
@@ -112,6 +113,25 @@ namespace CnoomFrameWork.Modules.UiModule
             {
                 Layer = layer;
             }
+        }
+
+        /// <summary>
+        /// 关闭某层最下方ui命令
+        /// </summary>
+        public struct CloseLayerBottomCommand
+        {
+            public string Layer;
+
+            public CloseLayerBottomCommand(string layer)
+            {
+                Layer = layer;
+            }
+        }
+
+        public struct CloseUiCommand
+        {
+            public UiBase UiBase;
+            public CloseUiCommand(UiBase uiBase) => UiBase = uiBase;
         }
 
         public struct OpenUiCommand
@@ -160,7 +180,7 @@ namespace CnoomFrameWork.Modules.UiModule
                 LayerCount = layerCount;
             }
         }
-        
+
         /// <summary>
         /// 清理所有ui,不触发ui移除事件
         /// </summary>

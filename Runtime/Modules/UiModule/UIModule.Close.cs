@@ -13,26 +13,40 @@ namespace CnoomFrameWork.Modules.UiModule
         [EventSubscriber(typeof(ClearUiCommand)), Preserve]
         private void OnClearUi(ClearUiCommand command)
         {
-            foreach (string stackKey in _layerStack.Keys)
+            foreach (string stackKey in _layerLinkedList.Keys)
             {
-                foreach (UiBase uiBase in _layerStack[stackKey])
+                foreach (UiBase uiBase in _layerLinkedList[stackKey])
                 {
                     RemoveUi(uiBase);
                 }
             }
 
-            foreach (var key in _layerStack.Keys)
+            foreach (var key in _layerLinkedList.Keys)
             {
-                _layerStack[key].Clear();
+                _layerLinkedList[key].Clear();
             }
         }
 
         [EventSubscriber(typeof(CloseLayerTopCommand)), Preserve]
         private void OnCloseUiTopLayer(CloseLayerTopCommand command)
         {
-            if (_layerStack[command.Layer].Count <= 0) return;
-            var ui = _layerStack[command.Layer].Peek();
+            if (_layerLinkedList[command.Layer].Count <= 0) return;
+            var ui = _layerLinkedList[command.Layer].Last();
             CloseUi(ui);
+        }
+
+        [EventSubscriber(typeof(CloseLayerBottomCommand)), Preserve]
+        private void OnCloseUiBottomLayer(CloseLayerBottomCommand command)
+        {
+            if (_layerLinkedList[command.Layer].Count <= 0) return;
+            var ui = _layerLinkedList[command.Layer].First();
+            CloseUi(ui);
+        }
+        
+        [EventSubscriber(typeof(CloseUiCommand)), Preserve]
+        private void OnCloseUi(CloseUiCommand command)
+        {
+            CloseUi(command.UiBase);
         }
 
         /// <summary>
@@ -41,8 +55,7 @@ namespace CnoomFrameWork.Modules.UiModule
         private void CloseUi(UiBase ui)
         {
             if (ui == null) return;
-            // 处理栈结构
-            RemoveInStack(ui);
+            RemoveUiInLinkedList(ui);
             Closing(ui);
         }
 
@@ -61,11 +74,10 @@ namespace CnoomFrameWork.Modules.UiModule
         ///     移除指定界面栈结构管理
         /// </summary>
         /// <param name="ui"></param>
-        private void RemoveInStack(UiBase ui)
+        private void RemoveUiInLinkedList(UiBase ui)
         {
-            var panelList = new List<UiBase>(_layerStack[ui.uiConfig.layer]);
-            panelList.Remove(ui);
-            _layerStack[ui.uiConfig.layer] = new Stack<UiBase>(panelList.Reverse<UiBase>());
+            LinkedList<UiBase> list = _layerLinkedList[ui.uiConfig.layer];
+            list.Remove(ui);
         }
 
         private IEnumerator CloseWithAnimation(UiBase ui)
@@ -93,13 +105,13 @@ namespace CnoomFrameWork.Modules.UiModule
             EventManager.Publish(new CloseUiEvent
             {
                 LayerType = ui.uiConfig.layer,
-                LayerCount = _layerStack[ui.uiConfig.layer].Count
+                LayerCount = _layerLinkedList[ui.uiConfig.layer].Count
             });
 
             // 恢复栈顶界面
-            if (_layerStack[layer].Count > 0)
+            if (_layerLinkedList[layer].Count > 0)
             {
-                var newTop = _layerStack[layer].Peek();
+                var newTop = _layerLinkedList[layer].Last();
                 SetPanelInteractable(newTop, true);
             }
         }
@@ -107,11 +119,9 @@ namespace CnoomFrameWork.Modules.UiModule
         private void SetPanelInteractable(UiBase ui, bool state)
         {
             var canvasGroup = ui.GetComponent<CanvasGroup>();
-            if (canvasGroup)
-            {
-                canvasGroup.interactable = state;
-                canvasGroup.blocksRaycasts = state;
-            }
+            if (!canvasGroup) return;
+            canvasGroup.interactable = state;
+            canvasGroup.blocksRaycasts = state;
         }
     }
 }

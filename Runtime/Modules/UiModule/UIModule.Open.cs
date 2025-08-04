@@ -21,7 +21,7 @@ namespace CnoomFrameWork.Modules.UiModule
             var layer = uiPrefab.uiConfig.layer;
             if (!uiPrefab.uiConfig.allowMultiple && HasUi(uiPrefab.uiConfig, out var ui))
             {
-                RemoveInStack(ui);
+                RemoveUiInLinkedList(ui);
             }
             else
             {
@@ -33,7 +33,7 @@ namespace CnoomFrameWork.Modules.UiModule
             }
 
             // 加入管理
-            _layerStack[layer].Push(ui);
+            _layerLinkedList[layer].AddLast(ui);
             RefreshUiDepths();
 
             // 调用生命周期
@@ -48,7 +48,7 @@ namespace CnoomFrameWork.Modules.UiModule
             SetPanelInteractable(ui, false);
 
             ui.OnEnter(param);
-            EventManager.Publish(new OpenUiEvent(ui, _layerStack[ui.uiConfig.layer].Count));
+            EventManager.Publish(new OpenUiEvent(ui, _layerLinkedList[ui.uiConfig.layer].Count));
             if (ui.uiAnimation && ui.uiAnimation.hasOpenAnimation) yield return ui.uiAnimation.PlayEnterAnimation();
 
             // 启用交互
