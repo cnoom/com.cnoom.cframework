@@ -48,13 +48,6 @@ namespace CnoomFrameWork.Modules.UiModule
             return ui;
         }
 
-        private void RemoveUi(UiBase ui)
-        {
-            ui.OnExit();
-            EventManager.Unregister(ui);
-            Object.Destroy(ui.gameObject);
-        }
-
         /// 刷新层级深度的方法
         private void RefreshUiDepths()
         {
@@ -80,27 +73,7 @@ namespace CnoomFrameWork.Modules.UiModule
             return false;
         }
 
-        /// <summary>
-        ///     关闭界面事件
-        /// </summary>
-        public struct CloseUiEvent
-        {
-            /// <summary>
-            ///     关闭的界面层级
-            /// </summary>
-            public string LayerType;
-
-            /// <summary>
-            ///     该层级剩余的界面数量
-            /// </summary>
-            public int LayerCount;
-
-            public CloseUiEvent(string layerType, int layerCount)
-            {
-                LayerType = layerType;
-                LayerCount = layerCount;
-            }
-        }
+        #region 命令
 
         /// <summary>
         ///     关闭某层最上方ui命令
@@ -109,10 +82,7 @@ namespace CnoomFrameWork.Modules.UiModule
         {
             public string Layer;
 
-            public CloseLayerTopCommand(string layer)
-            {
-                Layer = layer;
-            }
+            public CloseLayerTopCommand(string layer) => Layer = layer;
         }
 
         /// <summary>
@@ -122,16 +92,31 @@ namespace CnoomFrameWork.Modules.UiModule
         {
             public string Layer;
 
-            public CloseLayerBottomCommand(string layer)
-            {
-                Layer = layer;
-            }
+            public CloseLayerBottomCommand(string layer) => Layer = layer;
         }
 
+        /// <summary>
+        /// 关闭指定ui命令
+        /// </summary>
         public struct CloseUiCommand
         {
             public UiBase UiBase;
             public CloseUiCommand(UiBase uiBase) => UiBase = uiBase;
+        }
+
+        /// <summary>
+        /// 清理指定层所有ui命令
+        /// </summary>
+        public struct ClearLayerCommand
+        {
+            public string Layer;
+            public bool HasEvent;
+
+            public ClearLayerCommand(string layer, bool hasEvent = true)
+            {
+                Layer = layer;
+                HasEvent = hasEvent;
+            }
         }
 
         public struct OpenUiCommand
@@ -162,6 +147,31 @@ namespace CnoomFrameWork.Modules.UiModule
             }
         }
 
+        #endregion
+
+        /// <summary>
+        ///     关闭界面事件
+        /// </summary>
+        public struct CloseUiEvent
+        {
+            /// <summary>
+            ///     关闭的界面层级
+            /// </summary>
+            public string LayerType;
+
+            /// <summary>
+            ///     该层级剩余的界面数量
+            /// </summary>
+            public int LayerCount;
+
+            public CloseUiEvent(string layerType, int layerCount)
+            {
+                LayerType = layerType;
+                LayerCount = layerCount;
+            }
+        }
+
+
         public struct OpenUiEvent
         {
             /// <summary>
@@ -186,6 +196,8 @@ namespace CnoomFrameWork.Modules.UiModule
         /// </summary>
         public struct ClearUiCommand
         {
+            public bool HasEvent;
+            public ClearUiCommand(bool hasEvent = false) => HasEvent = hasEvent;
         }
     }
 }

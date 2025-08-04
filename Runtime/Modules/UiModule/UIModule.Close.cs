@@ -13,17 +13,9 @@ namespace CnoomFrameWork.Modules.UiModule
         [EventSubscriber(typeof(ClearUiCommand)), Preserve]
         private void OnClearUi(ClearUiCommand command)
         {
-            foreach (string stackKey in _layerLinkedList.Keys)
+            foreach (string layer in _layerLinkedList.Keys)
             {
-                foreach (UiBase uiBase in _layerLinkedList[stackKey])
-                {
-                    RemoveUi(uiBase);
-                }
-            }
-
-            foreach (var key in _layerLinkedList.Keys)
-            {
-                _layerLinkedList[key].Clear();
+                ClearLayer(layer, command.HasEvent);
             }
         }
 
@@ -42,24 +34,46 @@ namespace CnoomFrameWork.Modules.UiModule
             var ui = _layerLinkedList[command.Layer].First();
             CloseUi(ui);
         }
-        
+
         [EventSubscriber(typeof(CloseUiCommand)), Preserve]
         private void OnCloseUi(CloseUiCommand command)
         {
             CloseUi(command.UiBase);
         }
 
+        [EventSubscriber(typeof(ClearLayerCommand)), Preserve]
+        private void OnClearLayer(ClearLayerCommand command)
+        {
+            ClearLayer(command.Layer, command.HasEvent);
+        }
+
+        private void ClearLayer(string layer, bool hasEvent = true)
+        {
+            if (_layerLinkedList[layer].Count <= 0) return;
+            foreach (var ui in _layerLinkedList[layer])
+            {
+                CloseUi(ui, hasEvent);
+            }
+        }
+
         /// <summary>
         ///     关闭指定实例的界面
         /// </summary>
-        private void CloseUi(UiBase ui)
+        private void CloseUi(UiBase ui, bool hasEvent = true)
         {
             if (ui == null) return;
             RemoveUiInLinkedList(ui);
-            Closing(ui);
+            Closing(ui, hasEvent);
+        }
+        
+        private void RemoveUi(UiBase ui)
+        {
+            ui.OnExit();
+            EventManager.Unregister(ui);
+            Object.Destroy(ui.gameObject);
         }
 
-        private void Closing(UiBase ui)
+        private void Closing(UiBase ui, bool hasEvent = true)
         {
             if (ui.uiAnimation && ui.uiAnimation.hasCloseAnimation)
             {
@@ -67,7 +81,7 @@ namespace CnoomFrameWork.Modules.UiModule
                 return;
             }
 
-            FinalizeClose(ui);
+            FinalizeClose(ui, hasEvent);
         }
 
         /// <summary>
@@ -80,7 +94,7 @@ namespace CnoomFrameWork.Modules.UiModule
             list.Remove(ui);
         }
 
-        private IEnumerator CloseWithAnimation(UiBase ui)
+        private IEnumerator CloseWithAnimation(UiBase ui, bool hasEvent = true)
         {
             // 禁用交互
             SetPanelInteractable(ui, false);
@@ -89,10 +103,10 @@ namespace CnoomFrameWork.Modules.UiModule
             yield return ui.uiAnimation.PlayExitAnimation();
 
             // 确保没有被立即关闭
-            FinalizeClose(ui);
+            FinalizeClose(ui, hasEvent);
         }
 
-        private void FinalizeClose(UiBase ui)
+        private void FinalizeClose(UiBase ui, bool hasEvent = true)
         {
             var layer = ui.uiConfig.layer;
 
@@ -102,11 +116,15 @@ namespace CnoomFrameWork.Modules.UiModule
             RefreshUiDepths();
 
             // 触发关闭ui事件
-            EventManager.Publish(new CloseUiEvent
+            if (hasEvent)
             {
-                LayerType = ui.uiConfig.layer,
-                LayerCount = _layerLinkedList[ui.uiConfig.layer].Count
-            });
+                EventManager.Publish(new CloseUiEvent
+                {
+                    LayerType = ui.uiConfig.layer,
+                    LayerCount = _layerLinkedList[ui.uiConfig.layer].Count
+                });
+            }
+
 
             // 恢复栈顶界面
             if (_layerLinkedList[layer].Count > 0)

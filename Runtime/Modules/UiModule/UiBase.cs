@@ -32,11 +32,6 @@ namespace CnoomFrameWork.Modules.UiModule.UiPart
             OnGenerate();
         }
 
-        public void CloseLayerTop(string layerName = null)
-        {
-            if (string.IsNullOrEmpty(layerName)) layerName = uiConfig.layer;
-            EventManager.Publish(new UIModule.CloseLayerTopCommand(layerName));
-        }
 
         public virtual void OnGenerate()
         {
