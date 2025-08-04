@@ -55,7 +55,7 @@ namespace CnoomFrameWork.Modules.UiModule
             {
                 var layerTransform = _canvasTransform.Find(layer);
                 layerTransform.DetachChildren();
-                foreach (var basePanel in _layerLinkedList[layer].Reverse())
+                foreach (var basePanel in _layerLinkedList[layer])
                     basePanel.transform.SetParent(layerTransform);
             }
         }
