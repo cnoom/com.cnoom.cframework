@@ -102,9 +102,6 @@ namespace CnoomFrameWork.Services.AudioService
             InitializeAddressableSupport();
             LoadVolumeSettings();
             
-            // 注册事件监听器
-            EventManager.Register(this);
-            
             if (_config.PauseOnApplicationPause)
             {
                 _audioHolder.SetApplicationPauseCallback(OnApplicationPause);
