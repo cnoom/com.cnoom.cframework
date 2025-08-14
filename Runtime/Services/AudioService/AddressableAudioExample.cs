@@ -1,4 +1,5 @@
 using CnoomFrameWork.Base.Events;
+using CnoomFrameWork.Core;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
