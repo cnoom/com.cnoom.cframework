@@ -1,5 +1,6 @@
 ﻿using CnoomFrameWork.Base.Container;
 using CnoomFrameWork.Modules.AddressableModule;
+using CnoomFrameWork.Services.AudioService;
 using CnoomFrameWork.Services.StorageService;
 
 namespace CnoomFrameWork.Core
@@ -10,6 +11,7 @@ namespace CnoomFrameWork.Core
         {
             Register<IStorageService, StorageService>(990);
             Register<AssetsService>(950);
+            Register<AudioService>();
         }
     }
 }
