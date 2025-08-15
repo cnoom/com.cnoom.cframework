@@ -50,7 +50,8 @@ namespace CnoomFrameWork.Modules.UiModule
         private void ClearLayer(string layer, bool hasEvent = true)
         {
             if (_layerLinkedList[layer].Count <= 0) return;
-            foreach (var ui in _layerLinkedList[layer])
+            var list = _layerLinkedList[layer].ToList();
+            foreach (var ui in list)
             {
                 CloseUi(ui, hasEvent);
             }
